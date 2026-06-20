@@ -7,17 +7,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
-@font-face { font-family: 'SF Pro'; font-weight: 100; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Thin.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 200; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Ultralight.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 300; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Light.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 400; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Regular.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 500; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Medium.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 600; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Semibold.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 700; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Bold.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 800; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Heavy.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 900; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Black.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 400; font-style: italic; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-RegularItalic.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 600; font-style: italic; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-SemiboldItalic.otf'); }
+/* SF Pro Text — optimizado para texto pequeño (body, labels, inputs) */
+@font-face { font-family: 'SF Pro'; font-weight: 300; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Light.otf'); }
+@font-face { font-family: 'SF Pro'; font-weight: 400; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Regular.otf'); }
+@font-face { font-family: 'SF Pro'; font-weight: 500; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Medium.otf'); }
+@font-face { font-family: 'SF Pro'; font-weight: 600; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Semibold.otf'); }
+@font-face { font-family: 'SF Pro'; font-weight: 700; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Bold.otf'); }
+@font-face { font-family: 'SF Pro'; font-weight: 900; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Black.otf'); }
+/* SF Pro Display — optimizado para texto grande (hero, valores, titulos) */
+@font-face { font-family: 'SF Pro Display'; font-weight: 300; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Light.otf'); }
+@font-face { font-family: 'SF Pro Display'; font-weight: 400; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Regular.otf'); }
+@font-face { font-family: 'SF Pro Display'; font-weight: 500; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Medium.otf'); }
+@font-face { font-family: 'SF Pro Display'; font-weight: 600; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Semibold.otf'); }
+@font-face { font-family: 'SF Pro Display'; font-weight: 700; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Bold.otf'); }
+@font-face { font-family: 'SF Pro Display'; font-weight: 900; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Black.otf'); }
+/* SF Mono */
 @font-face { font-family: 'SF Mono'; font-weight: 300; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Mono-Light.otf'); }
 @font-face { font-family: 'SF Mono'; font-weight: 400; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Mono-Regular.otf'); }
 @font-face { font-family: 'SF Mono'; font-weight: 500; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Mono-Medium.otf'); }
