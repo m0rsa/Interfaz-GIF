@@ -460,7 +460,10 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
         <button class="btn primary" onclick="agregarMovimiento('in')">+ Agregar ingreso</button>
       </div>
       <div class="section-title">Historial</div>
-      <div class="filter-bar" id="filtro-bar-ingresos"></div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <div class="filter-bar" id="filtro-bar-ingresos" style="margin:0;flex:none"></div>
+        <input id="search-ingresos" type="text" placeholder="Buscar concepto..." oninput="renderIngresos()" style="width:auto;min-width:160px;flex:1;max-width:260px">
+      </div>
       <div class="table-wrap" id="lista-ingresos"><div class="empty">Sin ingresos registrados.</div></div>
     </div>
 
@@ -486,9 +489,10 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
           <div id="panel-sumar">
             <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Registrá un gasto con tarjeta. Suma a la deuda sin descontar de ninguna cuenta todavía.</div>
             <div class="cur-toggle"><button class="active" id="tc-cur-usd" onclick="setCurTC('usd')">U$D</button><button id="tc-cur-ars" onclick="setCurTC('ars')">$ Pesos</button></div>
-            <div class="grid-form-3">
+            <div class="grid-form-4">
               <div><label>Concepto</label><input type="text" id="tc-concepto" placeholder="Supermercado, Netflix..."></div>
               <div><label id="tc-monto-lbl">Monto (USD)</label><input type="number" id="tc-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tc')"><div class="hint" id="tc-hint"></div></div>
+              <div><label>Cuotas</label><input type="number" id="tc-cuotas" value="1" min="1" max="48" step="1"></div>
               <div><label>Fecha</label><input type="date" id="tc-fecha"></div>
             </div>
             <div style="margin-bottom:12px"><label>Nota</label><input type="text" id="tc-nota" placeholder=""></div>
@@ -508,6 +512,9 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
         </div>
       </div>
 
+      <div class="section-title">Historial tarjeta</div>
+      <div id="tc-historial-egresos"></div>
+
       <div class="section-title">Egreso en efectivo</div>
       <div class="card">
         <div class="cur-toggle">
@@ -524,8 +531,11 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
         <div style="margin-bottom:12px"><label>Nota (opcional)</label><input type="text" id="eg-nota" placeholder="Comentario..."></div>
         <button class="btn primary" onclick="agregarMovimiento('eg')">+ Agregar egreso</button>
       </div>
-      <div class="section-title">Historial</div>
-      <div class="filter-bar" id="filtro-bar-egresos"></div>
+      <div class="section-title">Historial efectivo</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <div class="filter-bar" id="filtro-bar-egresos" style="margin:0;flex:none"></div>
+        <input id="search-egresos" type="text" placeholder="Buscar concepto..." oninput="renderEgresos()" style="width:auto;min-width:160px;flex:1;max-width:260px">
+      </div>
       <div class="table-wrap" id="lista-egresos"><div class="empty">Sin egresos.</div></div>
     </div>
 
@@ -787,7 +797,28 @@ function openTarjeta(tab){ document.getElementById('tarjeta-body').classList.add
 function switchTab(tab){ document.getElementById('tab-sumar').classList.toggle('active',tab==='sumar'); document.getElementById('tab-pagar').classList.toggle('active',tab==='pagar'); document.getElementById('panel-sumar').style.display=tab==='sumar'?'block':'none'; document.getElementById('panel-pagar').style.display=tab==='pagar'?'block':'none'; if(tab==='pagar')renderCuentas('tp'); }
 function updateDeudaChip(){ const c=document.getElementById('deuda-chip-header'); if(c)c.textContent='Deuda: '+fmtARS(data.deudaTC*USD_ARS)+' ('+fmtUSD(data.deudaTC)+')'; }
 
-function agregarGastoTC(){ const concepto=document.getElementById('tc-concepto').value.trim()||'Gasto tarjeta'; const raw=parseFloat(document.getElementById('tc-monto').value); const fecha=document.getElementById('tc-fecha').value||today(); const nota=document.getElementById('tc-nota').value; if(isNaN(raw)||raw<=0){alert('Ingresá un monto válido.');return;} const usd=curMode.tc==='ars'?raw/USD_ARS:raw; data.deudaTC+=usd; data.movTC.push({id:Date.now(),tipo:'gasto',concepto,usd,rawMonto:raw,rawCur:curMode.tc,fecha,nota}); document.getElementById('tc-concepto').value=''; document.getElementById('tc-monto').value=''; document.getElementById('tc-hint').textContent=''; saveData(); updateDeudaChip(); renderAll(); }
+function agregarGastoTC(){
+  const concepto=document.getElementById('tc-concepto').value.trim()||'Gasto tarjeta';
+  const raw=parseFloat(document.getElementById('tc-monto').value);
+  const cuotas=Math.max(1,parseInt(document.getElementById('tc-cuotas').value)||1);
+  const fecha=document.getElementById('tc-fecha').value||today();
+  const nota=document.getElementById('tc-nota').value;
+  if(isNaN(raw)||raw<=0){alert('Ingresá un monto válido.');return;}
+  const usdTotal=curMode.tc==='ars'?raw/USD_ARS:raw;
+  const usdCuota=usdTotal/cuotas, rawCuota=raw/cuotas;
+  for(let i=0;i<cuotas;i++){
+    const d=new Date(fecha+'T12:00:00'); d.setMonth(d.getMonth()+i);
+    const fechaCuota=d.toISOString().split('T')[0];
+    const label=cuotas>1?`${concepto} (${i+1}/${cuotas})`:concepto;
+    data.deudaTC+=usdCuota;
+    data.movTC.push({id:Date.now()+i,tipo:'gasto',concepto:label,usd:usdCuota,rawMonto:rawCuota,rawCur:curMode.tc,fecha:fechaCuota,nota});
+  }
+  document.getElementById('tc-concepto').value='';
+  document.getElementById('tc-monto').value='';
+  document.getElementById('tc-cuotas').value='1';
+  document.getElementById('tc-hint').textContent='';
+  saveData(); updateDeudaChip(); renderAll();
+}
 function pagarTC(){ const raw=parseFloat(document.getElementById('tp-monto').value); const fecha=document.getElementById('tp-fecha').value||today(); const nota=document.getElementById('tp-nota').value||'Pago tarjeta'; const cuenta=selCuenta.tp; if(isNaN(raw)||raw<=0){alert('Ingresá un monto válido.');return;} const usd=curMode.tp==='ars'?raw/USD_ARS:raw; if(usd>data.deudaTC+0.001){alert('El monto supera la deuda actual.');return;} data.deudaTC=Math.max(0,data.deudaTC-usd); data.movTC.push({id:Date.now(),tipo:'pago',concepto:'Pago tarjeta',usd,rawMonto:raw,rawCur:curMode.tp,fecha,nota,cuenta}); document.getElementById('tp-monto').value=''; document.getElementById('tp-hint').textContent=''; saveData(); updateDeudaChip(); renderAll(); renderCuentas('tp'); }
 
 /* ── SIDEBAR TOGGLE ── */
@@ -971,10 +1002,7 @@ function renderPatrimonio(){
   document.getElementById('legend-evo').innerHTML=entries.map(([k],i)=>`<span><b style="background:${colors[i]}"></b>${k}</span>`).join('');
   if(chartEvo)chartEvo.destroy();
   chartEvo=new Chart(document.getElementById('chartEvo').getContext('2d'),{type:'bar',data:{labels:entries.map(([k])=>k),datasets:[{data:entries.map(([,v])=>v.usd*USD_ARS),backgroundColor:colors,borderRadius:8,borderSkipped:false,borderWidth:0,hoverBackgroundColor:colors.map(c=>c+'cc')}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:scalesARS()}});
-  const movs=data.movTC.filter(m=>m.tipo!=='deuda_inicial').sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  document.getElementById('deudas-detalle').innerHTML=`<div style="font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:22px;font-weight:500;color:var(--red);margin-bottom:6px">${fmtARS(data.deudaTC*USD_ARS)}</div><div style="font-size:11px;color:var(--text3);margin-bottom:16px">${fmtUSD(data.deudaTC)} pendiente</div>`+
-    (movs.length?`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Cuenta</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
-    movs.map(m=>`<tr><td style="color:var(--text3)">${fmtDate(m.fecha)}</td><td>${m.concepto}</td><td><span class="badge ${m.tipo==='pago'?'pago':'tarjeta'}">${m.tipo==='pago'?'Pago':'Gasto'}</span></td><td>${m.cuenta?`<span class="acct-pill" style="background:${COLORS[m.cuenta]||'#888'}22;color:${COLORS[m.cuenta]||'#888'}">${m.cuenta}</span>`:'-'}</td><td style="text-align:right"><div class="td-main" style="color:${m.tipo==='pago'?'var(--green)':'var(--red)'}">${m.tipo==='pago'?'-':'+'}${fmtARS(m.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(m.usd)}</div></td><td><button class="action-btn" onclick="eliminarTC(${m.id})" title="Eliminar">🗑</button></td></tr>`).join('')+'</tbody></table>':'<div class="empty">Sin movimientos de tarjeta.</div>');
+  renderTCHistorial(document.getElementById('deudas-detalle'));
 }
 
 /* ── AGREGAR MOVIMIENTOS ── */
@@ -1053,11 +1081,27 @@ function buildRows(items,tipo,cellsFn){
 }
 
 /* ── RENDER TABLES ── */
+function renderTCHistorial(el){
+  if(!el)return;
+  const movs=data.movTC.filter(m=>m.tipo!=='deuda_inicial').sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  el.innerHTML=`<div style="font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:22px;font-weight:500;color:var(--red);margin-bottom:6px">${fmtARS(data.deudaTC*USD_ARS)}</div><div style="font-size:11px;color:var(--text3);margin-bottom:16px">${fmtUSD(data.deudaTC)} pendiente</div>`+
+    (movs.length?`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Cuenta</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
+    movs.map(m=>{
+      const acct=m.cuenta?`<span class="acct-pill" style="background:${COLORS[m.cuenta]||'#888'}22;color:${COLORS[m.cuenta]||'#888'}">${m.cuenta}</span>`:'-';
+      const editBtn=m.tipo==='gasto'
+        ?`<button class="action-btn" onclick="toggleEditTC(${m.id})" title="Editar">✏️</button><button class="action-btn" onclick="eliminarTC(${m.id})" title="Eliminar">🗑</button><div class="edit-date-row" id="edr-tc-${m.id}"><input type="text" id="edr-tc-concepto-${m.id}" value="${(m.concepto||'').replace(/"/g,'&quot;')}" placeholder="Concepto" style="flex:2;min-width:120px"><input type="number" id="edr-tc-monto-${m.id}" value="${m.usd.toFixed(2)}" step="0.01" placeholder="USD" style="flex:1;min-width:70px"><input type="date" id="edr-tc-fecha-${m.id}" value="${m.fecha}" style="flex:1;min-width:120px"><button class="btn sm primary" onclick="saveEditTC(${m.id})">✓</button></div>`
+        :`<button class="action-btn" onclick="eliminarTC(${m.id})" title="Eliminar">🗑</button>`;
+      return`<tr><td style="color:var(--text3)">${fmtDate(m.fecha)}</td><td>${m.concepto}</td><td><span class="badge ${m.tipo==='pago'?'pago':'tarjeta'}">${m.tipo==='pago'?'Pago':'Gasto'}</span></td><td>${acct}</td><td style="text-align:right"><div class="td-main" style="color:${m.tipo==='pago'?'var(--green)':'var(--red)'}">${m.tipo==='pago'?'-':'+'}${fmtARS(m.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(m.usd)}</div></td><td>${editBtn}</td></tr>`;
+    }).join('')+'</tbody></table>':'<div class="empty">Sin movimientos de tarjeta.</div>');
+}
+
 function renderIngresos(){
   const meses=getMesesDe(data.ingresos);
   document.getElementById('filtro-bar-ingresos').innerHTML=buildFiltroSelect('ingresos',meses);
   const mes=mesFiltros.ingresos;
-  const items=mes?data.ingresos.filter(i=>i.fecha.startsWith(mes)):data.ingresos;
+  const busq=(document.getElementById('search-ingresos')?.value||'').toLowerCase().trim();
+  let items=mes?data.ingresos.filter(i=>i.fecha.startsWith(mes)):data.ingresos;
+  if(busq)items=items.filter(i=>(i.concepto||'').toLowerCase().includes(busq));
   const el=document.getElementById('lista-ingresos');
   if(!items.length){el.innerHTML='<div class="empty">Sin ingresos registrados.</div>';return;}
   el.innerHTML=`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Cuenta destino</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
@@ -1065,28 +1109,17 @@ function renderIngresos(){
 }
 
 function renderEgresos(){
+  renderTCHistorial(document.getElementById('tc-historial-egresos'));
   const meses=getMesesDe(data.egresos);
   document.getElementById('filtro-bar-egresos').innerHTML=buildFiltroSelect('egresos',meses);
   const mes=mesFiltros.egresos;
-  const egFiltered=mes?data.egresos.filter(e=>e.fecha.startsWith(mes)):data.egresos;
-  const tcFiltered=mes?data.movTC.filter(m=>m.tipo!=='deuda_inicial'&&m.fecha.startsWith(mes)):data.movTC.filter(m=>m.tipo!=='deuda_inicial');
-  const todos=[...egFiltered.map(x=>({...x,_sub:'egreso'})),...tcFiltered.map(x=>({...x,_sub:x.tipo}))].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const busq=(document.getElementById('search-egresos')?.value||'').toLowerCase().trim();
+  let egFiltered=mes?data.egresos.filter(e=>e.fecha.startsWith(mes)):data.egresos;
+  if(busq)egFiltered=egFiltered.filter(e=>(e.concepto||'').toLowerCase().includes(busq));
   const el=document.getElementById('lista-egresos');
-  if(!todos.length){el.innerHTML='<div class="empty">Sin egresos.</div>';return;}
-  el.innerHTML=`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Cuenta</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
-    todos.map(i=>{
-      let badge='',color='',signo='';
-      if(i._sub==='egreso'){badge='<span class="badge egreso">Efectivo</span>';color='var(--red)';signo='-';}
-      else if(i._sub==='gasto'){badge='<span class="badge tarjeta">Gasto TC</span>';color='#ff9478';signo='+';}
-      else{badge='<span class="badge pago">Pago TC</span>';color='var(--green)';signo='-';}
-      const acct=i.cuenta?`<span class="acct-pill" style="background:${COLORS[i.cuenta]||'#888'}22;color:${COLORS[i.cuenta]||'#888'}">${i.cuenta}</span>`:'-';
-      const editBtn=i._sub==='egreso'
-        ?`<button class="action-btn" onclick="toggleEditDate('egresos',${i.id})" title="Editar fecha">📅</button><button class="action-btn" onclick="eliminar('egresos',${i.id})" title="Eliminar">🗑</button><div class="edit-date-row" id="edr-egresos-${i.id}"><label>Nueva fecha</label><input type="date" id="edr-inp-egresos-${i.id}" value="${i.fecha}"><button class="btn sm primary" onclick="saveDate('egresos',${i.id})">✓ Guardar</button></div>`
-        :i._sub==='gasto'
-          ?`<button class="action-btn" onclick="toggleEditTC(${i.id})" title="Editar">✏️</button><button class="action-btn" onclick="eliminarTC(${i.id})" title="Eliminar">🗑</button><div class="edit-date-row" id="edr-tc-${i.id}"><input type="text" id="edr-tc-concepto-${i.id}" value="${(i.concepto||'').replace(/"/g,'&quot;')}" placeholder="Concepto" style="flex:2;min-width:120px"><input type="number" id="edr-tc-monto-${i.id}" value="${i.usd.toFixed(2)}" step="0.01" placeholder="USD" style="flex:1;min-width:70px"><input type="date" id="edr-tc-fecha-${i.id}" value="${i.fecha}" style="flex:1;min-width:120px"><button class="btn sm primary" onclick="saveEditTC(${i.id})">✓</button></div>`
-          :`<button class="action-btn" onclick="eliminarTC(${i.id})" title="Eliminar">🗑</button>`;
-      return`<tr><td style="color:var(--text3)">${fmtDate(i.fecha)}</td><td>${i.concepto||'—'}</td><td>${badge}</td><td>${acct}</td><td style="text-align:right"><div class="td-main" style="color:${color}">${signo}${fmtARS(i.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(i.usd)}</div></td><td>${editBtn}</td></tr>`;
-    }).join('')+`</tbody></table>`;
+  if(!egFiltered.length){el.innerHTML='<div class="empty">Sin egresos en efectivo.</div>';return;}
+  el.innerHTML=`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Cuenta</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
+    buildRows([...egFiltered],'egresos',i=>`<td>${i.concepto||'—'}</td><td><span class="badge egreso">${i.cat||'Otros'}</span></td><td>${i.cuenta?`<span class="acct-pill" style="background:${COLORS[i.cuenta]||'#888'}22;color:${COLORS[i.cuenta]||'#888'}">${i.cuenta}</span>`:'-'}</td><td style="text-align:right"><div class="td-main" style="color:var(--red)">-${fmtARS(i.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(i.usd)}${i.rawCur==='ars'?' · en $':''}</div></td>`)+`</tbody></table>`;
 }
 
 function renderAhorros(){
