@@ -530,8 +530,8 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
       <div class="section-title">Registrar movimiento</div>
       <div class="card">
         <div class="grid-form-3">
-          <div><label>Instrumento</label><select id="ah-tipo"><option>U$D Físicos</option><option>USD Galicia</option><option>Pesos MP</option><option>Pesos Galicia/BBVA</option><option>Pesos Efectivo</option><option>Criptomonedas (USDT)</option><option>Plazo fijo</option><option>Acciones / ETF</option><option>Fondo común</option><option>Inmueble</option><option>Otro</option></select></div>
-          <div><label>Monto (USD)</label><input type="number" id="ah-monto" placeholder="0" step="0.01"></div>
+          <div><label>Instrumento</label><select id="ah-tipo" onchange="updateAhTipo()"><option>U$D Físicos</option><option>USD Galicia</option><option>Pesos MP</option><option>Pesos Galicia/BBVA</option><option>Pesos Efectivo</option><option>Criptomonedas (USDT)</option><option>Plazo fijo</option><option>Acciones / ETF</option><option>Fondo común</option><option>Inmueble</option><option>Otro</option></select></div>
+          <div><label id="ah-monto-lbl">Monto (USD)</label><input type="number" id="ah-monto" placeholder="0" step="0.01"></div>
           <div><label>Tipo</label><select id="ah-mov"><option value="deposito">Depósito</option><option value="retiro">Retiro</option></select></div>
         </div>
         <div class="grid-form-2">
@@ -596,6 +596,7 @@ const INSTRUMENTOS=['U$D Físicos','USD Galicia','Pesos MP','Pesos Galicia/BBVA'
 const COLORS={'U$D Físicos':'#00D4A1','USD Galicia':'#4A9EFF','Pesos MP':'#F5A623','Pesos Galicia/BBVA':'#8B93A8','Pesos Efectivo':'#FF6B47','Criptomonedas (USDT)':'#8B7CF6','Plazo fijo':'#38BDF8','Acciones / ETF':'#F472B6','Fondo común':'#86EFAC','Inmueble':'#FCD34D','Otro':'#94A3B8'};
 const ICONS={'U$D Físicos':'💵','USD Galicia':'🏦','Pesos MP':'📱','Pesos Galicia/BBVA':'🏦','Pesos Efectivo':'💴','Criptomonedas (USDT)':'₿','Plazo fijo':'📈','Acciones / ETF':'📊','Fondo común':'🥧','Inmueble':'🏠','Otro':'💼'};
 const CAT_COLORS={'Alimentación':'#00D4A1','Entretenimiento':'#8B7CF6','Transporte':'#4A9EFF','Salud':'#FF6B47','Vivienda':'#F5A623','Servicios':'#38BDF8','Otros':'#8B93A8'};
+const ARS_INSTR=new Set(['Pesos MP','Pesos Galicia/BBVA','Pesos Efectivo']);
 
 /* ── SUPABASE ── */
 const SUPA_URL='https://axwxdiweiqxuqrbqmuwo.supabase.co';
@@ -707,11 +708,37 @@ function fmtUSD(n){ return'U$D '+Number(n).toLocaleString('es-AR',{minimumFracti
 /* ── BALANCES ── */
 function getSaldos(){
   const s={};
-  data.ahorros.forEach(a=>{ if(!s[a.tipo])s[a.tipo]={usd:0}; s[a.tipo].usd+=(a.mov==='retiro'?-1:1)*(a.usd||0); });
-  data.ingresos.forEach(i=>{ if(i.cuenta){ if(!s[i.cuenta])s[i.cuenta]={usd:0}; s[i.cuenta].usd+=i.usd; } });
-  data.egresos.forEach(i=>{ if(i.cuenta){ if(!s[i.cuenta])s[i.cuenta]={usd:0}; s[i.cuenta].usd-=i.usd; } });
-  data.movTC.filter(m=>m.tipo==='pago').forEach(m=>{ if(m.cuenta){ if(!s[m.cuenta])s[m.cuenta]={usd:0}; s[m.cuenta].usd-=m.usd; } });
-  (data.transferencias||[]).forEach(t=>{ if(!s[t.desde])s[t.desde]={usd:0}; if(!s[t.hacia])s[t.hacia]={usd:0}; s[t.desde].usd-=t.usd; s[t.hacia].usd+=t.usd; });
+  const init=k=>{ if(!s[k])s[k]={usd:0,ars:0}; };
+  const applyMov=(k,usd,rawMonto,rawCur,sign)=>{
+    init(k);
+    if(ARS_INSTR.has(k)){
+      const nARS=(rawCur==='ars'?(rawMonto||0):usd*USD_ARS)*sign;
+      s[k].ars+=nARS; s[k].usd+=nARS/USD_ARS;
+    } else {
+      s[k].usd+=usd*sign; s[k].ars+=usd*USD_ARS*sign;
+    }
+  };
+  data.ahorros.forEach(a=>{
+    const sign=a.mov==='retiro'?-1:1;
+    if(ARS_INSTR.has(a.tipo)){
+      const nARS=(a.ars||0)*sign;
+      init(a.tipo); s[a.tipo].ars+=nARS; s[a.tipo].usd+=nARS/USD_ARS;
+    } else {
+      const nUSD=(a.usd||0)*sign;
+      init(a.tipo); s[a.tipo].usd+=nUSD; s[a.tipo].ars+=nUSD*USD_ARS;
+    }
+  });
+  data.ingresos.forEach(i=>{ if(i.cuenta) applyMov(i.cuenta,i.usd,i.rawMonto,i.rawCur,1); });
+  data.egresos.forEach(i=>{ if(i.cuenta) applyMov(i.cuenta,i.usd,i.rawMonto,i.rawCur,-1); });
+  data.movTC.filter(m=>m.tipo==='pago').forEach(m=>{ if(m.cuenta) applyMov(m.cuenta,m.usd,m.rawMonto,m.rawCur,-1); });
+  (data.transferencias||[]).forEach(t=>{
+    init(t.desde); init(t.hacia);
+    const applyTr=(k,sign)=>{
+      if(ARS_INSTR.has(k)){ const nARS=(t.rawCur==='ars'?(t.rawMonto||0):t.usd*USD_ARS)*sign; s[k].ars+=nARS; s[k].usd+=nARS/USD_ARS; }
+      else { s[k].usd+=t.usd*sign; s[k].ars+=t.usd*USD_ARS*sign; }
+    };
+    applyTr(t.desde,-1); applyTr(t.hacia,1);
+  });
   return s;
 }
 function getTotActivosUSD(){ return Object.values(getSaldos()).reduce((s,x)=>s+Math.max(0,x.usd),0); }
@@ -731,6 +758,7 @@ function setCurTC(cur){ setCur('tc',cur); }
 function setCurTP(cur){ setCur('tp',cur); }
 function setCurTR(cur){ setCur('tr',cur); }
 function setCurSueldo(cur){ curMode.sueldo=cur; renderMQV(); renderHero(); }
+function updateAhTipo(){ const isARS=ARS_INSTR.has(document.getElementById('ah-tipo').value); document.getElementById('ah-monto-lbl').textContent=isARS?'Monto ($)':'Monto (USD)'; }
 
 function updateHint(form){
   if(curMode[form]!=='ars') return;
@@ -741,11 +769,10 @@ function updateHint(form){
 /* ── CUENTA SELECTOR ── */
 function renderCuentas(form){
   const saldos=getSaldos();
-  const cur=(form==='tp')?curMode.tp:(form==='trde'||form==='trha')?curMode.tr:curMode[form];
   const container=document.getElementById(form+'-cuentas'); if(!container)return;
   container.innerHTML=INSTRUMENTOS.map(inst=>{
-    const saldo=saldos[inst]?saldos[inst].usd:0, color=COLORS[inst]||'#888', isSel=selCuenta[form]===inst;
-    const saldoTxt=cur==='ars'?fmtARS(saldo*USD_ARS):fmtUSD(saldo);
+    const v=saldos[inst]||{usd:0,ars:0}, color=COLORS[inst]||'#888', isSel=selCuenta[form]===inst;
+    const saldoTxt=ARS_INSTR.has(inst)?fmtARS(v.ars):fmtUSD(v.usd);
     return`<button class="cs-opt${isSel?' sel':''}" style="${isSel?'background:'+color+';border-color:'+color+';':''}" onclick="selectCuenta('${form}','${inst.replace(/'/g,"\\'")}')"><span>${inst}</span><span class="saldo">${saldoTxt}</span></button>`;
   }).join('');
 }
@@ -930,7 +957,11 @@ function renderPatrimonio(){
   const total=entries.reduce((s,[,v])=>s+v.usd,0);
   document.getElementById('patrimonio-grid').innerHTML=entries.map(([tipo,v])=>{
     const pct=total>0?Math.round(v.usd/total*100):0, c=COLORS[tipo]||'#888', ic=ICONS[tipo]||'💼';
-    return`<div class="pat-card" style="border-left:3px solid ${c}"><div class="pc-icon">${ic}</div><div class="pc-name">${tipo}</div><div class="pc-amount" style="color:${v.usd<0?'var(--red)':'var(--text)'}">${fmtARS(v.usd*USD_ARS)}</div><div class="pc-sub">${fmtUSD(v.usd)}</div><div class="pc-pct">${pct}% del total</div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${c}"></div></div></div>`;
+    const isARS=ARS_INSTR.has(tipo);
+    const primary=isARS?fmtARS(v.ars):fmtUSD(v.usd);
+    const secondary=isARS?fmtUSD(v.usd):fmtARS(v.ars);
+    const neg=isARS?v.ars<0:v.usd<0;
+    return`<div class="pat-card" style="border-left:3px solid ${c}"><div class="pc-icon">${ic}</div><div class="pc-name">${tipo}</div><div class="pc-amount" style="color:${neg?'var(--red)':'var(--text)'}">${primary}</div><div class="pc-sub">${secondary}</div><div class="pc-pct">${pct}% del total</div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${c}"></div></div></div>`;
   }).join('');
   const colors=entries.map(([k])=>COLORS[k]||'#888');
   document.getElementById('legend-evo').innerHTML=entries.map(([k],i)=>`<span><b style="background:${colors[i]}"></b>${k}</span>`).join('');
@@ -963,7 +994,9 @@ function agregarMovimiento(form){
 function agregarAhorro(){
   const tipo=document.getElementById('ah-tipo').value, monto=parseFloat(document.getElementById('ah-monto').value), mov=document.getElementById('ah-mov').value, fecha=document.getElementById('ah-fecha').value||today(), nota=document.getElementById('ah-nota').value;
   if(isNaN(monto)||monto<=0){alert('Ingresá un monto válido.');return;}
-  data.ahorros.push({id:Date.now(),tipo,usd:monto,ars:monto*USD_ARS,mov,fecha,nota});
+  const isARS=ARS_INSTR.has(tipo);
+  const usd=isARS?monto/USD_ARS:monto, ars=isARS?monto:monto*USD_ARS;
+  data.ahorros.push({id:Date.now(),tipo,usd,ars,mov,fecha,nota});
   document.getElementById('ah-monto').value=''; document.getElementById('ah-nota').value='';
   saveData(); renderAll();
 }
@@ -982,7 +1015,7 @@ function agregarTransferencia(){
 }
 
 /* ── ELIMINAR ── */
-function eliminar(tipo,id){ data[tipo]=data[tipo].filter(x=>x.id!==id); saveData(); renderAll(); renderCuentas(tipo==='ingresos'?'in':'eg'); }
+function eliminar(tipo,id){ data[tipo]=data[tipo].filter(x=>x.id!==id); saveData(); renderAll(); if(tipo==='ingresos')renderCuentas('in'); else if(tipo==='egresos')renderCuentas('eg'); }
 function eliminarTC(id){ const m=data.movTC.find(x=>x.id===id); if(!m)return; if(m.tipo==='gasto')data.deudaTC=Math.max(0,data.deudaTC-m.usd); else if(m.tipo==='pago')data.deudaTC+=m.usd; data.movTC=data.movTC.filter(x=>x.id!==id); saveData(); updateDeudaChip(); renderAll(); const sp=document.getElementById('sec-patrimonio'); if(sp&&sp.classList.contains('active'))renderPatrimonio(); }
 function toggleEditTC(id){ const r=document.getElementById('edr-tc-'+id); if(!r)return; const o=r.classList.contains('open'); document.querySelectorAll('.edit-date-row.open').forEach(x=>x.classList.remove('open')); if(!o)r.classList.add('open'); }
 function saveEditTC(id){
@@ -996,7 +1029,6 @@ function saveEditTC(id){
   saveData(); updateDeudaChip(); renderAll();
 }
 function eliminarTransferencia(id){ data.transferencias=data.transferencias.filter(t=>t.id!==id); saveData(); renderAll(); renderCuentas('trde'); renderCuentas('trha'); }
-function eliminarAhorro(id){ data.ahorros=data.ahorros.filter(x=>x.id!==id); saveData(); renderAll(); }
 
 /* ── EDIT DATE ── */
 function toggleEditDate(tipo,id){ const r=document.getElementById('edr-'+tipo+'-'+id); if(!r)return; const o=r.classList.contains('open'); document.querySelectorAll('.edit-date-row.open').forEach(x=>x.classList.remove('open')); if(!o)r.classList.add('open'); }
@@ -1061,7 +1093,7 @@ function renderAhorros(){
   const el=document.getElementById('lista-ahorros');
   if(!items.length){el.innerHTML='<div class="empty">Sin movimientos.</div>';return;}
   el.innerHTML=`<table><thead><tr><th>Fecha</th><th>Instrumento</th><th>Tipo</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
-    buildRows([...items],'ahorros',i=>`<td>${i.tipo}</td><td><span class="badge ahorro">${i.mov==='retiro'?'Retiro':'Depósito'}</span></td><td style="text-align:right"><div class="td-main" style="color:${i.mov==='retiro'?'var(--red)':'var(--green)'}">${i.mov==='retiro'?'-':''}${fmtARS(i.usd*USD_ARS)}</div><div class="td-sub">${i.mov==='retiro'?'-':''}${fmtUSD(i.usd)}</div></td>`)+`</tbody></table>`;
+    buildRows([...items],'ahorros',i=>{ const isARS=ARS_INSTR.has(i.tipo),sign=i.mov==='retiro'?'-':''; return`<td>${i.tipo}</td><td><span class="badge ahorro">${i.mov==='retiro'?'Retiro':'Depósito'}</span></td><td style="text-align:right"><div class="td-main" style="color:${i.mov==='retiro'?'var(--red)':'var(--green)'}">${sign}${isARS?fmtARS(i.ars):fmtUSD(i.usd)}</div><div class="td-sub">${sign}${isARS?fmtUSD(i.usd):fmtARS(i.usd*USD_ARS)}</div></td>`; })+`</tbody></table>`;
 }
 
 function renderTransferencias(){
@@ -1180,7 +1212,7 @@ async function init(){
   document.getElementById('fecha-hoy').textContent=now.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'});
   document.getElementById('hero-label').textContent='Balance total al '+now.toLocaleDateString('es-AR',{day:'numeric',month:'numeric'});
   ['in-fecha','eg-fecha','tc-fecha','tp-fecha','ah-fecha','tr-fecha'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=today(); });
-  renderCuentas('in'); renderCuentas('eg'); renderCuentas('trde'); renderCuentas('trha'); updateDeudaChip(); renderResumen();
+  updateDeudaChip(); renderResumen();
   await loadFromSupabase();
   updateCotizDisplay();
   renderAll();
