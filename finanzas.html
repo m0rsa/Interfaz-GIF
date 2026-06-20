@@ -25,13 +25,8 @@
   --blue-bg: rgba(52,131,250,0.10);
   --blue-border: rgba(52,131,250,0.24);
   --green: #00A650;
-  --green-bg: rgba(0,166,80,0.10);
   --red: #F23D4F;
   --red-bg: rgba(242,61,79,0.10);
-  --amber: #FF9500;
-  --amber-bg: rgba(255,149,0,0.10);
-  --purple: #9B87F5;
-  --purple-bg: rgba(155,135,245,0.10);
   --sidebar-w: 240px;
   --radius: 16px;
   --radius-sm: 10px;
@@ -111,7 +106,6 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .mc-val.green { color: var(--green); }
 .mc-val.red { color: var(--red); }
 .mc-val.purple { color: var(--blue); }
-.mc-val.blue { color: var(--blue); }
 
 /* ── MQV CARD ── */
 .mqv-card { background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: var(--radius); padding: 24px 28px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
@@ -171,7 +165,6 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
 .badge.ahorro { background: rgba(52,131,250,0.15); color: var(--blue); }
 .badge.tarjeta { background: rgba(242,61,79,0.18); color: var(--red); }
 .badge.pago { background: rgba(0,166,80,0.15); color: var(--green); }
-.badge.transf { background: rgba(155,135,245,0.15); color: var(--purple); }
 .acct-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 9px; border-radius: 6px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
 
 /* ── TARJETA PANEL ── */
@@ -219,8 +212,6 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
 .empty { text-align: center; padding: 50px; color: var(--text3); font-size: 13px; }
 .action-btn { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 14px; padding: 4px 6px; border-radius: 6px; transition: all 0.15s; }
 .action-btn:hover { background: var(--surface3); color: var(--text2); }
-.divider { height: 1px; background: var(--border); margin: 20px 0; }
-.ico { font-style: normal; }
 
 /* ── TOPBAR / HAMBURGER ── */
 .topbar { display: none; }
@@ -466,7 +457,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
             <div class="cur-toggle"><button class="active" id="tc-cur-usd" onclick="setCurTC('usd')">U$D</button><button id="tc-cur-ars" onclick="setCurTC('ars')">$ Pesos</button></div>
             <div class="grid-form-3">
               <div><label>Concepto</label><input type="text" id="tc-concepto" placeholder="Supermercado, Netflix..."></div>
-              <div><label id="tc-monto-lbl">Monto (USD)</label><input type="number" id="tc-monto" placeholder="0" min="0" step="0.01" oninput="updateHintTC()"><div class="hint" id="tc-hint"></div></div>
+              <div><label id="tc-monto-lbl">Monto (USD)</label><input type="number" id="tc-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tc')"><div class="hint" id="tc-hint"></div></div>
               <div><label>Fecha</label><input type="date" id="tc-fecha"></div>
             </div>
             <div style="margin-bottom:12px"><label>Nota</label><input type="text" id="tc-nota" placeholder=""></div>
@@ -476,7 +467,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
             <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Registrá un pago. Descuenta de la cuenta elegida y reduce la deuda.</div>
             <div class="cur-toggle"><button class="active" id="tp-cur-usd" onclick="setCurTP('usd')">U$D</button><button id="tp-cur-ars" onclick="setCurTP('ars')">$ Pesos</button></div>
             <div class="grid-form-3">
-              <div><label id="tp-monto-lbl">Monto a pagar (USD)</label><input type="number" id="tp-monto" placeholder="0" min="0" step="0.01" oninput="updateHintTP()"><div class="hint" id="tp-hint"></div></div>
+              <div><label id="tp-monto-lbl">Monto a pagar (USD)</label><input type="number" id="tp-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tp')"><div class="hint" id="tp-hint"></div></div>
               <div><label>Fecha</label><input type="date" id="tp-fecha"></div>
               <div><label>Nota</label><input type="text" id="tp-nota" placeholder="Pago mínimo, total..."></div>
             </div>
@@ -537,7 +528,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
           <button id="tr-cur-ars" onclick="setCurTR('ars')">$ Pesos</button>
         </div>
         <div class="grid-form-3">
-          <div><label id="tr-monto-lbl">Monto (USD)</label><input type="number" id="tr-monto" placeholder="0" step="0.01" oninput="updateHintTR()"><div class="hint" id="tr-hint"></div></div>
+          <div><label id="tr-monto-lbl">Monto (USD)</label><input type="number" id="tr-monto" placeholder="0" step="0.01" oninput="updateHint('tr')"><div class="hint" id="tr-hint"></div></div>
           <div><label>Fecha</label><input type="date" id="tr-fecha"></div>
           <div><label>Nota (opcional)</label><input type="text" id="tr-nota" placeholder="Cambio de dólares..."></div>
         </div>
@@ -683,8 +674,7 @@ function updateCotizDisplay(){
 function today(){ return new Date().toISOString().split('T')[0]; }
 function fmtDate(d){ if(!d)return''; const[y,m,dy]=d.split('-'); return`${dy}/${m}/${y}`; }
 function fmtMes(m){ const[y,mo]=m.split('-'); return new Date(y,mo-1).toLocaleDateString('es-AR',{month:'short',year:'numeric'}); }
-function fmtARS(n){ const a=Math.abs(n),s=n<0?'-':''; return s+'$'+Math.round(a).toLocaleString('es-AR'); }
-function fmtARSF(n){ return(n<0?'-$':'$')+Math.round(Math.abs(n)).toLocaleString('es-AR'); }
+function fmtARS(n){ return(n<0?'-$':'$')+Math.round(Math.abs(n)).toLocaleString('es-AR'); }
 function fmtUSD(n){ return'U$D '+Number(n).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
 /* ── BALANCES ── */
@@ -703,21 +693,23 @@ function getBalanceUSD(){ return getTotActivosUSD()-data.deudaTC; }
 /* ── CURRENCY TOGGLES ── */
 function setCur(form,cur){
   curMode[form]=cur;
-  document.getElementById(form+'-cur-usd').classList.toggle('active',cur==='usd');
-  document.getElementById(form+'-cur-ars').classList.toggle('active',cur==='ars');
-  document.getElementById(form+'-monto-lbl').textContent=cur==='usd'?'Monto (USD)':'Monto ($)';
+  ['usd','ars'].forEach(c=>document.getElementById(form+'-cur-'+c)?.classList.toggle('active',cur===c));
+  const lbl=form==='tp'?'Monto a pagar':'Monto';
+  document.getElementById(form+'-monto-lbl').textContent=cur==='usd'?lbl+' (USD)':lbl+' ($)';
   document.getElementById(form+'-hint').textContent=cur==='ars'?'Se convierte a USD al tipo promedio.':'';
   if(form==='eg') renderCuentas('eg');
+  if(form==='tr'){ renderCuentas('trde'); renderCuentas('trha'); }
 }
-function setCurTC(cur){ curMode.tc=cur; document.getElementById('tc-cur-usd').classList.toggle('active',cur==='usd'); document.getElementById('tc-cur-ars').classList.toggle('active',cur==='ars'); document.getElementById('tc-monto-lbl').textContent=cur==='usd'?'Monto (USD)':'Monto ($)'; document.getElementById('tc-hint').textContent=cur==='ars'?'Se convierte a USD al tipo promedio.':''; }
-function setCurTP(cur){ curMode.tp=cur; document.getElementById('tp-cur-usd').classList.toggle('active',cur==='usd'); document.getElementById('tp-cur-ars').classList.toggle('active',cur==='ars'); document.getElementById('tp-monto-lbl').textContent=cur==='usd'?'Monto a pagar (USD)':'Monto a pagar ($)'; document.getElementById('tp-hint').textContent=cur==='ars'?'Se convierte a USD al tipo promedio.':''; }
-function setCurTR(cur){ curMode.tr=cur; document.getElementById('tr-cur-usd').classList.toggle('active',cur==='usd'); document.getElementById('tr-cur-ars').classList.toggle('active',cur==='ars'); document.getElementById('tr-monto-lbl').textContent=cur==='usd'?'Monto (USD)':'Monto ($)'; document.getElementById('tr-hint').textContent=cur==='ars'?'Se convierte a USD al tipo promedio.':''; renderCuentas('trde'); renderCuentas('trha'); }
+function setCurTC(cur){ setCur('tc',cur); }
+function setCurTP(cur){ setCur('tp',cur); }
+function setCurTR(cur){ setCur('tr',cur); }
 function setCurSueldo(cur){ curMode.sueldo=cur; renderMQV(); renderHero(); }
 
-function updateHint(form){ if(curMode[form]!=='ars')return; const v=parseFloat(document.getElementById(form+'-monto').value)||0; document.getElementById(form+'-hint').textContent=v>0?'≈ '+fmtUSD(v/USD_ARS):'Se convierte a USD al tipo promedio.'; }
-function updateHintTC(){ if(curMode.tc!=='ars')return; const v=parseFloat(document.getElementById('tc-monto').value)||0; document.getElementById('tc-hint').textContent=v>0?'≈ '+fmtUSD(v/USD_ARS):'Se convierte a USD al tipo promedio.'; }
-function updateHintTP(){ if(curMode.tp!=='ars')return; const v=parseFloat(document.getElementById('tp-monto').value)||0; document.getElementById('tp-hint').textContent=v>0?'≈ '+fmtUSD(v/USD_ARS):'Se convierte a USD al tipo promedio.'; }
-function updateHintTR(){ if(curMode.tr!=='ars')return; const v=parseFloat(document.getElementById('tr-monto').value)||0; document.getElementById('tr-hint').textContent=v>0?'≈ '+fmtUSD(v/USD_ARS):'Se convierte a USD al tipo promedio.'; }
+function updateHint(form){
+  if(curMode[form]!=='ars') return;
+  const v=parseFloat(document.getElementById(form+'-monto').value)||0;
+  document.getElementById(form+'-hint').textContent=v>0?'≈ '+fmtUSD(v/USD_ARS):'Se convierte a USD al tipo promedio.';
+}
 
 /* ── CUENTA SELECTOR ── */
 function renderCuentas(form){
@@ -764,7 +756,7 @@ function showSection(id){
 function renderHero(){
   const aUSD=getTotActivosUSD(), bUSD=getBalanceUSD(), mqv=bUSD+data.sueldo;
   const hero=document.getElementById('hero-balance');
-  hero.textContent=fmtARSF(bUSD*USD_ARS);
+  hero.textContent=fmtARS(bUSD*USD_ARS);
   hero.className='hero-balance'+(bUSD<0?' negative':'');
   document.getElementById('hero-sub').textContent=fmtUSD(bUSD);
   document.getElementById('hs-activos').textContent=fmtARS(aUSD*USD_ARS);
@@ -783,12 +775,12 @@ function renderMQV(){
   document.getElementById('mqv-block').innerHTML=`<div class="mqv-card">
     <div class="mqv-main" style="flex:1;min-width:180px">
       <div class="mqv-label">MQV — próximo mes</div>
-      <div class="mqv-val" id="mqv-total-ars">${fmtARSF(mqv*USD_ARS)}</div>
+      <div class="mqv-val" id="mqv-total-ars">${fmtARS(mqv*USD_ARS)}</div>
       <div class="mqv-sub" id="mqv-total-usd">${fmtUSD(mqv)}</div>
     </div>
     <div class="mqv-detail" style="min-width:240px">
-      <div>Balance actual: <strong>${fmtARSF(bal*USD_ARS)}</strong> <span style="font-size:11px;color:var(--text3)">(${fmtUSD(bal)})</span></div>
-      <div>+ Próximo sueldo: <strong id="mqv-sueldo-ars">${fmtARSF(data.sueldo*USD_ARS)}</strong> <span style="font-size:11px;color:var(--text3)" id="mqv-sueldo-usd">(${fmtUSD(data.sueldo)})</span></div>
+      <div>Balance actual: <strong>${fmtARS(bal*USD_ARS)}</strong> <span style="font-size:11px;color:var(--text3)">(${fmtUSD(bal)})</span></div>
+      <div>+ Próximo sueldo: <strong id="mqv-sueldo-ars">${fmtARS(data.sueldo*USD_ARS)}</strong> <span style="font-size:11px;color:var(--text3)" id="mqv-sueldo-usd">(${fmtUSD(data.sueldo)})</span></div>
       <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">
         <span style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.04em">Sueldo</span>
         <div style="display:flex;gap:4px">
@@ -805,17 +797,16 @@ function updateSueldo(val){
   data.sueldo=curMode.sueldo==='ars'?raw/USD_ARS:raw;
   saveData();
   const mqv=getBalanceUSD()+data.sueldo;
-  const t1=document.getElementById('mqv-total-ars'); if(t1) t1.textContent=fmtARSF(mqv*USD_ARS);
+  const t1=document.getElementById('mqv-total-ars'); if(t1) t1.textContent=fmtARS(mqv*USD_ARS);
   const t2=document.getElementById('mqv-total-usd'); if(t2) t2.textContent=fmtUSD(mqv);
-  const s1=document.getElementById('mqv-sueldo-ars'); if(s1) s1.textContent=fmtARSF(data.sueldo*USD_ARS);
+  const s1=document.getElementById('mqv-sueldo-ars'); if(s1) s1.textContent=fmtARS(data.sueldo*USD_ARS);
   const s2=document.getElementById('mqv-sueldo-usd'); if(s2) s2.textContent='('+fmtUSD(data.sueldo)+')';
-  const hv=document.getElementById('hs-mqv'); if(hv) hv.textContent=fmtARSF(mqv*USD_ARS);
+  const hv=document.getElementById('hs-mqv'); if(hv) hv.textContent=fmtARS(mqv*USD_ARS);
   const hu=document.getElementById('hs-mqv-usd'); if(hu) hu.textContent=fmtUSD(mqv);
 }
 
 /* ── MES HELPERS ── */
 function getMesesDe(items){ const s=new Set(items.map(i=>i.fecha.slice(0,7))); return[...s].sort().reverse(); }
-function getMesesCombinados(){ return getMesesDe([...data.ingresos,...data.egresos]); }
 function buildFiltroSelect(key,meses){
   if(!meses.length) return '';
   const cur=mesFiltros[key]||'';
