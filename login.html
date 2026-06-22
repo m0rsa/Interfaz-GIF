@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Acceso · Finanzas</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+@font-face{font-family:'SF Pro';font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'SF Pro';font-weight:600;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-600-normal.woff2') format('woff2')}
+@font-face{font-family:'SF Pro';font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'SF Pro';font-weight:800;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-800-normal.woff2') format('woff2')}
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060911;--surf:#0C1220;--surf2:#101928;
+  --bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.11);
+  --tx:#ECF1FF;--tx2:#6A82A8;--tx3:#3C5070;
+  --blue:#4A8CF5;--blue-h:#3878EE;--green:#12C98A;--red:#EF4858;
+}
+html,body{height:100%;background:var(--bg);overflow:hidden}
+body{font-family:'SF Pro',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--tx)}
+
+/* ── FONDO ── */
+.lbg{position:fixed;inset:0;overflow:hidden;pointer-events:none}
+.orb{position:absolute;border-radius:50%}
+.orb-1{width:700px;height:700px;top:-280px;left:50%;background:radial-gradient(ellipse,rgba(74,140,245,0.13) 0%,transparent 62%);animation:o1 9s ease-in-out infinite}
+.orb-2{width:500px;height:500px;bottom:-180px;right:-120px;background:radial-gradient(ellipse,rgba(18,201,138,0.08) 0%,transparent 65%);animation:o2 11s ease-in-out infinite}
+@keyframes o1{0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-22px)}}
+@keyframes o2{0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)}}
+
+/* ── LAYOUT ── */
+.wrap{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{width:100%;max-width:372px}
+
+/* ── LOGO ── */
+.logo{text-align:center;margin-bottom:30px}
+.logo-icon{width:58px;height:58px;background:linear-gradient(135deg,#5C9FFF 0%,var(--blue) 100%);border-radius:17px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;font-family:'SF Mono',ui-monospace,monospace;margin-bottom:14px;box-shadow:0 8px 32px rgba(74,140,245,0.4),0 0 0 1px rgba(74,140,245,0.2)}
+.logo-name{font-size:22px;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#7EC0FF 0%,var(--blue) 70%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.logo-sub{font-size:12px;color:var(--tx3)}
+
+/* ── STEP INDICATOR ── */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:22px}
+.s-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border:2px solid var(--bd2);color:var(--tx3);background:var(--surf2);transition:all 0.35s;flex-shrink:0}
+.s-dot.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 2px 12px rgba(74,140,245,0.4)}
+.s-dot.done{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 2px 10px rgba(18,201,138,0.35)}
+.s-line{width:48px;height:2px;background:var(--bd2);transition:background 0.4s}
+.s-line.done{background:var(--green)}
+
+/* ── FORM CARD ── */
+.fc{background:rgba(11,17,30,0.88);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:28px 30px 30px;backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);box-shadow:0 32px 80px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.07)}
+.step-panel{display:none}
+.step-panel.visible{display:block;animation:panelIn 0.3s ease both}
+@keyframes panelIn{from{opacity:0;transform:translateX(14px)} to{opacity:1;transform:translateX(0)}}
+
+/* ── STEP HEADER ── */
+.sh{margin-bottom:20px}
+.sh-title{font-size:16px;font-weight:700;letter-spacing:-0.02em;color:var(--tx);margin-bottom:3px}
+.sh-sub{font-size:12px;color:var(--tx3)}
+
+/* ── INPUTS ── */
+.field{margin-bottom:16px}
+.flabel{font-size:10px;font-weight:800;color:var(--tx2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px;display:block}
+.finput{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:10px;color:var(--tx);font-size:15px;padding:12px 14px;font-family:inherit;outline:none;transition:border-color 0.15s,box-shadow 0.15s;-webkit-appearance:none}
+.finput:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(74,140,245,0.16)}
+.finput.err{border-color:rgba(239,72,88,0.5)}
+.pw-wrap{position:relative}
+.pw-wrap .finput{padding-right:46px}
+.eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--tx3);cursor:pointer;padding:5px;border-radius:6px;transition:color 0.15s,background 0.15s;line-height:1;display:flex;align-items:center}
+.eye:hover{color:var(--tx2);background:rgba(255,255,255,0.06)}
+.attempts{font-size:11px;color:var(--tx3);min-height:14px;text-align:right;margin-top:5px}
+.attempts.warn{color:#F5A944}
+.attempts.danger{color:var(--red)}
+.ferr{font-size:12px;color:var(--red);min-height:14px;text-align:center;margin:12px 0 4px;line-height:1.5;padding:0;border-radius:9px;transition:all 0.2s}
+.ferr.show{background:rgba(239,72,88,0.10);border:1px solid rgba(239,72,88,0.18);padding:9px 12px}
+.ferr.lock{background:rgba(245,169,68,0.10);border:1px solid rgba(245,169,68,0.22);color:#F5A944}
+
+/* ── BUTTONS ── */
+.submit{width:100%;padding:13px;border-radius:11px;border:none;background:var(--blue);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.18s;font-family:inherit;letter-spacing:-0.01em;box-shadow:0 2px 14px rgba(74,140,245,0.38);display:flex;align-items:center;justify-content:center;gap:9px}
+.submit:hover:not(:disabled){background:var(--blue-h);box-shadow:0 4px 22px rgba(74,140,245,0.52);transform:translateY(-1px)}
+.submit:disabled{opacity:0.55;cursor:not-allowed;transform:none!important}
+.back{background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;margin-top:14px;padding:4px 0;font-family:inherit;transition:color 0.15s;display:block;text-align:center;width:100%}
+.back:hover{color:var(--tx2)}
+.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,0.28);border-top-color:#fff;border-radius:50%;animation:sp 0.65s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="lbg"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+<div class="wrap">
+  <div class="card">
+
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-icon">$</div>
+      <div class="logo-name">Finanzas</div>
+      <div class="logo-sub">Panel financiero personal</div>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="steps">
+      <div class="s-dot active" id="sd1">1</div>
+      <div class="s-line" id="sl"></div>
+      <div class="s-dot" id="sd2">2</div>
+    </div>
+
+    <!-- Form card -->
+    <div class="fc">
+
+      <!-- Paso 1: código de acceso -->
+      <div class="step-panel visible" id="step-gate">
+        <div class="sh">
+          <div class="sh-title">Código de acceso</div>
+          <div class="sh-sub">Ingresá el código para continuar</div>
+        </div>
+        <form onsubmit="checkGate();return false" autocomplete="off">
+          <div class="field">
+            <label class="flabel" for="gate-input">Código</label>
+            <div class="pw-wrap">
+              <input class="finput" type="password" id="gate-input" placeholder="••••••••" autocomplete="off" required>
+              <button type="button" class="eye" onclick="toggleEye('gate-input','gate-eye')" title="Mostrar código">
+                <svg id="gate-eye" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div id="gate-attempts" class="attempts"></div>
+          </div>
+          <div id="gate-error" class="ferr"></div>
+          <button type="submit" id="gate-btn" class="submit">Continuar</button>
+        </form>
+      </div>
+
+      <!-- Paso 2: login Supabase -->
+      <div class="step-panel" id="step-login">
+        <div class="sh">
+          <div class="sh-title">Iniciar sesión</div>
+          <div class="sh-sub">Ingresá tus credenciales</div>
+        </div>
+        <form onsubmit="doLogin();return false" autocomplete="on">
+          <div class="field">
+            <label class="flabel" for="login-email">Email</label>
+            <input class="finput" type="email" id="login-email" placeholder="tu@email.com" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label class="flabel" for="login-password">Contraseña</label>
+            <div class="pw-wrap">
+              <input class="finput" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required>
+              <button type="button" class="eye" onclick="toggleEye('login-password','login-eye')" title="Mostrar contraseña">
+                <svg id="login-eye" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div id="login-attempts" class="attempts"></div>
+          </div>
+          <div id="login-error" class="ferr"></div>
+          <button type="submit" id="login-btn" class="submit">Ingresar</button>
+        </form>
+        <button class="back" onclick="showGate()">← Volver al código de acceso</button>
+      </div>
+
+    </div><!-- /fc -->
+  </div><!-- /card -->
+</div><!-- /wrap -->
+
+<script>
+/* ── CONFIG ── */
+const SUPA_URL='https://axwxdiweiqxuqrbqmuwo.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4d3hkaXdlaXF4dXFyYnFtdXdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MjU3OTEsImV4cCI6MjA5NzQwMTc5MX0.X22UlXYmEZr3I4AV6iHgOvfaM3HSnSNriSAVWGtwAJs';
+
+// ← Cambiá GATE_KEY por tu clave de acceso personal
+const GATE_KEY='MORSA';
+const GATE_SALT='_fin_v2';
+
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+
+/* ── HASH ── */
+async function hashStr(s){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function gateHash(){ return hashStr(GATE_KEY+GATE_SALT); }
+
+/* ── TOGGLE EYE ── */
+const EYE_OPEN='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+const EYE_SHUT='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+function toggleEye(inputId,svgId){
+  const inp=document.getElementById(inputId),svg=document.getElementById(svgId);
+  inp.type=inp.type==='password'?'text':'password';
+  svg.innerHTML=inp.type==='password'?EYE_OPEN:EYE_SHUT;
+}
+
+/* ── STEP UI ── */
+function showGate(){
+  document.getElementById('step-login').classList.remove('visible');
+  document.getElementById('step-gate').classList.add('visible');
+  document.getElementById('sd1').classList.add('active'); document.getElementById('sd1').classList.remove('done');
+  document.getElementById('sd2').classList.remove('active');
+  document.getElementById('sl').classList.remove('done');
+  document.getElementById('gate-input').value='';
+  document.getElementById('gate-error').textContent=''; document.getElementById('gate-error').className='ferr';
+  setTimeout(()=>document.getElementById('gate-input').focus(),100);
+}
+function showLogin(){
+  document.getElementById('step-gate').classList.remove('visible');
+  document.getElementById('step-login').classList.add('visible');
+  document.getElementById('sd1').classList.remove('active'); document.getElementById('sd1').classList.add('done');
+  document.getElementById('sd2').classList.add('active');
+  document.getElementById('sl').classList.add('done');
+  setTimeout(()=>document.getElementById('login-email').focus(),100);
+}
+
+/* ── GATE RATE LIMIT ── */
+const GATE_MAX=3, GATE_LOCK_MS=10*60*1000;
+let gAttempts=parseInt(sessionStorage.getItem('_ga')||'0');
+let gLockUntil=parseInt(sessionStorage.getItem('_gl')||'0');
+let gTimer=null;
+
+function gLockRem(){ return Math.max(0,gLockUntil-Date.now()); }
+function gSetA(n){ gAttempts=n; sessionStorage.setItem('_ga',n); }
+function gSetL(u){ gLockUntil=u; sessionStorage.setItem('_gl',u); }
+
+function gUpdateUI(){
+  const attEl=document.getElementById('gate-attempts');
+  const errEl=document.getElementById('gate-error');
+  const btn=document.getElementById('gate-btn');
+  const rem=gLockRem();
+  if(rem>0){
+    const min=Math.floor(rem/60000),sec=Math.floor((rem%60000)/1000);
+    errEl.textContent=`Demasiados intentos. Esperá ${min}:${String(sec).padStart(2,'0')}.`;
+    errEl.className='ferr show lock'; btn.disabled=true; if(attEl)attEl.textContent='';
+  } else {
+    if(errEl.classList.contains('lock')){ errEl.textContent=''; errEl.className='ferr'; }
+    btn.disabled=false;
+    const left=GATE_MAX-gAttempts;
+    if(attEl && gAttempts>0){
+      attEl.textContent=`${left} intento${left!==1?'s':''} restante${left!==1?'s':''}`;
+      attEl.className='attempts'+(gAttempts>=GATE_MAX-1?' danger':gAttempts>=1?' warn':'');
+    } else if(attEl){ attEl.textContent=''; attEl.className='attempts'; }
+  }
+}
+
+function gStartTimer(){
+  clearInterval(gTimer);
+  gTimer=setInterval(()=>{
+    gUpdateUI();
+    if(gLockRem()<=0){ clearInterval(gTimer); gSetA(0); gSetL(0); gUpdateUI(); }
+  },1000);
+}
+
+/* ── CHECK GATE ── */
+async function checkGate(){
+  if(gLockRem()>0) return;
+  const val=document.getElementById('gate-input').value;
+  if(!val) return;
+  const btn=document.getElementById('gate-btn');
+  const errEl=document.getElementById('gate-error');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
+  const inputHash=await hashStr(val+GATE_SALT);
+  const correctHash=await gateHash();
+  btn.disabled=false; btn.innerHTML='Continuar';
+  if(inputHash!==correctHash){
+    gSetA(gAttempts+1);
+    document.getElementById('gate-input').classList.add('err');
+    if(gAttempts>=GATE_MAX){
+      gSetL(Date.now()+GATE_LOCK_MS); gStartTimer();
+    } else {
+      errEl.textContent='Código incorrecto.'; errEl.className='ferr show';
+      gUpdateUI();
+      document.getElementById('gate-input').value='';
+      document.getElementById('gate-input').focus();
+    }
+    return;
+  }
+  gSetA(0); gSetL(0);
+  sessionStorage.setItem('_gk',correctHash);
+  document.getElementById('gate-input').classList.remove('err');
+  showLogin();
+}
+
+/* ── LOGIN RATE LIMIT ── */
+const LOGIN_MAX=5, LOGIN_LOCK_MS=15*60*1000;
+let lAttempts=parseInt(sessionStorage.getItem('_la')||'0');
+let lLockUntil=parseInt(sessionStorage.getItem('_ll')||'0');
+let lTimer=null;
+
+function lLockRem(){ return Math.max(0,lLockUntil-Date.now()); }
+function lSetA(n){ lAttempts=n; sessionStorage.setItem('_la',n); }
+function lSetL(u){ lLockUntil=u; sessionStorage.setItem('_ll',u); }
+
+function lUpdateUI(){
+  const attEl=document.getElementById('login-attempts');
+  const errEl=document.getElementById('login-error');
+  const btn=document.getElementById('login-btn');
+  const rem=lLockRem();
+  if(rem>0){
+    const min=Math.floor(rem/60000),sec=Math.floor((rem%60000)/1000);
+    errEl.textContent=`Demasiados intentos. Esperá ${min}:${String(sec).padStart(2,'0')}.`;
+    errEl.className='ferr show lock'; btn.disabled=true; if(attEl)attEl.textContent='';
+  } else {
+    if(errEl.classList.contains('lock')){ errEl.textContent=''; errEl.className='ferr'; }
+    btn.disabled=false;
+    const left=LOGIN_MAX-lAttempts;
+    if(attEl && lAttempts>0){
+      attEl.textContent=`${left} intento${left!==1?'s':''} restante${left!==1?'s':''}`;
+      attEl.className='attempts'+(lAttempts>=LOGIN_MAX-1?' danger':lAttempts>=2?' warn':'');
+    } else if(attEl){ attEl.textContent=''; attEl.className='attempts'; }
+  }
+}
+
+function lStartTimer(){
+  clearInterval(lTimer);
+  lTimer=setInterval(()=>{
+    lUpdateUI();
+    if(lLockRem()<=0){ clearInterval(lTimer); lSetA(0); lSetL(0); lUpdateUI(); }
+  },1000);
+}
+
+/* ── DO LOGIN ── */
+async function doLogin(){
+  if(lLockRem()>0) return;
+  const email=(document.getElementById('login-email')?.value||'').trim();
+  const pw=document.getElementById('login-password')?.value||'';
+  const errEl=document.getElementById('login-error');
+  if(!email||!pw){ errEl.textContent='Completá los dos campos.'; errEl.className='ferr show'; return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ errEl.textContent='El email no es válido.'; errEl.className='ferr show'; return; }
+  errEl.textContent=''; errEl.className='ferr';
+  const btn=document.getElementById('login-btn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Verificando…';
+  const{error}=await sb.auth.signInWithPassword({email,password:pw});
+  btn.disabled=false; btn.innerHTML='Ingresar';
+  if(error){
+    lSetA(lAttempts+1);
+    document.getElementById('login-password').value='';
+    document.getElementById('login-email').classList.add('err');
+    document.getElementById('login-password').classList.add('err');
+    if(lAttempts>=LOGIN_MAX){
+      lSetL(Date.now()+LOGIN_LOCK_MS); lStartTimer();
+    } else {
+      errEl.textContent='Email o contraseña incorrectos.'; errEl.className='ferr show';
+      lUpdateUI();
+      document.getElementById('login-password').focus();
+    }
+    return;
+  }
+  lSetA(0); lSetL(0);
+  window.location.replace('finanzas.html');
+}
+
+/* ── INIT ── */
+window.addEventListener('load',async()=>{
+  // Inicializar rate limits
+  gUpdateUI(); lUpdateUI();
+  if(gLockRem()>0) gStartTimer();
+  if(lLockRem()>0) lStartTimer();
+
+  // Si ya hay sesión activa + gate válida → redirigir directo
+  const correctHash=await gateHash();
+  const gk=sessionStorage.getItem('_gk');
+  const{data:{session}}=await sb.auth.getSession();
+  if(session && gk===correctHash){ window.location.replace('finanzas.html'); return; }
+
+  // Si el gate ya fue pasado → ir a paso 2
+  if(gk===correctHash){ showLogin(); return; }
+
+  // Caso base: empezar en paso 1
+  setTimeout(()=>document.getElementById('gate-input').focus(),80);
+});
+</script>
+</body>
+</html>
