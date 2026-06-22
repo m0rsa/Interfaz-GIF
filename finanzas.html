@@ -267,13 +267,47 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
 
 @media (max-width: 500px) {
   .grid-3, .grid-form-3, .grid-form-4, .grid-4 { grid-template-columns: 1fr; }
-  .hero-balance { font-size: 28px; }
-  .hero-mqv-val { font-size: 18px; }
   .hero-stats { flex-wrap: wrap; gap: 14px 0; }
   .hero-stat { border-right: none !important; padding-right: 0; margin-right: 0; width: 50%; }
   .hero-stat:nth-child(odd) { border-right: 1px solid var(--border) !important; padding-right: 16px; margin-right: 0; }
-  .content { padding: 14px 14px; }
-  .header-hero { padding: 18px 16px 14px; }
+  .content { padding: 16px 16px; }
+  .header-hero { padding: 22px 18px 18px; }
+
+  /* Tipografía mobile — escala general */
+  body { font-size: 16px; }
+  label { font-size: 13px; }
+  .section-title { font-size: 12px; }
+  .card-title { font-size: 12px; }
+  .hint { font-size: 12px; }
+
+  /* Hero */
+  .hero-balance { font-size: 38px; }
+  .hero-sub { font-size: 14px; }
+  .hero-mqv-val { font-size: 26px; }
+  .hero-mqv-sub { font-size: 13px; }
+  .hero-stat .hs-label { font-size: 11px; }
+  .hero-stat .hs-val { font-size: 21px; }
+  .hero-stat .hs-sub { font-size: 13px; }
+
+  /* Cards y métricas */
+  .card { padding: 20px 18px; }
+  .metric-card { padding: 20px 18px; }
+  .metric-card .mc-label { font-size: 11px; }
+  .metric-card .mc-val { font-size: 26px; }
+  .metric-card .mc-sub { font-size: 13px; }
+
+  /* MQV */
+  .mqv-main .mqv-val { font-size: 32px; }
+  .mqv-main .mqv-sub { font-size: 13px; }
+  .mqv-detail { font-size: 13px; }
+
+  /* Botones */
+  .btn { font-size: 15px; padding: 13px 22px; }
+
+  /* Filas de transacciones */
+  .td-main { font-size: 15px; }
+  .td-sub { font-size: 13px; }
+  .acct-pill { font-size: 12px; }
 }
 
 /* ── EDIT MODAL ── */
