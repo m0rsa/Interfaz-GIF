@@ -185,6 +185,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
 .badge.ahorro { background: rgba(52,131,250,0.15); color: var(--blue); }
 .badge.tarjeta { background: rgba(242,61,79,0.18); color: var(--red); }
 .badge.pago { background: rgba(0,166,80,0.15); color: var(--green); }
+.badge.repago { background: rgba(139,124,246,0.15); color: #8B7CF6; }
 .acct-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 9px; border-radius: 6px; font-weight: 600; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 
 /* ── TARJETA PANEL ── */
@@ -538,7 +539,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
         <div class="grid-form-4">
           <div><label>Concepto</label><input type="text" id="in-concepto" placeholder="Sueldo, freelance..."></div>
           <div><label id="in-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="in-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('in')"><div class="hint" id="in-hint"></div></div>
-          <div><label>Categoría</label><select id="in-cat"><option>Sueldo</option><option>Freelance</option><option>Inversión</option><option>Otros</option></select></div>
+          <div><label>Categoría</label><select id="in-cat"><option>Sueldo</option><option>Freelance</option><option>Inversión</option><option>Repago</option><option>Otros</option></select></div>
           <div><label>Fecha</label><input type="date" id="in-fecha"></div>
         </div>
         <div class="cuenta-selector"><div class="cs-label">¿A qué cuenta entra?</div><div class="cs-options" id="in-cuentas"></div></div>
@@ -1219,18 +1220,22 @@ function renderResumen(){
   renderHero();
   renderMQV();
 
-  // P&L block
+  // P&L block — repagos se netean contra egresos, no cuentan como ingreso real
   const inMes=data.ingresos.filter(i=>inRango(i.fecha));
   const egMes=data.egresos.filter(e=>inRango(e.fecha));
   const totalIn=inMes.reduce((s,i)=>s+i.usd,0);
   const totalEg=egMes.reduce((s,e)=>s+e.usd,0);
-  const diff=totalIn-totalEg;
-  const tasaAhorro=totalIn>0?Math.round((diff/totalIn)*100):null;
+  const totalRepago=inMes.filter(i=>i.cat==='Repago').reduce((s,i)=>s+i.usd,0);
+  const totalInReal=totalIn-totalRepago;
+  const totalEgNeto=Math.max(0,totalEg-totalRepago);
+  const diff=totalInReal-totalEgNeto;
+  const tasaAhorro=totalInReal>0?Math.round((diff/totalInReal)*100):null;
+  const repSubtxt=totalRepago>0?`Repagos: -${fmtARS(totalRepago*USD_ARS)}`:'';
   document.getElementById('pnl-block').innerHTML=`
-    <div class="metric-card"><div class="mc-label">Ingresos</div><div class="mc-val green">${fmtARS(totalIn*USD_ARS)}</div><div class="mc-sub">${fmtUSD(totalIn)}</div></div>
-    <div class="metric-card"><div class="mc-label">Egresos</div><div class="mc-val red">${fmtARS(totalEg*USD_ARS)}</div><div class="mc-sub">${fmtUSD(totalEg)}</div></div>
+    <div class="metric-card"><div class="mc-label">Ingresos reales</div><div class="mc-val green">${fmtARS(totalInReal*USD_ARS)}</div><div class="mc-sub">${fmtUSD(totalInReal)}</div></div>
+    <div class="metric-card"><div class="mc-label">Egresos netos</div><div class="mc-val red">${fmtARS(totalEgNeto*USD_ARS)}</div><div class="mc-sub">${repSubtxt||fmtUSD(totalEgNeto)}</div></div>
     <div class="metric-card"><div class="mc-label">Diferencia</div><div class="mc-val ${diff>=0?'green':'red'}">${diff>=0?'':'-'}${fmtARS(Math.abs(diff)*USD_ARS)}</div><div class="mc-sub">${fmtUSD(diff)}</div></div>
-    <div class="metric-card"><div class="mc-label">Tasa de ahorro</div><div class="mc-val ${tasaAhorro===null?'':''}${tasaAhorro>=0?'green':'red'}" style="font-size:clamp(20px,3vw,26px)">${tasaAhorro===null?'—':tasaAhorro+'%'}</div><div class="mc-sub">${diff>=0?'Superávit del período':'Déficit del período'}</div></div>`;
+    <div class="metric-card"><div class="mc-label">Tasa de ahorro</div><div class="mc-val ${tasaAhorro>=0?'green':'red'}" style="font-size:clamp(20px,3vw,26px)">${tasaAhorro===null?'—':tasaAhorro+'%'}</div><div class="mc-sub">${diff>=0?'Superávit del período':'Déficit del período'}</div></div>`;
 
   // Asset charts
   const saldos=getSaldos(), entries=Object.entries(saldos).filter(([,v])=>v.usd>0), colors=entries.map(([k])=>COLORS[k]||'#888');
@@ -1265,7 +1270,7 @@ function renderUltimos(){
   el.innerHTML=`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Cuenta</th><th style="text-align:right">Monto</th></tr></thead><tbody>`+
     todos.map(x=>{
       let badge='',color='',signo='';
-      if(x._tipo==='ingreso'){badge='<span class="badge ingreso">Ingreso</span>';color='var(--green)';signo='+';}
+      if(x._tipo==='ingreso'){badge=`<span class="badge ${x.cat==='Repago'?'repago':'ingreso'}">${x.cat==='Repago'?'Repago':'Ingreso'}</span>`;color=x.cat==='Repago'?'#8B7CF6':'var(--green)';signo='+';}
       else if(x._tipo==='egreso'){badge='<span class="badge egreso">Egreso</span>';color='var(--red)';signo='-';}
       else if(x._tipo==='gasto_tc'){badge='<span class="badge tarjeta">Gasto TC</span>';color='#ff9478';signo='+';}
       else{badge='<span class="badge pago">Pago TC</span>';color='var(--green)';signo='-';}
@@ -1281,16 +1286,21 @@ function renderFlujoMensual(){
     const d=new Date(now.getFullYear(),now.getMonth()-i,1);
     months.push({ym:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('es-AR',{month:'short'})});
   }
-  const inByM={},egByM={};
-  months.forEach(({ym})=>{ inByM[ym]=0; egByM[ym]=0; });
-  data.ingresos.forEach(x=>{ const ym=x.fecha.slice(0,7); if(inByM[ym]!==undefined) inByM[ym]+=x.usd; });
+  const inByM={},egByM={},repByM={};
+  months.forEach(({ym})=>{ inByM[ym]=0; egByM[ym]=0; repByM[ym]=0; });
+  data.ingresos.forEach(x=>{
+    const ym=x.fecha.slice(0,7);
+    if(inByM[ym]===undefined) return;
+    if(x.cat==='Repago') repByM[ym]+=x.usd;
+    else inByM[ym]+=x.usd;
+  });
   data.egresos.forEach(x=>{ const ym=x.fecha.slice(0,7); if(egByM[ym]!==undefined) egByM[ym]+=x.usd; });
   if(chartFlujoMes) chartFlujoMes.destroy();
   const canv=document.getElementById('chartFlujoMes');
   if(!canv) return;
   chartFlujoMes=new Chart(canv.getContext('2d'),{type:'bar',data:{labels:months.map(m=>m.label),datasets:[
     {label:'Ingresos',data:months.map(m=>inByM[m.ym]*USD_ARS),backgroundColor:'rgba(0,166,80,0.75)',borderRadius:6,borderSkipped:false,borderWidth:0},
-    {label:'Egresos', data:months.map(m=>egByM[m.ym]*USD_ARS),backgroundColor:'rgba(242,61,79,0.75)',borderRadius:6,borderSkipped:false,borderWidth:0}
+    {label:'Egresos netos',data:months.map(m=>Math.max(0,egByM[m.ym]-repByM[m.ym])*USD_ARS),backgroundColor:'rgba(242,61,79,0.75)',borderRadius:6,borderSkipped:false,borderWidth:0}
   ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:true,labels:{color:'#8B93A8',font:{size:11},padding:16,boxWidth:10,usePointStyle:true,pointStyle:'rect'}},tooltip:{...ttARS(),callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmtARS(ctx.raw)}  (${fmtUSD(ctx.raw/USD_ARS)})`}}},scales:scalesARS()}});
 }
 
@@ -1468,7 +1478,7 @@ function renderIngresos(){
   const el=document.getElementById('lista-ingresos');
   if(!items.length){el.innerHTML='<div class="empty">Sin ingresos registrados.</div>';return;}
   el.innerHTML=`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Cuenta destino</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
-    buildRows([...items],'ingresos',i=>`<td>${i.concepto}</td><td><span class="badge ingreso">${i.cat}</span></td><td>${i.cuenta?`<span class="acct-pill" style="background:${COLORS[i.cuenta]||'#888'}22;color:${COLORS[i.cuenta]||'#888'}">${i.cuenta}</span>`:'-'}</td><td style="text-align:right"><div class="td-main" style="color:var(--green)">${fmtARS(i.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(i.usd)}${i.rawCur==='ars'?' · en $':''}</div></td>`)+`</tbody></table>`;
+    buildRows([...items],'ingresos',i=>`<td>${i.concepto}</td><td><span class="badge ${i.cat==='Repago'?'repago':'ingreso'}">${i.cat}</span></td><td>${i.cuenta?`<span class="acct-pill" style="background:${COLORS[i.cuenta]||'#888'}22;color:${COLORS[i.cuenta]||'#888'}">${i.cuenta}</span>`:'-'}</td><td style="text-align:right"><div class="td-main" style="color:var(--green)">${fmtARS(i.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(i.usd)}${i.rawCur==='ars'?' · en $':''}</div></td>`)+`</tbody></table>`;
 }
 
 function renderEgresos(){
@@ -1821,7 +1831,7 @@ function openEditModal(tipo, id) {
   let fields = '';
   if (tipo === 'ingresos' || tipo === 'egresos') {
     const cats = tipo === 'ingresos'
-      ? ['Sueldo','Freelance','Inversión','Otros']
+      ? ['Sueldo','Freelance','Inversión','Repago','Otros']
       : ['Vivienda','Alimentación','Transporte','Salud','Entretenimiento','Servicios','Otros'];
     const displayMonto = isCurARS
       ? Math.round(item.rawCur === 'ars' ? item.rawMonto : item.usd * USD_ARS)
