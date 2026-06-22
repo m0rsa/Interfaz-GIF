@@ -7,26 +7,24 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
-/* SF Pro Text — optimizado para texto pequeño (body, labels, inputs) */
-@font-face { font-family: 'SF Pro'; font-weight: 300; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Light.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 400; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Regular.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 500; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Medium.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 600; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Semibold.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 700; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Bold.otf'); }
-@font-face { font-family: 'SF Pro'; font-weight: 900; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Text-Black.otf'); }
-/* SF Pro Display — optimizado para texto grande (hero, valores, titulos) */
-@font-face { font-family: 'SF Pro Display'; font-weight: 300; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Light.otf'); }
-@font-face { font-family: 'SF Pro Display'; font-weight: 400; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Regular.otf'); }
-@font-face { font-family: 'SF Pro Display'; font-weight: 500; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Medium.otf'); }
-@font-face { font-family: 'SF Pro Display'; font-weight: 600; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Semibold.otf'); }
-@font-face { font-family: 'SF Pro Display'; font-weight: 700; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Bold.otf'); }
-@font-face { font-family: 'SF Pro Display'; font-weight: 900; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Pro-Display-Black.otf'); }
-/* SF Mono */
-@font-face { font-family: 'SF Mono'; font-weight: 300; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Mono-Light.otf'); }
-@font-face { font-family: 'SF Mono'; font-weight: 400; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Mono-Regular.otf'); }
-@font-face { font-family: 'SF Mono'; font-weight: 500; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Mono-Medium.otf'); }
-@font-face { font-family: 'SF Mono'; font-weight: 600; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Mono-Semibold.otf'); }
-@font-face { font-family: 'SF Mono'; font-weight: 700; src: url('file:///C:/Users/joaqu/AppData/Local/Microsoft/Windows/Fonts/SF-Mono-Bold.otf'); }
+/* Fuentes via CDN: Inter (SF Pro) + JetBrains Mono (SF Mono) */
+@font-face { font-family: 'SF Pro'; font-weight: 300; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-300-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Pro'; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Pro'; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Pro'; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Pro'; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Pro'; font-weight: 900; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-900-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Pro Display'; font-weight: 300; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-300-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Pro Display'; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Pro Display'; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Pro Display'; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Pro Display'; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Pro Display'; font-weight: 900; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-900-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Mono'; font-weight: 300; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-300-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Mono'; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Mono'; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Mono'; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'SF Mono'; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-700-normal.woff2') format('woff2'); }
 
 :root {
   --bg: #0B0F1A;
@@ -61,7 +59,7 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .logo-text { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
 .logo-date { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; }
 .sidebar-nav { padding: 12px 10px; flex: 1; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 5px 8px 5px 6px; border-radius: 10px; cursor: pointer; color: var(--text2); transition: background 0.12s, color 0.12s; margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 5px 8px 5px 6px; border-radius: 10px; cursor: pointer; color: var(--text2); transition: background 0.12s, color 0.12s; margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
 .nav-item:hover .nav-icon { background: var(--surface3); color: var(--text2); }
 .nav-item.active { background: rgba(52,131,250,0.10); }
@@ -86,19 +84,19 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .header-hero { background: linear-gradient(150deg, var(--surface2) 0%, var(--surface) 100%); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px 24px; position: relative; overflow: hidden; margin-bottom: 20px; }
 .header-hero::after { content: ''; position: absolute; top: -80px; right: -60px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(52,131,250,0.10) 0%, transparent 65%); pointer-events: none; }
 .hero-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); opacity: 0.75; margin-bottom: 10px; }
-.hero-balance { font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 46px; font-weight: 600; color: var(--blue); letter-spacing: -0.03em; line-height: 1; margin-bottom: 6px; }
+.hero-balance { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 46px; font-weight: 600; color: var(--blue); letter-spacing: -0.03em; line-height: 1; margin-bottom: 6px; }
 .hero-balance.negative { color: var(--red); }
-.hero-sub { font-size: 13px; color: var(--text3); font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; }
+.hero-sub { font-size: 13px; color: var(--text3); font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 .hero-mqv-section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
 .hero-mqv-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); opacity: 0.75; margin-bottom: 6px; }
-.hero-mqv-val { font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 26px; font-weight: 600; color: var(--blue); letter-spacing: -0.02em; line-height: 1; }
-.hero-mqv-sub { font-size: 12px; color: var(--text3); font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; margin-top: 3px; }
+.hero-mqv-val { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 26px; font-weight: 600; color: var(--blue); letter-spacing: -0.02em; line-height: 1; }
+.hero-mqv-sub { font-size: 12px; color: var(--text3); font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; margin-top: 3px; }
 .hero-stats { display: flex; gap: 0; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); flex-wrap: wrap; }
 .hero-stat { padding-right: 32px; margin-right: 32px; border-right: 1px solid var(--border); }
 .hero-stat:last-child { border-right: none; margin-right: 0; }
 .hero-stat .hs-label { font-size: 10px; color: var(--text3); margin-bottom: 6px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
-.hero-stat .hs-val { font-size: 18px; font-weight: 600; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; line-height: 1.2; }
-.hero-stat .hs-sub { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; }
+.hero-stat .hs-val { font-size: 18px; font-weight: 600; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; line-height: 1.2; }
+.hero-stat .hs-sub { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 
 /* ── CONTENT ── */
 .content { padding: 30px 40px; flex: 1; }
@@ -123,8 +121,8 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .metric-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; transition: border-color 0.15s; }
 .metric-card:hover { border-color: var(--border2); }
 .metric-card .mc-label { font-size: 10px; color: var(--text3); margin-bottom: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-.metric-card .mc-val { font-size: 22px; font-weight: 600; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; line-height: 1.15; word-break: break-all; }
-.metric-card .mc-sub { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; }
+.metric-card .mc-val { font-size: 22px; font-weight: 600; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; line-height: 1.15; word-break: break-all; }
+.metric-card .mc-sub { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 .mc-val.green { color: var(--green); }
 .mc-val.red { color: var(--red); }
 .mc-val.purple { color: var(--blue); }
@@ -132,8 +130,8 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 /* ── MQV CARD ── */
 .mqv-card { background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: var(--radius); padding: 24px 28px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
 .mqv-main .mqv-label { font-size: 10px; color: var(--blue); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
-.mqv-main .mqv-val { font-size: 34px; font-weight: 600; color: var(--text); font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; line-height: 1; word-break: break-all; }
-.mqv-main .mqv-sub { font-size: 12px; color: var(--text3); margin-top: 6px; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; }
+.mqv-main .mqv-val { font-size: 34px; font-weight: 600; color: var(--text); font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; line-height: 1; word-break: break-all; }
+.mqv-main .mqv-sub { font-size: 12px; color: var(--text3); margin-top: 6px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 .mqv-detail { font-size: 12px; color: var(--text2); display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
 .mqv-detail strong { color: var(--text); }
 
@@ -142,7 +140,7 @@ label { font-size: 11px; color: var(--text3); display: block; margin-bottom: 5px
 input[type=text], input[type=number], input[type=date], select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-size: 13px; padding: 10px 13px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
 input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(52,131,250,0.12); }
 select option { background: var(--surface2); }
-.hint { font-size: 11px; color: var(--text3); margin-top: 4px; min-height: 16px; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; }
+.hint { font-size: 11px; color: var(--text3); margin-top: 4px; min-height: 16px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 
 /* ── BUTTONS ── */
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border2); background: var(--surface2); color: var(--text); transition: all 0.15s; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
@@ -177,8 +175,8 @@ thead th { background: var(--surface2); color: var(--text3); font-size: 10px; fo
 tbody td { padding: 15px 18px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: rgba(52,131,250,0.04); }
-.td-main { font-weight: 600; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; white-space: nowrap; }
-.td-sub { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; white-space: nowrap; }
+.td-main { font-weight: 600; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; white-space: nowrap; }
+.td-sub { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; white-space: nowrap; }
 
 /* ── BADGES ── */
 .badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 9px; border-radius: 6px; }
@@ -187,13 +185,13 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
 .badge.ahorro { background: rgba(52,131,250,0.15); color: var(--blue); }
 .badge.tarjeta { background: rgba(242,61,79,0.18); color: var(--red); }
 .badge.pago { background: rgba(0,166,80,0.15); color: var(--green); }
-.acct-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 9px; border-radius: 6px; font-weight: 600; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; }
+.acct-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 9px; border-radius: 6px; font-weight: 600; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 
 /* ── TARJETA PANEL ── */
 .tarjeta-panel { background: rgba(242,61,79,0.04); border: 1px solid rgba(242,61,79,0.18); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
 .tarjeta-header { padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid rgba(242,61,79,0.12); }
 .tarjeta-title { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
-.deuda-chip { background: var(--red-bg); border: 1px solid rgba(242,61,79,0.22); color: var(--red); padding: 5px 14px; border-radius: 8px; font-size: 12px; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; font-weight: 600; }
+.deuda-chip { background: var(--red-bg); border: 1px solid rgba(242,61,79,0.22); color: var(--red); padding: 5px 14px; border-radius: 8px; font-size: 12px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 600; }
 .tarjeta-body { padding: 22px 26px; display: none; }
 .tarjeta-body.open { display: block; }
 .mode-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
@@ -216,8 +214,8 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
 .pat-card:hover { border-color: var(--blue-border); background: var(--surface3); }
 .pat-card .pc-icon { font-size: 22px; margin-bottom: 14px; }
 .pat-card .pc-name { font-size: 10px; color: var(--text3); margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
-.pat-card .pc-amount { font-size: 17px; font-weight: 600; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; line-height: 1.3; word-break: break-all; }
-.pat-card .pc-sub { font-size: 11px; color: var(--text3); margin-top: 4px; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; }
+.pat-card .pc-amount { font-size: 17px; font-weight: 600; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; line-height: 1.3; word-break: break-all; }
+.pat-card .pc-sub { font-size: 11px; color: var(--text3); margin-top: 4px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 .pat-card .pc-pct { font-size: 11px; color: var(--text3); margin-top: 10px; }
 
 /* ── EDIT DATE ROW ── */
@@ -276,6 +274,35 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
   .hero-stat:nth-child(odd) { border-right: 1px solid var(--border) !important; padding-right: 16px; margin-right: 0; }
   .content { padding: 14px 14px; }
   .header-hero { padding: 18px 16px 14px; }
+}
+
+/* ── EDIT MODAL ── */
+.edit-modal-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); align-items: flex-end; justify-content: center; }
+.edit-modal-overlay.open { display: flex; }
+.edit-modal-sheet { background: var(--surface); border: 1px solid var(--border2); border-radius: 20px 20px 0 0; width: 100%; max-width: 600px; padding: 20px 24px 32px; max-height: 88vh; overflow-y: auto; }
+.em-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 18px; }
+.em-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.em-header span { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+.em-close { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 6px 10px; border-radius: 6px; line-height: 1; }
+.em-close:hover { background: var(--surface2); color: var(--text); }
+@media (min-width: 600px) {
+  .edit-modal-overlay { align-items: center; }
+  .edit-modal-sheet { border-radius: var(--radius); }
+  .em-handle { display: none; }
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav { display: none; }
+@media (max-width: 860px) {
+  .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: none; border: none; color: var(--text3); cursor: pointer; font-size: 10px; padding: 8px 2px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 500; transition: color 0.12s; min-height: 54px; }
+  .bn-item.active { color: var(--blue); }
+  .bn-item svg { flex-shrink: 0; }
+  .content { padding-bottom: 80px; }
+  .action-btn { min-width: 40px; min-height: 40px; font-size: 16px; }
+  .cs-opt { font-size: 13px; padding: 9px 16px; }
+  .cs-options { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+  .cuenta-selector { overflow: hidden; }
 }
 </style>
 </head>
@@ -341,6 +368,14 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
       <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span>
       <span class="nav-label">Patrimonio</span>
     </button>
+    <button class="nav-item" onclick="showSection('metas')">
+      <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="22" y1="12" x2="19" y2="12"/><line x1="5" y1="12" x2="2" y2="12"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/></svg></span>
+      <span class="nav-label">Metas</span>
+    </button>
+    <button class="nav-item" onclick="showSection('inversiones')">
+      <span class="nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span>
+      <span class="nav-label">Inversiones</span>
+    </button>
   </div>
   <div class="sidebar-footer">
     <div class="cotiz-label">Dólar libre</div>
@@ -351,7 +386,9 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
       <input class="cotiz-input" type="number" id="cotiz-v" placeholder="1475">
     </div>
     <div class="cotiz-prom" id="cotiz-prom"></div>
-    <button class="cotiz-btn" onclick="updateCotiz()">Actualizar cotización</button>
+    <div id="cotiz-update-time" style="font-size:10px;color:var(--text3);font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-bottom:6px;min-height:14px"></div>
+    <button id="fetch-dolar-btn" class="cotiz-btn" onclick="fetchDolar()" style="margin-bottom:6px">↻ Traer cotización</button>
+    <button class="cotiz-btn" onclick="updateCotiz()" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text2)">Aplicar manual</button>
     <button onclick="doLogout()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">→ Cerrar sesión</button>
   </div>
 </nav>
@@ -414,6 +451,8 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
         <div class="grid-3" style="margin-bottom:0" id="pnl-block"></div>
       </div>
 
+      <div id="presupuesto-block"></div>
+
       <div class="grid-2">
         <div class="card">
           <div class="card-title">Activos por instrumento</div>
@@ -451,7 +490,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
         </div>
         <div class="grid-form-4">
           <div><label>Concepto</label><input type="text" id="in-concepto" placeholder="Sueldo, freelance..."></div>
-          <div><label id="in-monto-lbl">Monto (USD)</label><input type="number" id="in-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('in')"><div class="hint" id="in-hint"></div></div>
+          <div><label id="in-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="in-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('in')"><div class="hint" id="in-hint"></div></div>
           <div><label>Categoría</label><select id="in-cat"><option>Sueldo</option><option>Freelance</option><option>Inversión</option><option>Otros</option></select></div>
           <div><label>Fecha</label><input type="date" id="in-fecha"></div>
         </div>
@@ -491,8 +530,8 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
             <div class="cur-toggle"><button class="active" id="tc-cur-usd" onclick="setCurTC('usd')">U$D</button><button id="tc-cur-ars" onclick="setCurTC('ars')">$ Pesos</button></div>
             <div class="grid-form-4">
               <div><label>Concepto</label><input type="text" id="tc-concepto" placeholder="Supermercado, Netflix..."></div>
-              <div><label id="tc-monto-lbl">Monto (USD)</label><input type="number" id="tc-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tc')"><div class="hint" id="tc-hint"></div></div>
-              <div><label>Cuotas</label><input type="number" id="tc-cuotas" value="1" min="1" max="48" step="1"></div>
+              <div><label id="tc-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="tc-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tc')"><div class="hint" id="tc-hint"></div></div>
+              <div><label>Cuotas</label><input type="number" inputmode="numeric" id="tc-cuotas" value="1" min="1" max="48" step="1"></div>
               <div><label>Fecha</label><input type="date" id="tc-fecha"></div>
             </div>
             <div style="margin-bottom:12px"><label>Nota</label><input type="text" id="tc-nota" placeholder=""></div>
@@ -502,7 +541,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
             <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Registrá un pago. Descuenta de la cuenta elegida y reduce la deuda.</div>
             <div class="cur-toggle"><button class="active" id="tp-cur-usd" onclick="setCurTP('usd')">U$D</button><button id="tp-cur-ars" onclick="setCurTP('ars')">$ Pesos</button></div>
             <div class="grid-form-3">
-              <div><label id="tp-monto-lbl">Monto a pagar (USD)</label><input type="number" id="tp-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tp')"><div class="hint" id="tp-hint"></div></div>
+              <div><label id="tp-monto-lbl">Monto a pagar (USD)</label><input type="number" inputmode="decimal" id="tp-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tp')"><div class="hint" id="tp-hint"></div></div>
               <div><label>Fecha</label><input type="date" id="tp-fecha"></div>
               <div><label>Nota</label><input type="text" id="tp-nota" placeholder="Pago mínimo, total..."></div>
             </div>
@@ -523,7 +562,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
         </div>
         <div class="grid-form-4">
           <div><label>Concepto</label><input type="text" id="eg-concepto" placeholder="Alquiler, supermercado..."></div>
-          <div><label id="eg-monto-lbl">Monto (USD)</label><input type="number" id="eg-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('eg')"><div class="hint" id="eg-hint"></div></div>
+          <div><label id="eg-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="eg-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('eg')"><div class="hint" id="eg-hint"></div></div>
           <div><label>Categoría</label><select id="eg-cat"><option>Vivienda</option><option>Alimentación</option><option>Transporte</option><option>Salud</option><option>Entretenimiento</option><option>Servicios</option><option>Otros</option></select></div>
           <div><label>Fecha</label><input type="date" id="eg-fecha"></div>
         </div>
@@ -545,7 +584,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
       <div class="card">
         <div class="grid-form-3">
           <div><label>Instrumento</label><select id="ah-tipo" onchange="updateAhTipo()"><option>U$D Físicos</option><option>USD Galicia</option><option>Pesos MP</option><option>Pesos Galicia/BBVA</option><option>Pesos Efectivo</option><option>Criptomonedas (USDT)</option><option>Plazo fijo</option><option>Acciones / ETF</option><option>Fondo común</option><option>Inmueble</option><option>Otro</option></select></div>
-          <div><label id="ah-monto-lbl">Monto (USD)</label><input type="number" id="ah-monto" placeholder="0" step="0.01"></div>
+          <div><label id="ah-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="ah-monto" placeholder="0" step="0.01"></div>
           <div><label>Tipo</label><select id="ah-mov"><option value="deposito">Depósito</option><option value="retiro">Retiro</option></select></div>
         </div>
         <div class="grid-form-2">
@@ -569,7 +608,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
           <button id="tr-cur-ars" onclick="setCurTR('ars')">$ Pesos</button>
         </div>
         <div class="grid-form-3">
-          <div><label id="tr-monto-lbl">Monto (USD)</label><input type="number" id="tr-monto" placeholder="0" step="0.01" oninput="updateHint('tr')"><div class="hint" id="tr-hint"></div></div>
+          <div><label id="tr-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="tr-monto" placeholder="0" step="0.01" oninput="updateHint('tr')"><div class="hint" id="tr-hint"></div></div>
           <div><label>Fecha</label><input type="date" id="tr-fecha"></div>
           <div><label>Nota (opcional)</label><input type="text" id="tr-nota" placeholder="Cambio de dólares..."></div>
         </div>
@@ -599,12 +638,145 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
           <div id="deudas-detalle"></div>
         </div>
       </div>
+      <div class="card" style="margin-top:4px">
+        <div class="card-title">Evolución del patrimonio</div>
+        <div class="chart-wrap" style="height:240px"><canvas id="chartPatEvo" role="img" aria-label="Evolución">Evolución.</canvas></div>
+      </div>
+    </div>
+
+    <!-- METAS -->
+    <div id="sec-metas" class="section">
+      <div class="section-title">Nueva meta</div>
+      <div class="card">
+        <div class="grid-form-4">
+          <div><label>Nombre</label><input type="text" id="meta-nombre" placeholder="Viaje, casa, auto..."></div>
+          <div><label>Objetivo (U$D)</label><input type="number" id="meta-objetivo" placeholder="0" min="0" step="1"></div>
+          <div><label>Fecha límite</label><input type="date" id="meta-fecha"></div>
+          <div><label>Color</label>
+            <select id="meta-color">
+              <option value="#3483FA">Azul</option>
+              <option value="#00A650">Verde</option>
+              <option value="#F5A623">Naranja</option>
+              <option value="#8B7CF6">Violeta</option>
+              <option value="#F23D4F">Rojo</option>
+              <option value="#00D4A1">Turquesa</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:12px"><label>Nota (opcional)</label><input type="text" id="meta-nota" placeholder="Descripción..."></div>
+        <button class="btn primary" onclick="agregarMeta()">+ Agregar meta</button>
+      </div>
+      <div class="section-title">Mis metas</div>
+      <div id="metas-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:20px"></div>
+    </div>
+
+    <!-- INVERSIONES -->
+    <div id="sec-inversiones" class="section">
+      <div class="section-title">Mercados en tiempo real</div>
+      <div class="card" style="padding:20px 24px;margin-bottom:18px">
+        <div class="card-title">
+          <span>Precios de mercado</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span id="mercados-time" style="font-size:10px;color:var(--text3);font-family:'SF Mono',ui-monospace,monospace"></span>
+            <button id="fetch-mercados-btn" class="btn sm" onclick="fetchMercados()">↻ Actualizar</button>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="metric-card" id="btc-card">
+            <div class="mc-label">₿ Bitcoin</div>
+            <div class="mc-val" id="btc-price">—</div>
+            <div class="mc-sub" id="btc-change" style="margin-top:4px">—</div>
+          </div>
+          <div class="metric-card" id="eth-card">
+            <div class="mc-label">Ξ Ethereum</div>
+            <div class="mc-val" id="eth-price">—</div>
+            <div class="mc-sub" id="eth-change" style="margin-top:4px">—</div>
+          </div>
+          <div class="metric-card" id="sp500-card">
+            <div class="mc-label">📈 S&P 500</div>
+            <div class="mc-val" id="sp500-price">—</div>
+            <div class="mc-sub" id="sp500-change" style="margin-top:4px">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="section-title">Calculadora de interés compuesto</div>
+      <div class="card">
+        <div class="grid-form-4">
+          <div><label>Capital inicial (U$D)</label><input type="number" id="calc-capital" placeholder="1000" min="0" step="0.01" oninput="calcInteres()"></div>
+          <div><label>Tasa anual (%)</label><input type="number" id="calc-tasa" placeholder="12.00" min="0" step="0.1" oninput="calcInteres()"></div>
+          <div><label>Período (meses)</label><input type="number" id="calc-periodo" placeholder="12" min="1" step="1" oninput="calcInteres()"></div>
+          <div><label>Capitalización</label>
+            <select id="calc-freq" onchange="calcInteres()">
+              <option value="mensual">Mensual</option>
+              <option value="anual">Anual</option>
+            </select>
+          </div>
+        </div>
+        <div id="calc-result"></div>
+      </div>
     </div>
 
   </div><!-- /content -->
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav class="bottom-nav">
+    <button class="bn-item active" id="bn-resumen" onclick="showSection('resumen')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span>Resumen</span>
+    </button>
+    <button class="bn-item" id="bn-ingresos" onclick="showSection('ingresos')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+      <span>Ingresos</span>
+    </button>
+    <button class="bn-item" id="bn-egresos" onclick="showSection('egresos')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+      <span>Egresos</span>
+    </button>
+    <button class="bn-item" id="bn-ahorro" onclick="showSection('ahorro')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+      <span>Ahorros</span>
+    </button>
+    <button class="bn-item" id="bn-transferencias" onclick="showSection('transferencias')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+      <span>Transf.</span>
+    </button>
+    <button class="bn-item" id="bn-patrimonio" onclick="showSection('patrimonio')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+      <span>Patrimonio</span>
+    </button>
+    <button class="bn-item" id="bn-metas" onclick="showSection('metas')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+      <span>Metas</span>
+    </button>
+    <button class="bn-item" id="bn-inversiones" onclick="showSection('inversiones')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      <span>Invest.</span>
+    </button>
+  </nav>
+
 </div><!-- /main -->
 
+<!-- EDIT MODAL -->
+<div id="edit-modal" class="edit-modal-overlay" onclick="if(event.target===this)closeEditModal()">
+  <div class="edit-modal-sheet">
+    <div class="em-handle"></div>
+    <div class="em-header">
+      <span id="edit-modal-title">Editar</span>
+      <button class="em-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div id="edit-modal-fields"></div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn primary" style="flex:1" onclick="saveEditModal()">✓ Guardar cambios</button>
+      <button class="btn" onclick="closeEditModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <script>
+/* ── CHART.JS GLOBAL FONT ── */
+Chart.defaults.font.family="'SF Pro',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif";
+Chart.defaults.font.size=12;
+
 /* ── CONSTANTS ── */
 const INSTRUMENTOS=['U$D Físicos','USD Galicia','Pesos MP','Pesos Galicia/BBVA','Pesos Efectivo','Criptomonedas (USDT)'];
 const COLORS={'U$D Físicos':'#00D4A1','USD Galicia':'#4A9EFF','Pesos MP':'#F5A623','Pesos Galicia/BBVA':'#8B93A8','Pesos Efectivo':'#FF6B47','Criptomonedas (USDT)':'#8B7CF6','Plazo fijo':'#38BDF8','Acciones / ETF':'#F472B6','Fondo común':'#86EFAC','Inmueble':'#FCD34D','Otro':'#94A3B8'};
@@ -631,13 +803,15 @@ let data = {
   deudaTC: 0,
   movTC: [],
   sueldo: 0,
+  presupuestos: { Alimentación:0, Transporte:0, Salud:0, Entretenimiento:0, Servicios:0, Ahorros:0, Otros:0 },
+  metas: [],
 };
 
 /* ── UI STATE ── */
 let selCuenta={in:INSTRUMENTOS[0], eg:INSTRUMENTOS[0], tp:INSTRUMENTOS[0], trde:INSTRUMENTOS[0], trha:INSTRUMENTOS[1]};
 let curMode={in:'usd', eg:'usd', tc:'usd', tp:'usd', tr:'usd', sueldo:'usd'};
 let rangoResumen={desde:'',hasta:''}, mesFiltros={ingresos:'',egresos:'',ahorros:''};
-let chartFlujo=null, chartPatrim=null, chartEvo=null, chartCat=null;
+let chartFlujo=null, chartPatrim=null, chartEvo=null, chartCat=null, chartPatEvo=null;
 
 /* ── PERSISTENCE ── */
 function saveData(){ try{ localStorage.setItem('finanzas_v1', JSON.stringify(data)); }catch(e){} syncSupabase(); }
@@ -650,11 +824,13 @@ function loadData(){
     if(!data.transferencias) data.transferencias=[];
     if(!data.cotizC) data.cotizC=1455;
     if(!data.cotizV) data.cotizV=1475;
+    if(!data.presupuestos) data.presupuestos={ Vivienda:0, Alimentación:0, Transporte:0, Salud:0, Entretenimiento:0, Servicios:0, Otros:0 };
+    if(!data.metas) data.metas=[];
   }catch(e){}
 }
 async function syncSupabase(){
   try{
-    await sb.from('finanzas_config').upsert({id:1,cotiz_c:data.cotizC,cotiz_v:data.cotizV,deuda_tc:data.deudaTC,sueldo:data.sueldo,updated_at:new Date().toISOString()});
+    await sb.from('finanzas_config').upsert({id:1,cotiz_c:data.cotizC,cotiz_v:data.cotizV,deuda_tc:data.deudaTC,sueldo:data.sueldo,presupuestos_json:JSON.stringify(data.presupuestos),metas_json:JSON.stringify(data.metas),updated_at:new Date().toISOString()});
     const tbls=[
       {n:'ingresos',       arr:data.ingresos,           m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
       {n:'egresos',        arr:data.egresos,             m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
@@ -684,7 +860,7 @@ async function loadFromSupabase(){
       sb.from('mov_tc').select('*').order('fecha',{ascending:false}),
     ]);
     const fd=r=>typeof r==='string'&&r.includes('T')?r.split('T')[0]:r;
-    if(cfg.data){ data.cotizC=+cfg.data.cotiz_c; data.cotizV=+cfg.data.cotiz_v; data.deudaTC=+cfg.data.deuda_tc; data.sueldo=+cfg.data.sueldo; }
+    if(cfg.data){ data.cotizC=+cfg.data.cotiz_c; data.cotizV=+cfg.data.cotiz_v; data.deudaTC=+cfg.data.deuda_tc; data.sueldo=+cfg.data.sueldo; try{ if(cfg.data.presupuestos_json) data.presupuestos=JSON.parse(cfg.data.presupuestos_json); if(cfg.data.metas_json) data.metas=JSON.parse(cfg.data.metas_json); }catch(e){} }
     data.ingresos=(ing.data||[]).map(r=>({id:r.id,concepto:r.concepto,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,cat:r.cat,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta}));
     data.egresos=(eg.data||[]).map(r=>({id:r.id,concepto:r.concepto,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,cat:r.cat,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta}));
     data.ahorros=(ah.data||[]).map(r=>({id:r.id,tipo:r.tipo,usd:+r.usd,ars:+r.ars,fecha:fd(r.fecha),nota:r.nota||'',mov:r.mov}));
@@ -710,6 +886,29 @@ function updateCotizDisplay(){
   document.getElementById('cotiz-v').value=data.cotizV;
   USD_C=data.cotizC; USD_V=data.cotizV; USD_ARS=(USD_C+USD_V)/2;
   document.getElementById('cotiz-prom').innerHTML='Prom. <strong>$'+Math.round(USD_ARS).toLocaleString('es-AR')+'</strong>';
+}
+
+/* ── FETCH DOLAR API ── */
+async function fetchDolar(){
+  const btn=document.getElementById('fetch-dolar-btn');
+  const timeEl=document.getElementById('cotiz-update-time');
+  if(btn){ btn.textContent='↻ Cargando…'; btn.disabled=true; }
+  try{
+    const r=await fetch('https://dolarapi.com/v1/dolares/blue');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    if(d.compra && d.venta){
+      document.getElementById('cotiz-c').value=d.compra;
+      document.getElementById('cotiz-v').value=d.venta;
+      updateCotiz();
+      const hm=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+      if(timeEl) timeEl.textContent='Actualizado '+hm;
+    }
+  }catch(e){
+    if(timeEl) timeEl.textContent='Sin conexión';
+  }finally{
+    if(btn){ btn.textContent='↻ Traer cotización'; btn.disabled=false; }
+  }
 }
 
 /* ── FORMATTERS ── */
@@ -830,14 +1029,18 @@ function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
-  const secs=['resumen','ingresos','egresos','ahorro','transferencias','patrimonio'];
+  const secs=['resumen','ingresos','egresos','ahorro','transferencias','patrimonio','metas','inversiones'];
   document.querySelectorAll('.nav-item')[secs.indexOf(id)].classList.add('active');
   if(id==='resumen') renderResumen();
   if(id==='patrimonio') renderPatrimonio();
+  if(id==='metas') renderMetas();
+  if(id==='inversiones'){ renderInversiones(); fetchMercados(); }
   if(id==='ingresos'){ renderCuentas('in'); renderIngresos(); }
   if(id==='egresos'){ renderCuentas('eg'); updateDeudaChip(); renderEgresos(); }
   if(id==='ahorro') renderAhorros();
   if(id==='transferencias'){ renderCuentas('trde'); renderCuentas('trha'); renderTransferencias(); }
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
+  const bn=document.getElementById('bn-'+id); if(bn)bn.classList.add('active');
   closeSidebar();
 }
 
@@ -961,6 +1164,7 @@ function renderResumen(){
   } else { chartCat=null; }
 
   renderUltimos();
+  renderPresupuestos();
 }
 
 function renderUltimos(){
@@ -1003,6 +1207,12 @@ function renderPatrimonio(){
   if(chartEvo)chartEvo.destroy();
   chartEvo=new Chart(document.getElementById('chartEvo').getContext('2d'),{type:'bar',data:{labels:entries.map(([k])=>k),datasets:[{data:entries.map(([,v])=>v.usd*USD_ARS),backgroundColor:colors,borderRadius:8,borderSkipped:false,borderWidth:0,hoverBackgroundColor:colors.map(c=>c+'cc')}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:scalesARS()}});
   renderTCHistorial(document.getElementById('deudas-detalle'));
+  const snaps=getPatrimonioMensual();
+  if(chartPatEvo) chartPatEvo.destroy();
+  const canvPE=document.getElementById('chartPatEvo');
+  if(canvPE && snaps.length>1){
+    chartPatEvo=new Chart(canvPE.getContext('2d'),{type:'line',data:{labels:snaps.map(s=>s.label),datasets:[{data:snaps.map(s=>s.usd*USD_ARS),borderColor:'#3483FA',borderWidth:2,backgroundColor:'rgba(52,131,250,0.08)',fill:true,tension:0.4,pointBackgroundColor:'#3483FA',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:scalesARS()}});
+  }
 }
 
 /* ── AGREGAR MOVIMIENTOS ── */
@@ -1071,12 +1281,8 @@ function buildRows(items,tipo,cellsFn){
   return items.sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(i=>`<tr>
     <td style="color:var(--text3)">${fmtDate(i.fecha)}</td>${cellsFn(i)}
     <td>
-      <button class="action-btn" onclick="toggleEditDate('${tipo}',${i.id})" title="Editar fecha">📅</button>
+      <button class="action-btn" onclick="openEditModal('${tipo}',${i.id})" title="Editar">✏️</button>
       <button class="action-btn" onclick="eliminar('${tipo}',${i.id})" title="Eliminar">🗑</button>
-      <div class="edit-date-row" id="edr-${tipo}-${i.id}">
-        <label>Nueva fecha</label><input type="date" id="edr-inp-${tipo}-${i.id}" value="${i.fecha}">
-        <button class="btn sm primary" onclick="saveDate('${tipo}',${i.id})">✓ Guardar</button>
-      </div>
     </td></tr>`).join('');
 }
 
@@ -1084,7 +1290,7 @@ function buildRows(items,tipo,cellsFn){
 function renderTCHistorial(el){
   if(!el)return;
   const movs=data.movTC.filter(m=>m.tipo!=='deuda_inicial').sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  el.innerHTML=`<div style="font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:22px;font-weight:500;color:var(--red);margin-bottom:6px">${fmtARS(data.deudaTC*USD_ARS)}</div><div style="font-size:11px;color:var(--text3);margin-bottom:16px">${fmtUSD(data.deudaTC)} pendiente</div>`+
+  el.innerHTML=`<div style="font-family:'SF Pro Display',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:500;color:var(--red);margin-bottom:6px">${fmtARS(data.deudaTC*USD_ARS)}</div><div style="font-size:11px;color:var(--text3);margin-bottom:16px">${fmtUSD(data.deudaTC)} pendiente</div>`+
     (movs.length?`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Cuenta</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
     movs.map(m=>{
       const acct=m.cuenta?`<span class="acct-pill" style="background:${COLORS[m.cuenta]||'#888'}22;color:${COLORS[m.cuenta]||'#888'}">${m.cuenta}</span>`:'-';
@@ -1216,6 +1422,226 @@ function scalesARS() {
   };
 }
 
+/* ── PATRIMONIO MENSUAL ── */
+function getPatrimonioMensual(){
+  const allDates=[...data.ahorros,...data.ingresos,...data.egresos,...data.movTC].map(m=>m.fecha);
+  if(!allDates.length) return [];
+  const minMon=allDates.sort()[0].substring(0,7);
+  const todayMon=today().substring(0,7);
+  const months=[];
+  let cur=minMon;
+  while(cur<=todayMon){
+    const co=cur+'-31';
+    const netAh=data.ahorros.filter(m=>m.fecha<=co).reduce((s,m)=>s+(m.mov==='deposito'?m.usd:-m.usd),0);
+    const netIn=data.ingresos.filter(m=>m.fecha<=co).reduce((s,m)=>s+m.usd,0);
+    const netEg=data.egresos.filter(m=>m.fecha<=co).reduce((s,m)=>s+m.usd,0);
+    const netTC=data.movTC.filter(m=>m.fecha<=co&&m.tipo==='gasto').reduce((s,m)=>s+m.usd,0);
+    const [y,mo]=cur.split('-').map(Number);
+    const label=new Date(y,mo-1).toLocaleDateString('es-AR',{month:'short',year:'numeric'});
+    months.push({fecha:cur,usd:netAh+netIn-netEg-netTC,label});
+    if(mo===12) cur=`${y+1}-01`;
+    else cur=`${y}-${String(mo+1).padStart(2,'0')}`;
+  }
+  return months;
+}
+
+/* ── COMPARATIVA ── */
+function renderComparativa(){
+  const now=new Date();
+  const ty=now.getFullYear(),tm=now.getMonth()+1;
+  const py=tm===1?ty-1:ty, pm=tm===1?12:tm-1;
+  const ts=`${ty}-${String(tm).padStart(2,'0')}-01`, te=`${ty}-${String(tm).padStart(2,'0')}-31`;
+  const ps=`${py}-${String(pm).padStart(2,'0')}-01`, pe=`${py}-${String(pm).padStart(2,'0')}-31`;
+  const sum=(arr,f,t)=>arr.filter(x=>x.fecha>=f&&x.fecha<=t).reduce((s,x)=>s+x.usd,0);
+  const inT=sum(data.ingresos,ts,te),inP=sum(data.ingresos,ps,pe);
+  const egT=sum(data.egresos,ts,te),egP=sum(data.egresos,ps,pe);
+  const difT=inT-egT,difP=inP-egP;
+  function row(label,cur,prev){
+    const pct=prev>0?((cur-prev)/prev*100):cur>0?100:0;
+    const up=cur>=prev;
+    const col=label==='Egresos'?(up?'var(--red)':'var(--green)'):(up?'var(--green)':'var(--red)');
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:12px;color:var(--text2)">${label}</span>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-size:11px;color:var(--text3)">${fmtARS(prev*USD_ARS)}</span>
+        <span style="font-size:11px;color:var(--text3)">→</span>
+        <span style="font-size:13px;font-weight:600;font-family:'SF Pro Display',-apple-system,sans-serif">${fmtARS(cur*USD_ARS)}</span>
+        <span style="font-size:11px;font-weight:700;color:${col};min-width:52px;text-align:right">${up?'↑':'↓'} ${Math.abs(pct).toFixed(1)}%</span>
+      </div>
+    </div>`;
+  }
+  const mesP=new Date(py,pm-1).toLocaleDateString('es-AR',{month:'long'});
+  const mesT=new Date(ty,tm-1).toLocaleDateString('es-AR',{month:'long'});
+  const el=document.getElementById('comparativa-block');
+  if(el) el.innerHTML=`<div class="card" style="padding:16px 20px;margin-bottom:18px">
+    <div class="card-title" style="margin-bottom:14px"><span>Comparativa · ${mesP} vs ${mesT}</span></div>
+    ${row('Ingresos',inT,inP)}${row('Egresos',egT,egP)}${row('Balance',difT,difP)}
+  </div>`;
+}
+
+/* ── PRESUPUESTOS ── */
+function renderPresupuestos(){
+  const now=new Date();
+  const ts=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  const te=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-31`;
+  const gastado={};
+  data.egresos.filter(e=>e.fecha>=ts&&e.fecha<=te).forEach(e=>{ gastado[e.cat]=(gastado[e.cat]||0)+e.usd; });
+  const cats=Object.keys(data.presupuestos);
+  const rows=cats.map(cat=>{
+    const bUSD=data.presupuestos[cat];
+    const gUSD=gastado[cat]||0;
+    const pct=bUSD>0?Math.min(Math.round(gUSD/bUSD*100),100):0;
+    const over=bUSD>0&&gUSD>bUSD;
+    const barColor=over?'var(--red)':'var(--blue)';
+    return`<div style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:12px;color:var(--text2)">${cat}</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;color:${over?'var(--red)':'var(--text3)'}">${fmtARS(gUSD*USD_ARS)} /</span>
+          <input type="number" value="${bUSD||''}" placeholder="∞" min="0" step="1"
+            onchange="updatePresupuesto('${cat}',this.value)"
+            style="width:72px;padding:3px 6px;font-size:11px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:inherit;outline:none;text-align:right">
+          <span style="font-size:10px;color:var(--text3)">U$D</span>
+        </div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${barColor};transition:width 0.4s ease"></div></div>
+    </div>`;
+  }).join('');
+  const el=document.getElementById('presupuesto-block');
+  if(el) el.innerHTML=`<div class="card" style="padding:16px 20px;margin-bottom:18px">
+    <div class="card-title" style="margin-bottom:16px"><span>Presupuesto mensual</span><span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">Editá el límite en U$D</span></div>
+    ${rows}
+  </div>`;
+}
+
+function updatePresupuesto(cat,val){
+  data.presupuestos[cat]=parseFloat(val)||0;
+  saveData(); renderPresupuestos();
+}
+
+/* ── METAS ── */
+function agregarMeta(){
+  const nombre=document.getElementById('meta-nombre').value.trim();
+  const objetivo=parseFloat(document.getElementById('meta-objetivo').value)||0;
+  const fecha=document.getElementById('meta-fecha').value;
+  const color=document.getElementById('meta-color').value;
+  const nota=document.getElementById('meta-nota').value.trim();
+  if(!nombre||!objetivo){ alert('Ingresá nombre y objetivo.'); return; }
+  data.metas.push({id:Date.now(),nombre,objetivo,logrado:0,fecha,color,nota});
+  saveData();
+  ['meta-nombre','meta-objetivo','meta-fecha','meta-nota'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+  renderMetas();
+}
+
+function eliminarMeta(id){
+  data.metas=data.metas.filter(m=>m.id!==id);
+  saveData(); renderMetas();
+}
+
+function actualizarLogrado(id,val){
+  const m=data.metas.find(x=>x.id===id);
+  if(!m) return;
+  m.logrado=Math.max(0,parseFloat(val)||0);
+  saveData(); renderMetas();
+}
+
+function renderMetas(){
+  const el=document.getElementById('metas-grid');
+  if(!el) return;
+  if(!data.metas.length){ el.innerHTML='<div class="empty" style="grid-column:1/-1">Sin metas. Agregá tu primera meta arriba.</div>'; return; }
+  el.innerHTML=data.metas.map(m=>{
+    const pct=m.objetivo>0?Math.min(Math.round(m.logrado/m.objetivo*100),100):0;
+    const restante=Math.max(0,m.objetivo-m.logrado);
+    return`<div style="background:var(--surface2);border:1px solid var(--border);border-top:3px solid ${m.color};border-radius:var(--radius);padding:20px 20px 16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">${m.nombre}</div>
+          ${m.nota?`<div style="font-size:11px;color:var(--text3)">${m.nota}</div>`:''}
+          ${m.fecha?`<div style="font-size:10px;color:var(--text3);margin-top:3px">⏱ ${fmtDate(m.fecha)}</div>`:''}
+        </div>
+        <button onclick="eliminarMeta(${m.id})" class="action-btn" style="color:var(--red);font-size:12px">✕</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:11px;color:var(--text3)">Progreso</span>
+        <span style="font-size:12px;font-weight:700;color:${m.color}">${pct}%</span>
+      </div>
+      <div class="progress-bar" style="height:6px;margin-bottom:14px"><div class="progress-fill" style="width:${pct}%;background:${m.color};transition:width 0.4s ease"></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Ahorrado</div><div style="font-size:15px;font-weight:600;font-family:'SF Pro Display',-apple-system,sans-serif;color:${m.color}">${fmtUSD(m.logrado)}</div></div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Objetivo</div><div style="font-size:15px;font-weight:600;font-family:'SF Pro Display',-apple-system,sans-serif">${fmtUSD(m.objetivo)}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="number" value="${m.logrado}" min="0" step="1" placeholder="0"
+          onchange="actualizarLogrado(${m.id},this.value)"
+          style="flex:1;padding:7px 10px;font-size:12px;background:var(--surface);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:inherit;outline:none">
+        <span style="font-size:11px;color:var(--text3);white-space:nowrap">U$D guardados</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── INVERSIONES ── */
+function renderInversiones(){ /* cards ya están en HTML, fetchMercados llena los datos */ }
+
+async function fetchMercados(){
+  const btn=document.getElementById('fetch-mercados-btn');
+  const timeEl=document.getElementById('mercados-time');
+  if(btn){btn.textContent='↻ Cargando…';btn.disabled=true;}
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true');
+    const d=await r.json();
+    setPriceCard('btc',d.bitcoin?.usd,d.bitcoin?.usd_24h_change);
+    setPriceCard('eth',d.ethereum?.usd,d.ethereum?.usd_24h_change);
+  }catch(e){ setPriceCard('btc',null,null); setPriceCard('eth',null,null); }
+  try{
+    const r=await fetch('https://axwxdiweiqxuqrbqmuwo.supabase.co/functions/v1/sp500-proxy');
+    const d=await r.json();
+    if(d.error) throw new Error(d.error);
+    setPriceCard('sp500',d.price,d.change);
+  }catch(e){
+    const el=document.getElementById('sp500-price');
+    const sub=document.getElementById('sp500-change');
+    if(el) el.textContent='Sin datos';
+    if(sub){ sub.textContent='Error al cargar'; sub.style.color='var(--text3)'; }
+  }
+  if(btn){btn.textContent='↻ Actualizar';btn.disabled=false;}
+  if(timeEl) timeEl.textContent='Actualizado '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+}
+
+function setPriceCard(id,price,change){
+  const priceEl=document.getElementById(id+'-price');
+  const changeEl=document.getElementById(id+'-change');
+  if(!priceEl) return;
+  if(price==null){ priceEl.textContent='Error'; if(changeEl) changeEl.textContent='—'; return; }
+  priceEl.textContent='$'+price.toLocaleString('en-US',{minimumFractionDigits:id==='sp500'?2:0,maximumFractionDigits:id==='sp500'?2:0});
+  if(changeEl&&change!=null){
+    const up=change>=0;
+    changeEl.textContent=`${up?'↑':'↓'} ${Math.abs(change).toFixed(2)}% 24h`;
+    changeEl.style.color=up?'var(--green)':'var(--red)';
+  }
+}
+
+function calcInteres(){
+  const capital=parseFloat(document.getElementById('calc-capital')?.value)||0;
+  const tasa=parseFloat(document.getElementById('calc-tasa')?.value)||0;
+  const periodo=parseInt(document.getElementById('calc-periodo')?.value)||0;
+  const freq=document.getElementById('calc-freq')?.value||'mensual';
+  const el=document.getElementById('calc-result');
+  if(!el) return;
+  if(!capital||!tasa||!periodo){ el.innerHTML=''; return; }
+  const meses=freq==='anual'?periodo*12:periodo;
+  const tasaMensual=(tasa/100)/12;
+  const capitalFinal=capital*Math.pow(1+tasaMensual,meses);
+  const ganancia=capitalFinal-capital;
+  const rendTotal=((ganancia/capital)*100).toFixed(2);
+  const tasaEfAnual=((Math.pow(1+tasaMensual,12)-1)*100).toFixed(2);
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:8px">
+    <div class="metric-card"><div class="mc-label">Capital final</div><div class="mc-val">${fmtUSD(capitalFinal)}</div><div class="mc-sub">${fmtARS(capitalFinal*USD_ARS)}</div></div>
+    <div class="metric-card"><div class="mc-label">Ganancia</div><div class="mc-val green">+${fmtUSD(ganancia)}</div><div class="mc-sub">+${rendTotal}% total · ${fmtARS(ganancia*USD_ARS)}</div></div>
+    <div class="metric-card"><div class="mc-label">TNA efectiva</div><div class="mc-val purple">${tasaEfAnual}%</div><div class="mc-sub">${(tasa/12).toFixed(2)}% mensual</div></div>
+  </div>`;
+}
+
 /* ── AUTH ── */
 async function checkAuth(){
   const {data:{session}}=await sb.auth.getSession();
@@ -1254,7 +1680,116 @@ async function init(){
   updateCotizDisplay();
   renderAll();
   renderCuentas('in'); renderCuentas('eg'); renderCuentas('trde'); renderCuentas('trha'); updateDeudaChip();
+  fetchDolar();
 }
+/* ── EDIT MODAL ── */
+let editState = { tipo: null, id: null, cur: 'usd' };
+
+function openEditModal(tipo, id) {
+  let item;
+  if (tipo === 'ingresos') item = data.ingresos.find(x => x.id === id);
+  else if (tipo === 'egresos') item = data.egresos.find(x => x.id === id);
+  else if (tipo === 'ahorros') item = data.ahorros.find(x => x.id === id);
+  if (!item) return;
+  editState = { tipo, id, cur: item.rawCur || 'usd' };
+  const titles = { ingresos: 'Editar ingreso', egresos: 'Editar egreso', ahorros: 'Editar ahorro' };
+  document.getElementById('edit-modal-title').textContent = titles[tipo] || 'Editar';
+  const isCurARS = editState.cur === 'ars';
+  let fields = '';
+  if (tipo === 'ingresos' || tipo === 'egresos') {
+    const cats = tipo === 'ingresos'
+      ? ['Sueldo','Freelance','Inversión','Otros']
+      : ['Vivienda','Alimentación','Transporte','Salud','Entretenimiento','Servicios','Otros'];
+    const displayMonto = isCurARS
+      ? Math.round(item.rawCur === 'ars' ? item.rawMonto : item.usd * USD_ARS)
+      : (item.rawCur === 'usd' ? item.rawMonto : item.usd);
+    fields = `<div style="margin-bottom:14px"><label>Concepto</label><input type="text" id="em-concepto" value="${(item.concepto||'').replace(/"/g,'&quot;')}"></div>
+      <div style="margin-bottom:14px"><div class="cur-toggle" style="margin-bottom:8px"><button class="${!isCurARS?'active':''}" id="em-cur-usd" onclick="setCurEdit('usd')">U$D</button><button class="${isCurARS?'active':''}" id="em-cur-ars" onclick="setCurEdit('ars')">$ Pesos</button></div><label id="em-monto-lbl">Monto (${isCurARS?'$':'USD'})</label><input type="number" inputmode="decimal" id="em-monto" value="${displayMonto}" step="${isCurARS?'1':'0.01'}"></div>
+      <div style="margin-bottom:14px"><label>Categoría</label><select id="em-cat">${cats.map(c=>`<option${c===item.cat?' selected':''}>${c}</option>`).join('')}</select></div>
+      <div style="margin-bottom:14px"><label>Cuenta</label><select id="em-cuenta">${INSTRUMENTOS.map(inst=>`<option value="${inst}"${inst===item.cuenta?' selected':''}>${inst}</option>`).join('')}</select></div>
+      <div style="margin-bottom:14px"><label>Fecha</label><input type="date" id="em-fecha" value="${item.fecha}"></div>
+      <div style="margin-bottom:14px"><label>Nota (opcional)</label><input type="text" id="em-nota" value="${(item.nota||'').replace(/"/g,'&quot;')}"></div>`;
+  } else if (tipo === 'ahorros') {
+    const isARS = ARS_INSTR.has(item.tipo);
+    const displayMonto = isARS ? Math.round(item.ars || 0) : item.usd;
+    fields = `<div style="margin-bottom:14px"><label>Instrumento</label><select id="em-ah-tipo" onchange="updateEditAhTipo()">${INSTRUMENTOS.map(i=>`<option value="${i}"${i===item.tipo?' selected':''}>${i}</option>`).join('')}</select></div>
+      <div style="margin-bottom:14px"><label id="em-ah-monto-lbl">Monto (${isARS?'$':'USD'})</label><input type="number" inputmode="decimal" id="em-ah-monto" value="${displayMonto}" step="${isARS?'1':'0.01'}"></div>
+      <div style="margin-bottom:14px"><label>Tipo</label><select id="em-ah-mov"><option value="deposito"${item.mov==='deposito'?' selected':''}>Depósito</option><option value="retiro"${item.mov==='retiro'?' selected':''}>Retiro</option></select></div>
+      <div style="margin-bottom:14px"><label>Fecha</label><input type="date" id="em-ah-fecha" value="${item.fecha}"></div>
+      <div style="margin-bottom:14px"><label>Nota (opcional)</label><input type="text" id="em-ah-nota" value="${(item.nota||'').replace(/"/g,'&quot;')}"></div>`;
+  }
+  document.getElementById('edit-modal-fields').innerHTML = fields;
+  document.getElementById('edit-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function setCurEdit(cur) {
+  editState.cur = cur;
+  const { tipo, id } = editState;
+  let item;
+  if (tipo === 'ingresos') item = data.ingresos.find(x => x.id === id);
+  else if (tipo === 'egresos') item = data.egresos.find(x => x.id === id);
+  if (!item) return;
+  const isCurARS = cur === 'ars';
+  document.getElementById('em-cur-usd')?.classList.toggle('active', !isCurARS);
+  document.getElementById('em-cur-ars')?.classList.toggle('active', isCurARS);
+  document.getElementById('em-monto-lbl').textContent = 'Monto (' + (isCurARS ? '$' : 'USD') + ')';
+  const inp = document.getElementById('em-monto');
+  inp.value = isCurARS
+    ? Math.round(item.rawCur === 'ars' ? item.rawMonto : item.usd * USD_ARS)
+    : (item.rawCur === 'usd' ? item.rawMonto : item.usd);
+  inp.step = isCurARS ? '1' : '0.01';
+}
+
+function updateEditAhTipo() {
+  const sel = document.getElementById('em-ah-tipo');
+  const lbl = document.getElementById('em-ah-monto-lbl');
+  if (!sel || !lbl) return;
+  const isARS = ARS_INSTR.has(sel.value);
+  lbl.textContent = 'Monto (' + (isARS ? '$' : 'USD') + ')';
+  const inp = document.getElementById('em-ah-monto');
+  if (inp) inp.step = isARS ? '1' : '0.01';
+}
+
+function saveEditModal() {
+  const { tipo, id, cur } = editState;
+  if (tipo === 'ingresos' || tipo === 'egresos') {
+    const arr = tipo === 'ingresos' ? data.ingresos : data.egresos;
+    const item = arr.find(x => x.id === id);
+    if (!item) return;
+    const concepto = document.getElementById('em-concepto').value.trim();
+    const raw = parseFloat(document.getElementById('em-monto').value);
+    const cat = document.getElementById('em-cat').value;
+    const cuenta = document.getElementById('em-cuenta').value;
+    const fecha = document.getElementById('em-fecha').value;
+    const nota = document.getElementById('em-nota').value;
+    if (!concepto || isNaN(raw) || raw <= 0) { alert('Completá concepto y monto.'); return; }
+    item.concepto = concepto; item.usd = cur === 'ars' ? raw / USD_ARS : raw;
+    item.rawMonto = raw; item.rawCur = cur; item.cat = cat; item.cuenta = cuenta;
+    item.fecha = fecha; item.nota = nota;
+  } else if (tipo === 'ahorros') {
+    const item = data.ahorros.find(x => x.id === id);
+    if (!item) return;
+    const nuevoTipo = document.getElementById('em-ah-tipo').value;
+    const raw = parseFloat(document.getElementById('em-ah-monto').value);
+    const mov = document.getElementById('em-ah-mov').value;
+    const fecha = document.getElementById('em-ah-fecha').value;
+    const nota = document.getElementById('em-ah-nota').value;
+    if (isNaN(raw) || raw <= 0) { alert('Ingresá un monto válido.'); return; }
+    const isARS = ARS_INSTR.has(nuevoTipo);
+    item.tipo = nuevoTipo; item.usd = isARS ? raw / USD_ARS : raw;
+    item.ars = isARS ? raw : raw * USD_ARS; item.mov = mov; item.fecha = fecha; item.nota = nota;
+  }
+  saveData(); renderAll(); closeEditModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEditModal(); });
+
 checkAuth();
 </script>
 </body>
