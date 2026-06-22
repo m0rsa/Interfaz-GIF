@@ -569,7 +569,10 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
               <div><label>Cuotas</label><input type="number" inputmode="numeric" id="tc-cuotas" value="1" min="1" max="48" step="1"></div>
               <div><label>Fecha</label><input type="date" id="tc-fecha"></div>
             </div>
-            <div style="margin-bottom:12px"><label>Nota</label><input type="text" id="tc-nota" placeholder=""></div>
+            <div class="grid-form-2" style="margin-bottom:12px">
+              <div><label>Tarjeta</label><select id="tc-tarjeta"><option value="Visa">Visa</option><option value="Mastercard">Mastercard</option><option value="Amex">Amex</option></select></div>
+              <div><label>Nota</label><input type="text" id="tc-nota" placeholder=""></div>
+            </div>
             <button class="btn danger" onclick="agregarGastoTC()">💳 Sumar a deuda</button>
           </div>
           <div id="panel-pagar" style="display:none">
@@ -805,6 +808,7 @@ let INSTRUMENTOS=[];
 let COLORS={};
 let ICONS={};
 const CAT_COLORS={'Alimentación':'#00D4A1','Entretenimiento':'#8B7CF6','Transporte':'#4A9EFF','Salud':'#FF6B47','Vivienda':'#F5A623','Servicios':'#38BDF8','Otros':'#8B93A8'};
+const TC_COLORS={Visa:'#1A56DB',Mastercard:'#E25718',Amex:'#00A4A6'};
 let ARS_INSTR=new Set();
 
 /* ── SUPABASE ── */
@@ -859,7 +863,7 @@ async function syncSupabase(){
       {n:'egresos',        arr:data.egresos,             m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
       {n:'ahorros',        arr:data.ahorros,             m:r=>({id:r.id,tipo:r.tipo,usd:r.usd,ars:r.ars||0,fecha:r.fecha,nota:r.nota||'',mov:r.mov})},
       {n:'transferencias', arr:data.transferencias||[],  m:r=>({id:r.id,desde:r.desde,hacia:r.hacia,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,fecha:r.fecha,nota:r.nota||''})},
-      {n:'mov_tc',         arr:data.movTC,               m:r=>({id:r.id,tipo:r.tipo,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto||null,raw_cur:r.rawCur||null,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta||null})},
+      {n:'mov_tc',         arr:data.movTC,               m:r=>({id:r.id,tipo:r.tipo,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto||null,raw_cur:r.rawCur||null,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta||null,tarjeta:r.tarjeta||null})},
     ];
     for(const t of tbls){
       if(t.arr.length){
@@ -900,7 +904,7 @@ async function loadFromSupabase(){
     data.egresos=(eg.data||[]).map(r=>({id:r.id,concepto:r.concepto,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,cat:r.cat,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta}));
     data.ahorros=(ah.data||[]).map(r=>({id:r.id,tipo:r.tipo,usd:+r.usd,ars:+r.ars,fecha:fd(r.fecha),nota:r.nota||'',mov:r.mov}));
     data.transferencias=(tr.data||[]).map(r=>({id:r.id,desde:r.desde,hacia:r.hacia,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,fecha:fd(r.fecha),nota:r.nota||''}));
-    data.movTC=(tc.data||[]).map(r=>({id:r.id,tipo:r.tipo,concepto:r.concepto,usd:+r.usd,rawMonto:r.raw_monto!=null?+r.raw_monto:undefined,rawCur:r.raw_cur||undefined,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta||undefined}));
+    data.movTC=(tc.data||[]).map(r=>({id:r.id,tipo:r.tipo,concepto:r.concepto,usd:+r.usd,rawMonto:r.raw_monto!=null?+r.raw_monto:undefined,rawCur:r.raw_cur||undefined,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta||undefined,tarjeta:r.tarjeta||undefined}));
     try{ localStorage.setItem('finanzas_v1',JSON.stringify(data)); }catch(e){}
   }catch(e){ console.error('Error cargando Supabase:',e); }
 }
@@ -1009,9 +1013,13 @@ function setCurSueldo(cur){ curMode.sueldo=cur; renderMQV(); renderHero(); }
 function updateAhTipo(){ const isARS=ARS_INSTR.has(document.getElementById('ah-tipo').value); document.getElementById('ah-monto-lbl').textContent=isARS?'Monto ($)':'Monto (USD)'; }
 
 function updateHint(form){
-  if(curMode[form]!=='ars') return;
   const v=parseFloat(document.getElementById(form+'-monto').value)||0;
-  document.getElementById(form+'-hint').textContent=v>0?'≈ '+fmtUSD(v/USD_ARS):'Se convierte a USD al tipo promedio.';
+  const el=document.getElementById(form+'-hint');
+  if(curMode[form]==='ars'){
+    el.textContent=v>0?'≈ '+fmtUSD(v/USD_ARS):'Se convierte a USD al tipo promedio.';
+  } else {
+    el.textContent=v>0?'≈ '+fmtARS(v*USD_ARS):'';
+  }
 }
 
 /* ── CUENTA SELECTOR ── */
@@ -1037,6 +1045,7 @@ function agregarGastoTC(){
   const cuotas=Math.max(1,parseInt(document.getElementById('tc-cuotas').value)||1);
   const fecha=document.getElementById('tc-fecha').value||today();
   const nota=document.getElementById('tc-nota').value;
+  const tarjeta=document.getElementById('tc-tarjeta').value;
   if(isNaN(raw)||raw<=0){alert('Ingresá un monto válido.');return;}
   const usdTotal=curMode.tc==='ars'?raw/USD_ARS:raw;
   const usdCuota=usdTotal/cuotas, rawCuota=raw/cuotas;
@@ -1045,7 +1054,7 @@ function agregarGastoTC(){
     const fechaCuota=d.toISOString().split('T')[0];
     const label=cuotas>1?`${concepto} (${i+1}/${cuotas})`:concepto;
     data.deudaTC+=usdCuota;
-    data.movTC.push({id:Date.now()+i,tipo:'gasto',concepto:label,usd:usdCuota,rawMonto:rawCuota,rawCur:curMode.tc,fecha:fechaCuota,nota});
+    data.movTC.push({id:Date.now()+i,tipo:'gasto',concepto:label,usd:usdCuota,rawMonto:rawCuota,rawCur:curMode.tc,fecha:fechaCuota,nota,tarjeta});
   }
   document.getElementById('tc-concepto').value='';
   document.getElementById('tc-monto').value='';
@@ -1300,9 +1309,10 @@ function saveEditTC(id){
   const concepto=document.getElementById('edr-tc-concepto-'+id).value.trim()||m.concepto;
   const nuevoUSD=parseFloat(document.getElementById('edr-tc-monto-'+id).value);
   const fecha=document.getElementById('edr-tc-fecha-'+id).value||m.fecha;
+  const tarjeta=document.getElementById('edr-tc-tarjeta-'+id)?.value||m.tarjeta;
   if(isNaN(nuevoUSD)||nuevoUSD<=0){alert('Monto inválido.');return;}
   data.deudaTC=Math.max(0,data.deudaTC-m.usd+nuevoUSD);
-  m.concepto=concepto; m.usd=nuevoUSD; m.fecha=fecha;
+  m.concepto=concepto; m.usd=nuevoUSD; m.fecha=fecha; m.tarjeta=tarjeta;
   saveData(); updateDeudaChip(); renderAll();
 }
 function eliminarTransferencia(id){ data.transferencias=data.transferencias.filter(t=>t.id!==id); saveData(); renderAll(); renderCuentas('trde'); renderCuentas('trha'); }
@@ -1325,12 +1335,26 @@ function buildRows(items,tipo,cellsFn){
 function renderTCHistorial(el){
   if(!el)return;
   const movs=data.movTC.filter(m=>m.tipo!=='deuda_inicial').sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  el.innerHTML=`<div style="font-family:'SF Pro Display',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:500;color:var(--red);margin-bottom:6px">${fmtARS(data.deudaTC*USD_ARS)}</div><div style="font-size:11px;color:var(--text3);margin-bottom:16px">${fmtUSD(data.deudaTC)} pendiente</div>`+
-    (movs.length?`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Cuenta</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
+  // Desglose por tarjeta
+  const byCard={};
+  data.movTC.filter(m=>m.tipo==='gasto').forEach(m=>{ const k=m.tarjeta||'Sin tarjeta'; byCard[k]=(byCard[k]||0)+m.usd; });
+  const cardBreakdown=Object.keys(byCard).length
+    ? '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">'+
+      Object.entries(byCard).map(([k,v])=>`<div style="background:var(--surface2);border:1px solid ${TC_COLORS[k]||'var(--border)'};border-radius:10px;padding:10px 14px;min-width:120px"><div style="font-size:11px;font-weight:700;color:${TC_COLORS[k]||'var(--text3)'};margin-bottom:4px">${k}</div><div style="font-size:17px;font-weight:600;color:var(--red)">${fmtARS(v*USD_ARS)}</div><div style="font-size:12px;color:var(--text3)">${fmtUSD(v)}</div></div>`).join('')+
+      '</div>'
+    : '';
+  el.innerHTML=
+    `<div style="font-size:22px;font-weight:500;color:var(--red);margin-bottom:4px">${fmtARS(data.deudaTC*USD_ARS)}</div>`+
+    `<div style="font-size:13px;color:var(--text3);margin-bottom:16px">${fmtUSD(data.deudaTC)} pendiente en total</div>`+
+    cardBreakdown+
+    (movs.length?`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Tarjeta / Cuenta</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
     movs.map(m=>{
-      const acct=m.cuenta?`<span class="acct-pill" style="background:${COLORS[m.cuenta]||'#888'}22;color:${COLORS[m.cuenta]||'#888'}">${m.cuenta}</span>`:'-';
+      const acct=m.tipo==='gasto'
+        ? (m.tarjeta?`<span class="acct-pill" style="background:${TC_COLORS[m.tarjeta]||'#888'}22;color:${TC_COLORS[m.tarjeta]||'#888'}">${m.tarjeta}</span>`:'-')
+        : (m.cuenta?`<span class="acct-pill" style="background:${COLORS[m.cuenta]||'#888'}22;color:${COLORS[m.cuenta]||'#888'}">${m.cuenta}</span>`:'-');
+      const tarjOpts=['Visa','Mastercard','Amex'].map(t=>`<option value="${t}"${(m.tarjeta||'Visa')===t?' selected':''}>${t}</option>`).join('');
       const editBtn=m.tipo==='gasto'
-        ?`<button class="action-btn" onclick="toggleEditTC(${m.id})" title="Editar">✏️</button><button class="action-btn" onclick="eliminarTC(${m.id})" title="Eliminar">🗑</button><div class="edit-date-row" id="edr-tc-${m.id}"><input type="text" id="edr-tc-concepto-${m.id}" value="${(m.concepto||'').replace(/"/g,'&quot;')}" placeholder="Concepto" style="flex:2;min-width:120px"><input type="number" id="edr-tc-monto-${m.id}" value="${m.usd.toFixed(2)}" step="0.01" placeholder="USD" style="flex:1;min-width:70px"><input type="date" id="edr-tc-fecha-${m.id}" value="${m.fecha}" style="flex:1;min-width:120px"><button class="btn sm primary" onclick="saveEditTC(${m.id})">✓</button></div>`
+        ?`<button class="action-btn" onclick="toggleEditTC(${m.id})" title="Editar">✏️</button><button class="action-btn" onclick="eliminarTC(${m.id})" title="Eliminar">🗑</button><div class="edit-date-row" id="edr-tc-${m.id}"><input type="text" id="edr-tc-concepto-${m.id}" value="${(m.concepto||'').replace(/"/g,'&quot;')}" placeholder="Concepto" style="flex:2;min-width:120px"><input type="number" id="edr-tc-monto-${m.id}" value="${m.usd.toFixed(2)}" step="0.01" placeholder="USD" style="flex:1;min-width:70px"><input type="date" id="edr-tc-fecha-${m.id}" value="${m.fecha}" style="flex:1;min-width:120px"><select id="edr-tc-tarjeta-${m.id}" style="flex:1;min-width:100px">${tarjOpts}</select><button class="btn sm primary" onclick="saveEditTC(${m.id})">✓</button></div>`
         :`<button class="action-btn" onclick="eliminarTC(${m.id})" title="Eliminar">🗑</button>`;
       return`<tr><td style="color:var(--text3)">${fmtDate(m.fecha)}</td><td>${m.concepto}</td><td><span class="badge ${m.tipo==='pago'?'pago':'tarjeta'}">${m.tipo==='pago'?'Pago':'Gasto'}</span></td><td>${acct}</td><td style="text-align:right"><div class="td-main" style="color:${m.tipo==='pago'?'var(--green)':'var(--red)'}">${m.tipo==='pago'?'-':'+'}${fmtARS(m.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(m.usd)}</div></td><td>${editBtn}</td></tr>`;
     }).join('')+'</tbody></table>':'<div class="empty">Sin movimientos de tarjeta.</div>');
