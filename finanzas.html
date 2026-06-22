@@ -240,16 +240,16 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
 
 @media (max-width: 860px) {
   /* topbar */
-  .topbar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: calc(64px + env(safe-area-inset-top, 0px)); background: var(--surface); border-bottom: 1px solid var(--border); z-index: 150; align-items: flex-end; padding: 0 20px 12px; gap: 16px; }
-  .topbar-logo { font-size: 18px; font-weight: 700; color: var(--text); flex: 1; }
-  .hamburger { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 10px; color: var(--text2); border-radius: 10px; transition: background 0.15s; }
+  .topbar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: calc(68px + env(safe-area-inset-top, 0px)); background: var(--surface); border-bottom: 1px solid var(--border); z-index: 150; align-items: flex-end; padding: 0 22px 13px; gap: 16px; }
+  .topbar-logo { font-size: 20px; font-weight: 700; color: var(--text); flex: 1; }
+  .hamburger { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 12px; color: var(--text2); border-radius: 10px; transition: background 0.15s; }
   .hamburger:hover { background: var(--surface2); }
-  .hamburger span { width: 24px; height: 2.5px; background: currentColor; border-radius: 2px; display: block; transition: all 0.2s; }
+  .hamburger span { width: 26px; height: 2.5px; background: currentColor; border-radius: 2px; display: block; transition: all 0.2s; }
   /* sidebar slides from left */
   .sidebar { transform: translateX(-100%); transition: transform 0.26s cubic-bezier(0.4,0,0.2,1); width: var(--sidebar-w) !important; z-index: 200; }
   .sidebar.open { transform: translateX(0); }
   /* main */
-  .main { margin-left: 0 !important; padding-top: calc(64px + env(safe-area-inset-top, 0px)); }
+  .main { margin-left: 0 !important; padding-top: calc(68px + env(safe-area-inset-top, 0px)); }
   /* grids */
   .grid-4 { grid-template-columns: 1fr 1fr; }
   .grid-3, .grid-form-3, .grid-form-4 { grid-template-columns: 1fr 1fr; }
@@ -274,40 +274,40 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
   .header-hero { padding: 22px 18px 18px; }
 
   /* Tipografía mobile — escala general */
-  body { font-size: 16px; }
-  label { font-size: 13px; }
-  .section-title { font-size: 12px; }
-  .card-title { font-size: 12px; }
-  .hint { font-size: 12px; }
+  body { font-size: 18px; }
+  label { font-size: 15px; }
+  .section-title { font-size: 14px; }
+  .card-title { font-size: 14px; }
+  .hint { font-size: 14px; }
 
   /* Hero */
-  .hero-balance { font-size: 38px; }
-  .hero-sub { font-size: 14px; }
-  .hero-mqv-val { font-size: 26px; }
-  .hero-mqv-sub { font-size: 13px; }
-  .hero-stat .hs-label { font-size: 11px; }
-  .hero-stat .hs-val { font-size: 21px; }
-  .hero-stat .hs-sub { font-size: 13px; }
+  .hero-balance { font-size: 48px; }
+  .hero-sub { font-size: 16px; }
+  .hero-mqv-val { font-size: 36px; }
+  .hero-mqv-sub { font-size: 15px; }
+  .hero-stat .hs-label { font-size: 13px; }
+  .hero-stat .hs-val { font-size: 28px; }
+  .hero-stat .hs-sub { font-size: 15px; }
 
   /* Cards y métricas */
-  .card { padding: 20px 18px; }
-  .metric-card { padding: 20px 18px; }
-  .metric-card .mc-label { font-size: 11px; }
-  .metric-card .mc-val { font-size: 26px; }
-  .metric-card .mc-sub { font-size: 13px; }
+  .card { padding: 26px 20px; }
+  .metric-card { padding: 24px 20px; }
+  .metric-card .mc-label { font-size: 13px; }
+  .metric-card .mc-val { font-size: 34px; }
+  .metric-card .mc-sub { font-size: 15px; }
 
   /* MQV */
-  .mqv-main .mqv-val { font-size: 32px; }
-  .mqv-main .mqv-sub { font-size: 13px; }
-  .mqv-detail { font-size: 13px; }
+  .mqv-main .mqv-val { font-size: 42px; }
+  .mqv-main .mqv-sub { font-size: 15px; }
+  .mqv-detail { font-size: 15px; }
 
   /* Botones */
-  .btn { font-size: 15px; padding: 13px 22px; }
+  .btn { font-size: 16px; padding: 15px 24px; }
 
   /* Filas de transacciones */
-  .td-main { font-size: 15px; }
-  .td-sub { font-size: 13px; }
-  .acct-pill { font-size: 12px; }
+  .td-main { font-size: 17px; }
+  .td-sub { font-size: 15px; }
+  .acct-pill { font-size: 14px; }
 }
 
 /* ── EDIT MODAL ── */
@@ -329,7 +329,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
 .bottom-nav { display: none; }
 @media (max-width: 860px) {
   .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; background: none; border: none; color: var(--text3); cursor: pointer; font-size: 12px; padding: 10px 2px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 500; transition: color 0.12s; min-height: 64px; }
+  .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; background: none; border: none; color: var(--text3); cursor: pointer; font-size: 14px; padding: 12px 2px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 500; transition: color 0.12s; min-height: 72px; }
   .bn-item.active { color: var(--blue); }
   .bn-item svg { flex-shrink: 0; }
   .content { padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)); }
