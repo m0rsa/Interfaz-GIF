@@ -100,8 +100,10 @@ body{font-family:'SF Pro',-apple-system,BlinkMacSystemFont,sans-serif;color:var(
     <!-- Step indicator -->
     <div class="steps">
       <div class="s-dot active" id="sd1">1</div>
-      <div class="s-line" id="sl"></div>
+      <div class="s-line" id="sl1"></div>
       <div class="s-dot" id="sd2">2</div>
+      <div class="s-line" id="sl2" style="display:none"></div>
+      <div class="s-dot" id="sd3" style="display:none">3</div>
     </div>
 
     <!-- Form card -->
@@ -156,6 +158,22 @@ body{font-family:'SF Pro',-apple-system,BlinkMacSystemFont,sans-serif;color:var(
         <button class="back" onclick="showGate()">← Volver al código de acceso</button>
       </div>
 
+      <!-- Paso 3: 2FA TOTP (solo aparece si el usuario tiene MFA activado) -->
+      <div class="step-panel" id="step-mfa">
+        <div class="sh">
+          <div class="sh-title">Verificación en dos pasos</div>
+          <div class="sh-sub">Ingresá el código de tu app autenticadora</div>
+        </div>
+        <form onsubmit="doMFA();return false" autocomplete="off">
+          <div class="field">
+            <label class="flabel" for="mfa-code">Código de 6 dígitos</label>
+            <input class="finput" type="text" id="mfa-code" placeholder="000 000" maxlength="7" inputmode="numeric" autocomplete="one-time-code" style="font-family:'SF Mono',ui-monospace,monospace;letter-spacing:0.18em;font-size:20px;text-align:center">
+          </div>
+          <div id="mfa-error" class="ferr"></div>
+          <button type="submit" id="mfa-btn" class="submit">Verificar</button>
+        </form>
+      </div>
+
     </div><!-- /fc -->
   </div><!-- /card -->
 </div><!-- /wrap -->
@@ -170,7 +188,7 @@ const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 //   new TextEncoder().encode('NUEVA_CLAVE_fin_v2'))
 //   .then(b=>console.log(Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')))
 // Pegá el resultado en GATE_HASH de login.html y finanzas.html
-const GATE_HASH='759ade99d53faa2814a61181376e779f604d672e758849bcfd3164ad186b16fc';
+const GATE_HASH='783f65ce837f04ad0d5bd6badcdb4b7d41a1f1dae61f4472f858c10d806514d4';
 const GATE_SALT='_fin_v2';
 
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -192,11 +210,12 @@ function toggleEye(inputId,svgId){
 
 /* ── STEP UI ── */
 function showGate(){
-  document.getElementById('step-login').classList.remove('visible');
+  ['step-login','step-mfa'].forEach(id=>document.getElementById(id).classList.remove('visible'));
   document.getElementById('step-gate').classList.add('visible');
-  document.getElementById('sd1').classList.add('active'); document.getElementById('sd1').classList.remove('done');
-  document.getElementById('sd2').classList.remove('active');
-  document.getElementById('sl').classList.remove('done');
+  document.getElementById('sd1').className='s-dot active';
+  document.getElementById('sd2').className='s-dot';
+  document.getElementById('sl1').classList.remove('done');
+  ['sl2','sd3'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('gate-input').value='';
   document.getElementById('gate-error').textContent=''; document.getElementById('gate-error').className='ferr';
   setTimeout(()=>document.getElementById('gate-input').focus(),100);
@@ -204,10 +223,54 @@ function showGate(){
 function showLogin(){
   document.getElementById('step-gate').classList.remove('visible');
   document.getElementById('step-login').classList.add('visible');
-  document.getElementById('sd1').classList.remove('active'); document.getElementById('sd1').classList.add('done');
-  document.getElementById('sd2').classList.add('active');
-  document.getElementById('sl').classList.add('done');
+  document.getElementById('sd1').className='s-dot done';
+  document.getElementById('sd2').className='s-dot active';
+  document.getElementById('sl1').classList.add('done');
   setTimeout(()=>document.getElementById('login-email').focus(),100);
+}
+
+/* ── MFA STEP ── */
+let _mfaFactorId=null, _mfaChallengeId=null;
+
+async function showMFA(){
+  const{data:{totp}}=await sb.auth.mfa.listFactors();
+  _mfaFactorId=totp[0]?.id;
+  if(!_mfaFactorId){ window.location.replace('finanzas.html'); return; }
+  const{data:ch}=await sb.auth.mfa.challenge({factorId:_mfaFactorId});
+  _mfaChallengeId=ch.id;
+  document.getElementById('step-login').classList.remove('visible');
+  document.getElementById('step-mfa').classList.add('visible');
+  document.getElementById('sd2').className='s-dot done';
+  document.getElementById('sl1').classList.add('done');
+  document.getElementById('sl2').style.display='';
+  document.getElementById('sd3').style.display='';
+  document.getElementById('sd3').className='s-dot active';
+  const inp=document.getElementById('mfa-code');
+  inp.value='';
+  inp.oninput=function(){
+    this.value=this.value.replace(/\D/g,'');
+    if(this.value.length===6) doMFA();
+  };
+  setTimeout(()=>inp.focus(),100);
+}
+
+async function doMFA(){
+  const code=(document.getElementById('mfa-code').value||'').replace(/\D/g,'');
+  if(code.length!==6) return;
+  const errEl=document.getElementById('mfa-error');
+  const btn=document.getElementById('mfa-btn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Verificando…';
+  const{error}=await sb.auth.mfa.verify({factorId:_mfaFactorId,challengeId:_mfaChallengeId,code});
+  btn.disabled=false; btn.innerHTML='Verificar';
+  if(error){
+    errEl.textContent='Código incorrecto o expirado.'; errEl.className='ferr show';
+    document.getElementById('mfa-code').value='';
+    document.getElementById('mfa-code').focus();
+    const{data:ch}=await sb.auth.mfa.challenge({factorId:_mfaFactorId});
+    _mfaChallengeId=ch.id;
+    return;
+  }
+  window.location.replace('finanzas.html');
 }
 
 /* ── GATE RATE LIMIT ── */
@@ -343,6 +406,8 @@ async function doLogin(){
     return;
   }
   lSetA(0); lSetL(0);
+  const{data:aal}=await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+  if(aal?.nextLevel==='aal2'){ await showMFA(); return; }
   window.location.replace('finanzas.html');
 }
 

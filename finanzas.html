@@ -417,7 +417,8 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
     <div id="cotiz-update-time" style="font-size:10px;color:var(--text3);font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-bottom:6px;min-height:14px"></div>
     <button id="fetch-dolar-btn" class="cotiz-btn" onclick="fetchDolar()" style="margin-bottom:6px">↻ Traer cotización</button>
     <button class="cotiz-btn" onclick="updateCotiz()" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text2)">Aplicar manual</button>
-    <button onclick="doLogout()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">→ Cerrar sesión</button>
+    <button onclick="openMFAModal()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">🔑 Gestionar 2FA</button>
+    <button onclick="doLogout()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">→ Cerrar sesión</button>
   </div>
 </nav>
 
@@ -2021,7 +2022,7 @@ function calcInteres(){
 
 /* ── AUTH ── */
 // Hash SHA-256 de la clave de acceso. Debe coincidir con login.html.
-const GATE_HASH='759ade99d53faa2814a61181376e779f604d672e758849bcfd3164ad186b16fc';
+const GATE_HASH='783f65ce837f04ad0d5bd6badcdb4b7d41a1f1dae61f4472f858c10d806514d4';
 
 function _hideOverlay(){
   const o=document.getElementById('auth-overlay');
@@ -2041,15 +2042,114 @@ async function checkAuth(){
   if(!session){
     window.location.replace('login.html'); return;
   }
-  // 3. Detectar cierre de sesión mientras la app está abierta
+  // 3. Detectar cierre de sesión remoto
   sb.auth.onAuthStateChange((event)=>{
     if(event==='SIGNED_OUT') window.location.replace('login.html');
   });
   _hideOverlay();
+  _startIdleTimer();
   await init();
 }
 
 async function doLogout(){ await sb.auth.signOut(); window.location.replace('login.html'); }
+
+/* ── IDLE TIMEOUT ── */
+const IDLE_MS=20*60*1000, IDLE_WARN_MS=2*60*1000;
+let _lastActive=Date.now(), _idleInterval=null, _warnShown=false;
+
+function _resetIdle(){ _lastActive=Date.now(); if(_warnShown) _hideIdleWarn(); }
+
+function _startIdleTimer(){
+  ['mousemove','keydown','click','scroll','touchstart'].forEach(e=>
+    document.addEventListener(e,_resetIdle,{passive:true})
+  );
+  _idleInterval=setInterval(()=>{
+    const idle=Date.now()-_lastActive;
+    if(idle>=IDLE_MS){ doLogout(); return; }
+    if(idle>=IDLE_MS-IDLE_WARN_MS && !_warnShown) _showIdleWarn();
+  },30000);
+}
+
+function _showIdleWarn(){
+  _warnShown=true;
+  const w=document.getElementById('idle-warn');
+  if(w) w.style.display='flex';
+  _tickWarn();
+}
+function _hideIdleWarn(){
+  _warnShown=false;
+  const w=document.getElementById('idle-warn');
+  if(w) w.style.display='none';
+}
+function _tickWarn(){
+  const el=document.getElementById('idle-countdown');
+  if(!el||!_warnShown) return;
+  const rem=Math.max(0,IDLE_MS-(Date.now()-_lastActive));
+  const m=Math.floor(rem/60000),s=Math.floor((rem%60000)/1000);
+  el.textContent=`${m}:${String(s).padStart(2,'0')}`;
+  if(rem>0&&_warnShown) setTimeout(_tickWarn,1000);
+}
+function continueSession(){ _resetIdle(); }
+
+/* ── MFA MODAL ── */
+let _mfaEnrollData=null;
+
+async function openMFAModal(){
+  const modal=document.getElementById('mfa-modal');
+  const content=document.getElementById('mfa-modal-content');
+  modal.style.display='flex';
+  content.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Cargando…</div>';
+  const{data:{totp}}=await sb.auth.mfa.listFactors();
+  if(totp&&totp.length>0){
+    content.innerHTML=`
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:30px;margin-bottom:10px">✅</div>
+        <div style="font-size:14px;color:var(--green);font-weight:700;margin-bottom:4px">2FA activo</div>
+        <div style="font-size:12px;color:var(--text3)">Tu cuenta está protegida con autenticación de dos factores.</div>
+      </div>
+      <button onclick="unenrollMFA('${totp[0].id}')" style="width:100%;padding:11px;border-radius:10px;border:1px solid rgba(239,72,88,0.3);background:rgba(239,72,88,0.08);color:var(--red);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Desactivar 2FA</button>`;
+  } else {
+    const{data,error}=await sb.auth.mfa.enroll({factorType:'totp',friendlyName:'Finanzas'});
+    if(error){ content.innerHTML=`<div style="color:var(--red);font-size:13px;text-align:center">${error.message}</div>`; return; }
+    _mfaEnrollData=data;
+    content.innerHTML=`
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.6">Escaneá el código QR con Google Authenticator, Authy u otra app. Luego ingresá el código de 6 dígitos para confirmar.</div>
+      <div style="background:white;border-radius:12px;padding:12px;margin-bottom:12px;text-align:center">${data.totp.qr_code}</div>
+      <div style="font-size:9px;color:var(--text3);margin-bottom:14px;font-family:'SF Mono',ui-monospace,monospace;word-break:break-all;text-align:center;letter-spacing:0.04em">${data.totp.secret}</div>
+      <input id="mfa-enroll-code" type="text" inputmode="numeric" maxlength="6" placeholder="Código de 6 dígitos" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:20px;padding:12px;font-family:'SF Mono',monospace;text-align:center;letter-spacing:0.18em;outline:none;margin-bottom:8px">
+      <div id="mfa-enroll-err" style="font-size:12px;color:var(--red);min-height:14px;text-align:center;margin-bottom:10px"></div>
+      <button onclick="enrollMFA()" id="mfa-enroll-btn" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 12px rgba(74,140,245,0.35)">Activar 2FA</button>`;
+    const inp=document.getElementById('mfa-enroll-code');
+    inp.addEventListener('input',function(){ this.value=this.value.replace(/\D/g,''); });
+    setTimeout(()=>inp.focus(),100);
+  }
+}
+
+async function enrollMFA(){
+  const code=(document.getElementById('mfa-enroll-code')?.value||'').trim();
+  if(code.length!==6) return;
+  const btn=document.getElementById('mfa-enroll-btn');
+  const err=document.getElementById('mfa-enroll-err');
+  btn.disabled=true; btn.textContent='Verificando…';
+  const{error}=await sb.auth.mfa.challengeAndVerify({factorId:_mfaEnrollData.id,code});
+  if(error){ err.textContent='Código incorrecto. Intentá de nuevo.'; btn.disabled=false; btn.textContent='Activar 2FA'; return; }
+  document.getElementById('mfa-modal-content').innerHTML=`
+    <div style="text-align:center;padding:12px 0">
+      <div style="font-size:36px;margin-bottom:12px">✅</div>
+      <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:6px">¡2FA activado!</div>
+      <div style="font-size:12px;color:var(--text3)">Desde ahora necesitarás tu app autenticadora al iniciar sesión.</div>
+    </div>
+    <button onclick="closeMFAModal()" style="width:100%;padding:11px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:14px">Listo</button>`;
+}
+
+async function unenrollMFA(factorId){
+  if(!confirm('¿Seguro que querés desactivar el 2FA?')) return;
+  const{error}=await sb.auth.mfa.unenroll({factorId});
+  if(error){ alert('Error: '+error.message); return; }
+  closeMFAModal();
+}
+
+function closeMFAModal(){ document.getElementById('mfa-modal').style.display='none'; _mfaEnrollData=null; }
 
 /* ── INIT ── */
 async function init(){
@@ -2180,5 +2280,29 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEditMod
 
 checkAuth();
 </script>
+
+<!-- IDLE WARNING -->
+<div id="idle-warn" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(6,9,17,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:18px;padding:30px 28px;max-width:310px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.55)">
+    <div style="font-size:32px;margin-bottom:12px">⏱</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:5px">¿Seguís ahí?</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:4px">Tu sesión se cerrará en</div>
+    <div id="idle-countdown" style="font-size:36px;font-weight:800;font-family:'SF Mono',ui-monospace,monospace;color:var(--blue);margin:14px 0;letter-spacing:-0.02em">2:00</div>
+    <button onclick="continueSession()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;box-shadow:0 2px 12px rgba(74,140,245,0.35)">Continuar sesión</button>
+    <button onclick="doLogout()" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:13px;cursor:pointer;font-family:inherit">Cerrar sesión ahora</button>
+  </div>
+</div>
+
+<!-- MFA MODAL -->
+<div id="mfa-modal" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(6,9,17,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:18px;padding:28px;max-width:340px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.55)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-size:15px;font-weight:700;color:var(--text)">Verificación en dos pasos</div>
+      <button onclick="closeMFAModal()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1;padding:2px 6px;border-radius:6px" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">×</button>
+    </div>
+    <div id="mfa-modal-content"></div>
+  </div>
+</div>
+
 </body>
 </html>
