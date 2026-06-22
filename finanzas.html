@@ -84,7 +84,7 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .header-hero { background: linear-gradient(150deg, var(--surface2) 0%, var(--surface) 100%); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px 24px; position: relative; overflow: hidden; margin-bottom: 20px; }
 .header-hero::after { content: ''; position: absolute; top: -80px; right: -60px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(52,131,250,0.10) 0%, transparent 65%); pointer-events: none; }
 .hero-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); opacity: 0.75; margin-bottom: 10px; }
-.hero-balance { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 46px; font-weight: 600; color: var(--blue); letter-spacing: -0.03em; line-height: 1; margin-bottom: 6px; }
+.hero-balance { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 46px; font-weight: 600; color: var(--blue); letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 6px; word-break: break-word; }
 .hero-balance.negative { color: var(--red); }
 .hero-sub { font-size: 13px; color: var(--text3); font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 .hero-mqv-section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
@@ -995,6 +995,13 @@ function getSaldos(){
 }
 function getTotActivosUSD(){ return Object.values(getSaldos()).reduce((s,x)=>s+Math.max(0,x.usd),0); }
 function getBalanceUSD(){ return getTotActivosUSD()-data.deudaTC; }
+function getBalanceSplit(){
+  const saldos=getSaldos();
+  let ars=0,usd=0;
+  Object.entries(saldos).forEach(([inst,v])=>{ if(ARS_INSTR.has(inst))ars+=v.ars; else usd+=v.usd; });
+  const tc=getTCRawTotales();
+  return{ars:ars-tc.ars, usd:usd-tc.usd};
+}
 function getTCRawTotales(){
   let usd=0,ars=0;
   data.movTC.forEach(m=>{
@@ -1115,11 +1122,12 @@ function renderHero(){
   document.getElementById('hs-activos').textContent=fmtARS(aUSD*USD_ARS);
   document.getElementById('hs-activos-usd').textContent=fmtUSD(aUSD);
   const _tc=getTCRawTotales();
-  const _parts=[];
-  if(_tc.usd>0.005)_parts.push(fmtUSD(_tc.usd));
-  if(_tc.ars>0.5)_parts.push(fmtARS(_tc.ars));
-  document.getElementById('hs-deuda').textContent=_parts[0]||'$0';
-  document.getElementById('hs-deuda-usd').textContent=_parts[1]||'';
+  const deudaParts=[];
+  if(_tc.ars>0.5) deudaParts.push(fmtARS(_tc.ars));
+  if(_tc.usd>0.005) deudaParts.push(fmtUSD(_tc.usd));
+  document.getElementById('hs-deuda').textContent=deudaParts.join(' + ')||'Sin deuda';
+  const totalDeudaARS=_tc.ars+_tc.usd*USD_ARS;
+  document.getElementById('hs-deuda-usd').textContent=totalDeudaARS>0.5?'≈ '+fmtARS(totalDeudaARS)+' total':'';
   document.getElementById('hs-mqv').textContent=fmtARS(mqv*USD_ARS);
   document.getElementById('hs-mqv-usd').textContent=fmtUSD(mqv);
 }
