@@ -498,8 +498,14 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
         </div>
         <div class="grid-4" style="margin-bottom:0" id="pnl-block"></div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-          <span style="font-size:11px;color:var(--text3);font-weight:600">Resumen mensual:</span>
-          <input type="month" id="resumen-mes-picker" style="font-size:12px;padding:5px 8px;width:auto">
+          <span style="font-size:9px;color:var(--text3);font-weight:800;letter-spacing:0.12em;text-transform:uppercase">Resumen mensual</span>
+          <select id="resumen-mes-sel" style="width:auto;padding:6px 10px;font-size:12px">
+            <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option>
+            <option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option>
+            <option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option>
+            <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+          </select>
+          <select id="resumen-anio-sel" style="width:auto;padding:6px 10px;font-size:12px"></select>
           <button class="btn sm primary" onclick="downloadResumenMes()">📄 Descargar</button>
         </div>
       </div>
@@ -1770,8 +1776,9 @@ function renderMetas(){
 
 /* ── RESUMEN MENSUAL (DESCARGA) ── */
 function downloadResumenMes(){
-  const picker=document.getElementById('resumen-mes-picker');
-  const ym=picker?.value||today().slice(0,7);
+  const mes=document.getElementById('resumen-mes-sel')?.value||String(new Date().getMonth()+1).padStart(2,'0');
+  const anio=document.getElementById('resumen-anio-sel')?.value||new Date().getFullYear();
+  const ym=`${anio}-${mes}`;
   const desde=`${ym}-01`, hasta=`${ym}-31`;
   const mesLabel=new Date(ym+'-15').toLocaleDateString('es-AR',{month:'long',year:'numeric'});
   const inMes=data.ingresos.filter(i=>i.fecha>=desde&&i.fecha<=hasta).sort((a,b)=>b.fecha.localeCompare(a.fecha));
@@ -1799,91 +1806,100 @@ function downloadResumenMes(){
   const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
 <title>Resumen financiero · ${mesLabel}</title>
 <style>
+@font-face{font-family:'Inter';font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-weight:600;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-600-normal.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-weight:800;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-800-normal.woff2') format('woff2')}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:13px;color:#1a1a2e;background:#fff;padding:36px 40px;max-width:820px;margin:0 auto}
-h1{font-size:22px;font-weight:800;color:#0B0F1A;letter-spacing:-0.03em;margin-bottom:3px}
-h2{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#aaa;margin:28px 0 10px;border-bottom:1px solid #eee;padding-bottom:6px}
-.header{margin-bottom:28px;padding-bottom:16px;border-bottom:3px solid #3483FA}
-.header-sub{font-size:11px;color:#888;margin-top:5px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px}
-.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:8px}
-.card{background:#f8f9fb;border:1px solid #e8eaf0;border-radius:10px;padding:14px 16px}
-.card-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:6px}
-.card-val{font-size:18px;font-weight:700;letter-spacing:-0.02em}
-.card-sub{font-size:11px;color:#888;margin-top:3px}
-.green{color:#00A650}.red{color:#F23D4F}.blue{color:#3483FA}.purple{color:#8B7CF6}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{background:#f0f2f8;color:#555;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;padding:8px 12px;text-align:left}
-td{padding:7px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
-tr:last-child td{border-bottom:none}
+:root{--bg:#06080F;--surf:#0C1220;--surf2:#101928;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.12);--tx:#ECF1FF;--tx2:#6A82A8;--tx3:#3C5070;--blue:#4A8CF5;--green:#12C98A;--red:#EF4858}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:13px;color:var(--tx);background:var(--bg);padding:36px 40px;max-width:860px;margin:0 auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+h1{font-size:22px;font-weight:800;color:var(--tx);letter-spacing:-0.03em;margin-bottom:3px}
+h2{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:var(--tx3);margin:26px 0 10px;display:flex;align-items:center;gap:8px}
+h2::before{content:'';width:3px;height:10px;background:var(--blue);border-radius:2px;opacity:.5;flex-shrink:0}
+h2::after{content:'';flex:1;height:1px;background:var(--bd)}
+.header{margin-bottom:26px;padding:20px 24px;background:linear-gradient(145deg,#101D35 0%,#0B1526 55%,#080E1C 100%);border:1px solid rgba(74,140,245,0.16);border-radius:12px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;background:radial-gradient(ellipse,rgba(74,140,245,0.12) 0%,transparent 65%);pointer-events:none}
+.header-title{font-size:22px;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#7EC0FF 0%,var(--blue) 70%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+.header-sub{font-size:11px;color:var(--tx3);margin-top:5px;position:relative}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
+.card{background:var(--surf2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.card-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--tx3);margin-bottom:8px}
+.card-val{font-size:18px;font-weight:700;letter-spacing:-0.02em;color:var(--tx)}
+.card-sub{font-size:11px;color:var(--tx3);margin-top:3px}
+.green{color:var(--green)}.red{color:var(--red)}.blue{color:var(--blue)}
+.card.has-green{border-left:2px solid rgba(18,201,138,.35)}.card.has-red{border-left:2px solid rgba(239,72,88,.35)}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:4px}
+thead th{background:rgba(16,25,40,.9);color:var(--tx3);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;padding:9px 14px;text-align:left;border-bottom:1px solid var(--bd)}
+tbody td{padding:10px 14px;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--tx)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(74,140,245,.04)}
 .ta-right{text-align:right}
-.text-sm{color:#888;font-size:11px}
-.badge{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em}
-.b-ing{background:#e6f7ef;color:#00A650}.b-eg{background:#fdecea;color:#F23D4F}
-.b-rep{background:#f0eeff;color:#8B7CF6}.b-pago{background:#e6f7ef;color:#00A650}
-.b-dep{background:#eaf2ff;color:#3483FA}.b-ah{background:#eaf2ff;color:#3483FA}
-.print-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:24px;padding:8px 18px;background:#3483FA;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
-.note{font-size:10px;color:#aaa;margin-top:4px}
+.tx3{color:var(--tx3);font-size:11px}
+.badge{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:0.05em}
+.b-ing{background:rgba(18,201,138,.13);color:var(--green)}
+.b-eg{background:rgba(239,72,88,.13);color:var(--red)}
+.b-rep{background:rgba(139,124,246,.13);color:#9F8FFF}
+.b-pago{background:rgba(18,201,138,.13);color:var(--green)}
+.b-dep{background:rgba(74,140,245,.13);color:var(--blue)}
+.print-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:22px;padding:9px 20px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 10px rgba(74,140,245,.3)}
+.empty-row td{color:var(--tx3);text-align:center;padding:16px;font-style:italic}
 @media print{.print-btn{display:none}body{padding:20px 24px}h2{margin-top:20px}}
 </style></head>
 <body>
-<button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+<button class="print-btn" onclick="window.print()">🖨️ Guardar como PDF</button>
 <div class="header">
-  <h1>Resumen financiero · ${mesLabel.charAt(0).toUpperCase()+mesLabel.slice(1)}</h1>
-  <div class="header-sub">Generado el ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+  <div class="header-title">Resumen financiero · ${mesLabel.charAt(0).toUpperCase()+mesLabel.slice(1)}</div>
+  <div class="header-sub">Generado el ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})} · TC 1 USD = ${fmtARS(USD_ARS)}</div>
 </div>
 ${isCurrentMonth?`<h2>Balance al día de hoy</h2>
 <div class="grid-3">
-  <div class="card"><div class="card-label">Balance neto</div><div class="card-val ${bUSD>=0?'green':'red'}">${fmtARS(bUSD*USD_ARS)}</div><div class="card-sub">${fmtUSD(bUSD)}</div></div>
-  <div class="card"><div class="card-label">Activos totales</div><div class="card-val green">${fmtARS(aUSD*USD_ARS)}</div><div class="card-sub">${fmtUSD(aUSD)}</div></div>
-  <div class="card"><div class="card-label">Deuda tarjeta</div><div class="card-val red">${(()=>{const p=[];if(tc.ars>0.5)p.push(fmtARS(tc.ars));if(tc.usd>0.005)p.push(fmtUSD(tc.usd));return p.join(' + ')||'Sin deuda';})()}</div></div>
+  <div class="card has-${bUSD>=0?'green':'red'}"><div class="card-label">Balance neto</div><div class="card-val ${bUSD>=0?'green':'red'}">${fmtARS(bUSD*USD_ARS)}</div><div class="card-sub">${fmtUSD(bUSD)}</div></div>
+  <div class="card has-green"><div class="card-label">Activos totales</div><div class="card-val green">${fmtARS(aUSD*USD_ARS)}</div><div class="card-sub">${fmtUSD(aUSD)}</div></div>
+  <div class="card has-red"><div class="card-label">Deuda tarjeta</div><div class="card-val red">${(()=>{const p=[];if(tc.ars>0.5)p.push(fmtARS(tc.ars));if(tc.usd>0.005)p.push(fmtUSD(tc.usd));return p.join(' + ')||'Sin deuda';})()}</div></div>
 </div>`:''}
 <h2>Flujo del mes</h2>
-<div class="grid-3" style="margin-bottom:${totalRepago>0?8:0}px">
-  <div class="card"><div class="card-label">Ingresos reales</div><div class="card-val green">${fmtARS(totalIn*USD_ARS)}</div><div class="card-sub">${fmtUSD(totalIn)}</div></div>
-  <div class="card"><div class="card-label">Egresos netos</div><div class="card-val red">${fmtARS(totalEgNeto*USD_ARS)}</div><div class="card-sub">${totalRepago>0?`-${fmtARS(totalRepago*USD_ARS)} repagos`:fmtUSD(totalEgNeto)}</div></div>
-  <div class="card"><div class="card-label">Diferencia${tasaAhorro!==null?' · '+tasaAhorro+'% ahorro':''}</div><div class="card-val ${diff>=0?'green':'red'}">${diff>=0?'':'-'}${fmtARS(Math.abs(diff)*USD_ARS)}</div><div class="card-sub">${diff>=0?'':'-'}${fmtUSD(Math.abs(diff))}</div></div>
+<div class="grid-3">
+  <div class="card has-green"><div class="card-label">Ingresos reales</div><div class="card-val green">${fmtARS(totalIn*USD_ARS)}</div><div class="card-sub">${fmtUSD(totalIn)}</div></div>
+  <div class="card has-red"><div class="card-label">Egresos netos${totalRepago>0?' · -'+fmtARS(totalRepago*USD_ARS)+' repagos':''}</div><div class="card-val red">${fmtARS(totalEgNeto*USD_ARS)}</div><div class="card-sub">${fmtUSD(totalEgNeto)}</div></div>
+  <div class="card has-${diff>=0?'green':'red'}"><div class="card-label">Diferencia${tasaAhorro!==null?' · '+tasaAhorro+'% ahorro':''}</div><div class="card-val ${diff>=0?'green':'red'}">${diff>=0?'':'-'}${fmtARS(Math.abs(diff)*USD_ARS)}</div><div class="card-sub">${diff>=0?'':'-'}${fmtUSD(Math.abs(diff))}</div></div>
 </div>
 <h2>Ingresos por categoría</h2>
 <table><thead><tr><th>Categoría</th><th class="ta-right">ARS</th><th class="ta-right">USD</th></tr></thead>
-<tbody>${inCatRows||'<tr><td colspan="3" class="text-sm" style="text-align:center;padding:14px">Sin ingresos en el período</td></tr>'}</tbody></table>
+<tbody>${inCatRows||'<tr class="empty-row"><td colspan="3">Sin ingresos en el período</td></tr>'}</tbody></table>
 <h2>Ingresos · detalle</h2>
 <table><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Cuenta</th><th class="ta-right">Monto</th></tr></thead>
 <tbody>${inMes.map(i=>`<tr>
-  <td class="text-sm">${fmtDate(i.fecha)}</td>
-  <td>${i.concepto||'—'}</td>
+  <td class="tx3">${fmtDate(i.fecha)}</td><td>${i.concepto||'—'}</td>
   <td><span class="badge ${i.cat==='Repago'?'b-rep':'b-ing'}">${i.cat}</span></td>
-  <td class="text-sm">${i.cuenta||'—'}</td>
-  <td class="ta-right"><strong class="green">${fmtARS(i.usd*USD_ARS)}</strong><div class="text-sm">${fmtUSD(i.usd)}</div></td>
-</tr>`).join('')||'<tr><td colspan="5" class="text-sm" style="text-align:center;padding:14px">Sin ingresos</td></tr>'}</tbody></table>
+  <td class="tx3">${i.cuenta||'—'}</td>
+  <td class="ta-right"><span class="green" style="font-weight:700">${fmtARS(i.usd*USD_ARS)}</span><div class="tx3">${fmtUSD(i.usd)}</div></td>
+</tr>`).join('')||'<tr class="empty-row"><td colspan="5">Sin ingresos</td></tr>'}</tbody></table>
 <h2>Egresos por categoría</h2>
 <table><thead><tr><th>Categoría</th><th class="ta-right">ARS</th><th class="ta-right">USD</th></tr></thead>
-<tbody>${egCatRows||'<tr><td colspan="3" class="text-sm" style="text-align:center;padding:14px">Sin egresos en el período</td></tr>'}</tbody></table>
+<tbody>${egCatRows||'<tr class="empty-row"><td colspan="3">Sin egresos en el período</td></tr>'}</tbody></table>
 <h2>Egresos · detalle</h2>
 <table><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Cuenta</th><th class="ta-right">Monto</th></tr></thead>
 <tbody>${egMes.map(e=>`<tr>
-  <td class="text-sm">${fmtDate(e.fecha)}</td>
-  <td>${e.concepto||'—'}</td>
+  <td class="tx3">${fmtDate(e.fecha)}</td><td>${e.concepto||'—'}</td>
   <td><span class="badge b-eg">${e.cat}</span></td>
-  <td class="text-sm">${e.cuenta||'—'}</td>
-  <td class="ta-right"><strong class="red">${fmtARS(e.usd*USD_ARS)}</strong><div class="text-sm">${fmtUSD(e.usd)}</div></td>
-</tr>`).join('')||'<tr><td colspan="5" class="text-sm" style="text-align:center;padding:14px">Sin egresos</td></tr>'}</tbody></table>
+  <td class="tx3">${e.cuenta||'—'}</td>
+  <td class="ta-right"><span class="red" style="font-weight:700">-${fmtARS(e.usd*USD_ARS)}</span><div class="tx3">${fmtUSD(e.usd)}</div></td>
+</tr>`).join('')||'<tr class="empty-row"><td colspan="5">Sin egresos</td></tr>'}</tbody></table>
 ${tcMes.length?`<h2>Tarjeta de crédito · movimientos</h2>
 <table><thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Tarjeta</th><th class="ta-right">Monto</th></tr></thead>
 <tbody>${tcMes.map(m=>`<tr>
-  <td class="text-sm">${fmtDate(m.fecha)}</td>
-  <td>${m.concepto||'—'}</td>
+  <td class="tx3">${fmtDate(m.fecha)}</td><td>${m.concepto||'—'}</td>
   <td><span class="badge ${m.tipo==='pago'?'b-pago':'b-eg'}">${m.tipo==='pago'?'Pago':'Gasto'}</span></td>
-  <td class="text-sm">${m.tarjeta||'—'}</td>
-  <td class="ta-right ${m.tipo==='pago'?'green':'red'}"><strong>${fmtARS(m.usd*USD_ARS)}</strong><div class="text-sm">${fmtUSD(m.usd)}</div></td>
+  <td class="tx3">${m.tarjeta||'—'}</td>
+  <td class="ta-right"><span class="${m.tipo==='pago'?'green':'red'}" style="font-weight:700">${m.tipo==='pago'?'-':'+'}${fmtARS(m.usd*USD_ARS)}</span><div class="tx3">${fmtUSD(m.usd)}</div></td>
 </tr>`).join('')}</tbody></table>`:''}
 ${ahMes.length?`<h2>Ahorros · movimientos</h2>
 <table><thead><tr><th>Fecha</th><th>Instrumento</th><th>Tipo</th><th class="ta-right">Monto</th></tr></thead>
 <tbody>${ahMes.map(a=>`<tr>
-  <td class="text-sm">${fmtDate(a.fecha)}</td>
-  <td>${a.inst||'—'}</td>
-  <td><span class="badge ${a.tipo==='deposito'?'b-dep':'b-eg'}">${a.tipo}</span></td>
-  <td class="ta-right ${a.tipo==='deposito'?'blue':'red'}"><strong>${fmtARS(a.usd*USD_ARS)}</strong><div class="text-sm">${fmtUSD(a.usd)}</div></td>
+  <td class="tx3">${fmtDate(a.fecha)}</td><td>${a.inst||a.tipo||'—'}</td>
+  <td><span class="badge ${a.mov==='deposito'?'b-dep':'b-eg'}">${a.mov==='deposito'?'Depósito':'Retiro'}</span></td>
+  <td class="ta-right"><span class="${a.mov==='deposito'?'blue':'red'}" style="font-weight:700">${a.mov==='deposito'?'':'-'}${fmtARS(a.usd*USD_ARS)}</span><div class="tx3">${fmtUSD(a.usd)}</div></td>
 </tr>`).join('')}</tbody></table>`:''}
 </body></html>`;
   const w=window.open('','_blank');
@@ -2056,7 +2072,10 @@ async function init(){
   document.getElementById('fecha-hoy').textContent=now.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'});
   document.getElementById('hero-label').textContent='Balance total al '+now.toLocaleDateString('es-AR',{day:'numeric',month:'numeric'});
   ['in-fecha','eg-fecha','tc-fecha','tp-fecha','ah-fecha','tr-fecha'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=today(); });
-  const rmp=document.getElementById('resumen-mes-picker'); if(rmp) rmp.value=today().slice(0,7);
+  const nowY=new Date().getFullYear(), nowM=String(new Date().getMonth()+1).padStart(2,'0');
+  const anioSel=document.getElementById('resumen-anio-sel');
+  if(anioSel){for(let y=nowY-4;y<=nowY+1;y++){const o=document.createElement('option');o.value=y;o.textContent=y;o.selected=y===nowY;anioSel.appendChild(o);}}
+  const mesSel=document.getElementById('resumen-mes-sel'); if(mesSel) mesSel.value=nowM;
   await loadFromSupabase();
   updateCotizDisplay();
   updateDeudaChip(); renderResumen();
