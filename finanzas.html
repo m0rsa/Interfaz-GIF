@@ -995,6 +995,23 @@ function getSaldos(){
 }
 function getTotActivosUSD(){ return Object.values(getSaldos()).reduce((s,x)=>s+Math.max(0,x.usd),0); }
 function getBalanceUSD(){ return getTotActivosUSD()-data.deudaTC; }
+function getTCRawTotales(){
+  let usd=0,ars=0;
+  data.movTC.forEach(m=>{
+    const sign=m.tipo==='gasto'?1:m.tipo==='pago'?-1:0;
+    if(!sign)return;
+    if(m.rawCur==='ars') ars+=(m.rawMonto||0)*sign;
+    else usd+=(m.rawMonto||m.usd||0)*sign;
+  });
+  return{usd:Math.max(0,usd),ars:Math.max(0,ars)};
+}
+function fmtTCDeuda(){
+  const{usd,ars}=getTCRawTotales();
+  const parts=[];
+  if(usd>0.005)parts.push(fmtUSD(usd));
+  if(ars>0.5)parts.push(fmtARS(ars));
+  return parts.length?parts.join(' + '):'Sin deuda';
+}
 
 /* ── CURRENCY TOGGLES ── */
 function setCur(form,cur){
@@ -1037,7 +1054,7 @@ function selectCuenta(form,inst){ selCuenta[form]=inst; renderCuentas(form); }
 /* ── TARJETA ── */
 function openTarjeta(tab){ document.getElementById('tarjeta-body').classList.add('open'); switchTab(tab); }
 function switchTab(tab){ document.getElementById('tab-sumar').classList.toggle('active',tab==='sumar'); document.getElementById('tab-pagar').classList.toggle('active',tab==='pagar'); document.getElementById('panel-sumar').style.display=tab==='sumar'?'block':'none'; document.getElementById('panel-pagar').style.display=tab==='pagar'?'block':'none'; if(tab==='pagar')renderCuentas('tp'); }
-function updateDeudaChip(){ const c=document.getElementById('deuda-chip-header'); if(c)c.textContent='Deuda: '+fmtARS(data.deudaTC*USD_ARS)+' ('+fmtUSD(data.deudaTC)+')'; }
+function updateDeudaChip(){ const c=document.getElementById('deuda-chip-header'); if(c)c.textContent='Deuda: '+fmtTCDeuda(); }
 
 function agregarGastoTC(){
   const concepto=document.getElementById('tc-concepto').value.trim()||'Gasto tarjeta';
@@ -1097,8 +1114,12 @@ function renderHero(){
   document.getElementById('hero-sub').textContent=fmtUSD(bUSD);
   document.getElementById('hs-activos').textContent=fmtARS(aUSD*USD_ARS);
   document.getElementById('hs-activos-usd').textContent=fmtUSD(aUSD);
-  document.getElementById('hs-deuda').textContent=fmtARS(data.deudaTC*USD_ARS);
-  document.getElementById('hs-deuda-usd').textContent=fmtUSD(data.deudaTC);
+  const _tc=getTCRawTotales();
+  const _parts=[];
+  if(_tc.usd>0.005)_parts.push(fmtUSD(_tc.usd));
+  if(_tc.ars>0.5)_parts.push(fmtARS(_tc.ars));
+  document.getElementById('hs-deuda').textContent=_parts[0]||'$0';
+  document.getElementById('hs-deuda-usd').textContent=_parts[1]||'';
   document.getElementById('hs-mqv').textContent=fmtARS(mqv*USD_ARS);
   document.getElementById('hs-mqv-usd').textContent=fmtUSD(mqv);
 }
@@ -1233,7 +1254,7 @@ function renderPatrimonio(){
   const saldos=getSaldos(), aUSD=getTotActivosUSD(), bUSD=getBalanceUSD();
   document.getElementById('metrics-patrim').innerHTML=`
     <div class="metric-card"><div class="mc-label">Activos totales</div><div class="mc-val green">${fmtARS(aUSD*USD_ARS)}</div><div class="mc-sub">${fmtUSD(aUSD)}</div></div>
-    <div class="metric-card"><div class="mc-label">Deuda tarjeta</div><div class="mc-val red">${fmtARS(data.deudaTC*USD_ARS)}</div><div class="mc-sub">${fmtUSD(data.deudaTC)}</div></div>
+    <div class="metric-card"><div class="mc-label">Deuda tarjeta</div><div class="mc-val red" style="font-size:clamp(16px,3vw,22px)">${(()=>{const t=getTCRawTotales();const p=[];if(t.usd>0.005)p.push(fmtUSD(t.usd));if(t.ars>0.5)p.push(fmtARS(t.ars));return p.join(' + ')||'$0';})()}</div><div class="mc-sub">${fmtUSD(data.deudaTC)} equiv.</div></div>
     <div class="metric-card"><div class="mc-label">Balance neto</div><div class="mc-val ${bUSD>=0?'green':'red'}">${fmtARS(bUSD*USD_ARS)}</div><div class="mc-sub">${fmtUSD(bUSD)}</div></div>
     <div class="metric-card"><div class="mc-label">MQV proyectado</div><div class="mc-val purple">${fmtARS((bUSD+data.sueldo)*USD_ARS)}</div><div class="mc-sub">${fmtUSD(bUSD+data.sueldo)}</div></div>`;
   const entries=Object.entries(saldos).filter(([,v])=>v.usd>0).sort((a,b)=>b[1].usd-a[1].usd);
@@ -1343,9 +1364,13 @@ function renderTCHistorial(el){
       Object.entries(byCard).map(([k,v])=>`<div style="background:var(--surface2);border:1px solid ${TC_COLORS[k]||'var(--border)'};border-radius:10px;padding:10px 14px;min-width:120px"><div style="font-size:11px;font-weight:700;color:${TC_COLORS[k]||'var(--text3)'};margin-bottom:4px">${k}</div><div style="font-size:17px;font-weight:600;color:var(--red)">${fmtARS(v*USD_ARS)}</div><div style="font-size:12px;color:var(--text3)">${fmtUSD(v)}</div></div>`).join('')+
       '</div>'
     : '';
+  const{usd:_rusd,ars:_rars}=getTCRawTotales();
+  const _rparts=[];
+  if(_rusd>0.005)_rparts.push(`<span style="color:var(--red)">${fmtUSD(_rusd)}</span>`);
+  if(_rars>0.5)_rparts.push(`<span style="color:var(--red)">${fmtARS(_rars)}</span>`);
   el.innerHTML=
-    `<div style="font-size:22px;font-weight:500;color:var(--red);margin-bottom:4px">${fmtARS(data.deudaTC*USD_ARS)}</div>`+
-    `<div style="font-size:13px;color:var(--text3);margin-bottom:16px">${fmtUSD(data.deudaTC)} pendiente en total</div>`+
+    `<div style="font-size:22px;font-weight:600;margin-bottom:4px">${_rparts.join('<span style="color:var(--text3);margin:0 6px">+</span>')||'Sin deuda'}</div>`+
+    `<div style="font-size:13px;color:var(--text3);margin-bottom:16px">≈ ${fmtARS(data.deudaTC*USD_ARS)} · ${fmtUSD(data.deudaTC)} en total convertido</div>`+
     cardBreakdown+
     (movs.length?`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Tarjeta / Cuenta</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
     movs.map(m=>{
