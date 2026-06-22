@@ -2020,13 +2020,8 @@ function calcInteres(){
 }
 
 /* ── AUTH ── */
-const GATE_KEY='MORSA'; // debe coincidir con login.html
-const GATE_SALT='_fin_v2';
-
-async function _hashStr(s){
-  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
+// Hash SHA-256 de la clave de acceso. Debe coincidir con login.html.
+const GATE_HASH='759ade99d53faa2814a61181376e779f604d672e758849bcfd3164ad186b16fc';
 
 function _hideOverlay(){
   const o=document.getElementById('auth-overlay');
@@ -2038,8 +2033,7 @@ function _hideOverlay(){
 
 async function checkAuth(){
   // 1. Verificar gate token
-  const expected=await _hashStr(GATE_KEY+GATE_SALT);
-  if(sessionStorage.getItem('_gk')!==expected){
+  if(sessionStorage.getItem('_gk')!==GATE_HASH){
     window.location.replace('login.html'); return;
   }
   // 2. Verificar sesión Supabase

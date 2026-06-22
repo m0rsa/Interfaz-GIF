@@ -165,8 +165,12 @@ body{font-family:'SF Pro',-apple-system,BlinkMacSystemFont,sans-serif;color:var(
 const SUPA_URL='https://axwxdiweiqxuqrbqmuwo.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4d3hkaXdlaXF4dXFyYnFtdXdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MjU3OTEsImV4cCI6MjA5NzQwMTc5MX0.X22UlXYmEZr3I4AV6iHgOvfaM3HSnSNriSAVWGtwAJs';
 
-// ← Cambiá GATE_KEY por tu clave de acceso personal
-const GATE_KEY='MORSA';
+// Hash SHA-256 de tu clave + salt. La clave en sí nunca está en el código.
+// Para cambiar la clave: consola del browser → crypto.subtle.digest('SHA-256',
+//   new TextEncoder().encode('NUEVA_CLAVE_fin_v2'))
+//   .then(b=>console.log(Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')))
+// Pegá el resultado en GATE_HASH de login.html y finanzas.html
+const GATE_HASH='759ade99d53faa2814a61181376e779f604d672e758849bcfd3164ad186b16fc';
 const GATE_SALT='_fin_v2';
 
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -176,7 +180,6 @@ async function hashStr(s){
   const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-async function gateHash(){ return hashStr(GATE_KEY+GATE_SALT); }
 
 /* ── TOGGLE EYE ── */
 const EYE_OPEN='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
@@ -254,9 +257,8 @@ async function checkGate(){
   const errEl=document.getElementById('gate-error');
   btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
   const inputHash=await hashStr(val+GATE_SALT);
-  const correctHash=await gateHash();
   btn.disabled=false; btn.innerHTML='Continuar';
-  if(inputHash!==correctHash){
+  if(inputHash!==GATE_HASH){
     gSetA(gAttempts+1);
     document.getElementById('gate-input').classList.add('err');
     if(gAttempts>=GATE_MAX){
@@ -270,7 +272,7 @@ async function checkGate(){
     return;
   }
   gSetA(0); gSetL(0);
-  sessionStorage.setItem('_gk',correctHash);
+  sessionStorage.setItem('_gk',GATE_HASH);
   document.getElementById('gate-input').classList.remove('err');
   showLogin();
 }
@@ -352,13 +354,12 @@ window.addEventListener('load',async()=>{
   if(lLockRem()>0) lStartTimer();
 
   // Si ya hay sesión activa + gate válida → redirigir directo
-  const correctHash=await gateHash();
   const gk=sessionStorage.getItem('_gk');
   const{data:{session}}=await sb.auth.getSession();
-  if(session && gk===correctHash){ window.location.replace('finanzas.html'); return; }
+  if(session && gk===GATE_HASH){ window.location.replace('finanzas.html'); return; }
 
   // Si el gate ya fue pasado → ir a paso 2
-  if(gk===correctHash){ showLogin(); return; }
+  if(gk===GATE_HASH){ showLogin(); return; }
 
   // Caso base: empezar en paso 1
   setTimeout(()=>document.getElementById('gate-input').focus(),80);
