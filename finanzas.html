@@ -724,6 +724,22 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
 
     <!-- INVERSIONES -->
     <div id="sec-inversiones" class="section">
+      <div class="section-title">Rendimientos del período</div>
+      <div class="card" style="padding:20px 24px;margin-bottom:18px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px" id="rend-tabs">
+          <button class="mode-tab active" onclick="setRendPeriodo('mes-actual')">Mes actual</button>
+          <button class="mode-tab" onclick="setRendPeriodo('mes-anterior')">Mes anterior</button>
+          <button class="mode-tab" onclick="setRendPeriodo('30dias')">Últimos 30 días</button>
+          <button class="mode-tab" onclick="setRendPeriodo('custom')">Personalizado</button>
+        </div>
+        <div id="rend-custom" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+          <span style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.04em">Desde</span>
+          <input type="date" id="rend-desde" style="width:auto" onchange="renderRendimientos()">
+          <span style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.04em">Hasta</span>
+          <input type="date" id="rend-hasta" style="width:auto" onchange="renderRendimientos()">
+        </div>
+        <div id="rend-result"></div>
+      </div>
       <div class="section-title">Mercados en tiempo real</div>
       <div class="card" style="padding:20px 24px;margin-bottom:18px">
         <div class="card-title">
@@ -851,6 +867,7 @@ let data = {
 /* ── UI STATE ── */
 let selCuenta={in:'', eg:'', tp:'', trde:'', trha:''};
 let sortDir={ingresos:'desc',egresos:'desc',ahorros:'desc',transferencias:'desc',tc:'desc'};
+let rendPeriodo='mes-actual', rendCustom={desde:'',hasta:''};
 let curMode={in:'usd', eg:'usd', tc:'usd', tp:'usd', tr:'usd', sueldo:'usd'};
 let rangoResumen={desde:'',hasta:''}, mesFiltros={ingresos:'',egresos:'',ahorros:''};
 let chartFlujo=null, chartPatrim=null, chartEvo=null, chartCat=null, chartPatEvo=null, chartFlujoMes=null;
@@ -1119,7 +1136,7 @@ function showSection(id){
   if(id==='resumen') renderResumen();
   if(id==='patrimonio') renderPatrimonio();
   if(id==='metas') renderMetas();
-  if(id==='inversiones'){ fetchMercados(); }
+  if(id==='inversiones'){ renderRendimientos(); fetchMercados(); }
   if(id==='ingresos'){ renderCuentas('in'); renderIngresos(); }
   if(id==='egresos'){ renderCuentas('eg'); updateDeudaChip(); renderEgresos(); }
   if(id==='ahorro') renderAhorros();
@@ -1734,6 +1751,77 @@ function renderMetas(){
       </div>
     </div>`;
   }).join('');
+}
+
+/* ── RENDIMIENTOS ── */
+function setRendPeriodo(p){
+  rendPeriodo=p;
+  const keys=['mes-actual','mes-anterior','30dias','custom'];
+  document.querySelectorAll('#rend-tabs .mode-tab').forEach((b,i)=>b.classList.toggle('active',keys[i]===p));
+  const custom=document.getElementById('rend-custom');
+  if(custom) custom.style.display=p==='custom'?'flex':'none';
+  renderRendimientos();
+}
+
+function getRendFechas(){
+  const now=new Date(), hoy=today();
+  if(rendPeriodo==='mes-actual'){
+    return{desde:`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`,hasta:hoy};
+  }
+  if(rendPeriodo==='mes-anterior'){
+    const d=new Date(now.getFullYear(),now.getMonth()-1,1);
+    const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0');
+    return{desde:`${y}-${m}-01`,hasta:`${y}-${m}-31`};
+  }
+  if(rendPeriodo==='30dias'){
+    const d=new Date(); d.setDate(d.getDate()-30);
+    return{desde:d.toISOString().split('T')[0],hasta:hoy};
+  }
+  const desde=document.getElementById('rend-desde')?.value||'';
+  const hasta=document.getElementById('rend-hasta')?.value||hoy;
+  return{desde,hasta};
+}
+
+function renderRendimientos(){
+  const el=document.getElementById('rend-result');
+  if(!el) return;
+  const{desde,hasta}=getRendFechas();
+  if(!desde){ el.innerHTML='<div class="empty" style="padding:24px">Elegí un rango de fechas.</div>'; return; }
+  const items=data.ingresos.filter(i=>i.cat==='Inversión'&&i.fecha>=desde&&i.fecha<=hasta)
+    .sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const total=items.reduce((s,i)=>s+i.usd,0);
+  if(!items.length){
+    el.innerHTML=`<div class="empty" style="padding:24px">Sin rendimientos en el período.<br><span style="font-size:12px">Registrá ingresos con categoría <strong>Inversión</strong> para que aparezcan acá.</span></div>`;
+    return;
+  }
+  const byCuenta={};
+  items.forEach(i=>{ const k=i.cuenta||'—'; byCuenta[k]=(byCuenta[k]||0)+i.usd; });
+  const periodoTxt=desde===hasta?fmtDate(desde):`${fmtDate(desde)} → ${fmtDate(hasta)}`;
+  el.innerHTML=
+    `<div class="grid-2" style="margin-bottom:18px">
+      <div class="metric-card"><div class="mc-label">Total rendimientos</div><div class="mc-val green">${fmtARS(total*USD_ARS)}</div><div class="mc-sub">${fmtUSD(total)}</div></div>
+      <div class="metric-card"><div class="mc-label">Movimientos</div><div class="mc-val">${items.length}</div><div class="mc-sub" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${periodoTxt}</div></div>
+    </div>`+
+    (Object.keys(byCuenta).length>1?
+      `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">${
+        Object.entries(byCuenta).sort((a,b)=>b[1]-a[1]).map(([k,v])=>{
+          const c=COLORS[k]||'var(--text3)';
+          return`<div style="background:var(--surface2);border:1px solid ${c}44;border-left:3px solid ${c};border-radius:9px;padding:10px 14px;min-width:130px">
+            <div style="font-size:10px;color:${c};font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">${k}</div>
+            <div style="font-size:16px;font-weight:600;color:var(--green)">${fmtARS(v*USD_ARS)}</div>
+            <div style="font-size:11px;color:var(--text3)">${fmtUSD(v)}</div>
+          </div>`;
+        }).join('')
+      }</div>`:'')
+    +`<div class="table-wrap"><table>
+      <thead><tr><th>Fecha</th><th>Concepto</th><th>Cuenta</th><th style="text-align:right">Monto</th></tr></thead>
+      <tbody>${items.map(i=>`<tr>
+        <td style="color:var(--text3)">${fmtDate(i.fecha)}</td>
+        <td>${i.concepto||'—'}${i.nota?`<div class="td-sub">${i.nota}</div>`:''}</td>
+        <td>${i.cuenta?`<span class="acct-pill" style="background:${COLORS[i.cuenta]||'#888'}22;color:${COLORS[i.cuenta]||'#888'}">${i.cuenta}</span>`:'—'}</td>
+        <td style="text-align:right"><div class="td-main" style="color:var(--green)">${fmtARS(i.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(i.usd)}</div></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
 }
 
 /* ── INVERSIONES ── */
