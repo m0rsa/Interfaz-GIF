@@ -583,7 +583,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
       <div class="section-title">Registrar movimiento</div>
       <div class="card">
         <div class="grid-form-3">
-          <div><label>Instrumento</label><select id="ah-tipo" onchange="updateAhTipo()"><option>U$D Físicos</option><option>USD Galicia</option><option>Pesos MP</option><option>Pesos Galicia/BBVA</option><option>Pesos Efectivo</option><option>Criptomonedas (USDT)</option><option>Plazo fijo</option><option>Acciones / ETF</option><option>Fondo común</option><option>Inmueble</option><option>Otro</option></select></div>
+          <div><label>Instrumento</label><select id="ah-tipo" onchange="updateAhTipo()"></select></div>
           <div><label id="ah-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="ah-monto" placeholder="0" step="0.01"></div>
           <div><label>Tipo</label><select id="ah-mov"><option value="deposito">Depósito</option><option value="retiro">Retiro</option></select></div>
         </div>
@@ -778,11 +778,11 @@ Chart.defaults.font.family="'SF Pro',-apple-system,BlinkMacSystemFont,'Helvetica
 Chart.defaults.font.size=12;
 
 /* ── CONSTANTS ── */
-const INSTRUMENTOS=['U$D Físicos','USD Galicia','Pesos MP','Pesos Galicia/BBVA','Pesos Efectivo','Criptomonedas (USDT)'];
-const COLORS={'U$D Físicos':'#00D4A1','USD Galicia':'#4A9EFF','Pesos MP':'#F5A623','Pesos Galicia/BBVA':'#8B93A8','Pesos Efectivo':'#FF6B47','Criptomonedas (USDT)':'#8B7CF6','Plazo fijo':'#38BDF8','Acciones / ETF':'#F472B6','Fondo común':'#86EFAC','Inmueble':'#FCD34D','Otro':'#94A3B8'};
-const ICONS={'U$D Físicos':'💵','USD Galicia':'🏦','Pesos MP':'📱','Pesos Galicia/BBVA':'🏦','Pesos Efectivo':'💴','Criptomonedas (USDT)':'₿','Plazo fijo':'📈','Acciones / ETF':'📊','Fondo común':'🥧','Inmueble':'🏠','Otro':'💼'};
+let INSTRUMENTOS=[];
+let COLORS={};
+let ICONS={};
 const CAT_COLORS={'Alimentación':'#00D4A1','Entretenimiento':'#8B7CF6','Transporte':'#4A9EFF','Salud':'#FF6B47','Vivienda':'#F5A623','Servicios':'#38BDF8','Otros':'#8B93A8'};
-const ARS_INSTR=new Set(['Pesos MP','Pesos Galicia/BBVA','Pesos Efectivo']);
+let ARS_INSTR=new Set();
 
 /* ── SUPABASE ── */
 const SUPA_URL='https://axwxdiweiqxuqrbqmuwo.supabase.co';
@@ -808,7 +808,7 @@ let data = {
 };
 
 /* ── UI STATE ── */
-let selCuenta={in:INSTRUMENTOS[0], eg:INSTRUMENTOS[0], tp:INSTRUMENTOS[0], trde:INSTRUMENTOS[0], trha:INSTRUMENTOS[1]};
+let selCuenta={in:'', eg:'', tp:'', trde:'', trha:''};
 let curMode={in:'usd', eg:'usd', tc:'usd', tp:'usd', tr:'usd', sueldo:'usd'};
 let rangoResumen={desde:'',hasta:''}, mesFiltros={ingresos:'',egresos:'',ahorros:''};
 let chartFlujo=null, chartPatrim=null, chartEvo=null, chartCat=null, chartPatEvo=null;
@@ -830,7 +830,7 @@ function loadData(){
 }
 async function syncSupabase(){
   try{
-    await sb.from('finanzas_config').upsert({id:1,cotiz_c:data.cotizC,cotiz_v:data.cotizV,deuda_tc:data.deudaTC,sueldo:data.sueldo,presupuestos_json:JSON.stringify(data.presupuestos),metas_json:JSON.stringify(data.metas),updated_at:new Date().toISOString()});
+    await sb.from('finanzas_config').upsert({id:1,cotiz_c:data.cotizC,cotiz_v:data.cotizV,deuda_tc:data.deudaTC,sueldo:data.sueldo,presupuestos_json:JSON.stringify(data.presupuestos),metas_json:JSON.stringify(data.metas),instrumentos_json:JSON.stringify({instrumentos:INSTRUMENTOS,colors:COLORS,icons:ICONS,ars_instr:[...ARS_INSTR]}),updated_at:new Date().toISOString()});
     const tbls=[
       {n:'ingresos',       arr:data.ingresos,           m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
       {n:'egresos',        arr:data.egresos,             m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
@@ -860,7 +860,19 @@ async function loadFromSupabase(){
       sb.from('mov_tc').select('*').order('fecha',{ascending:false}),
     ]);
     const fd=r=>typeof r==='string'&&r.includes('T')?r.split('T')[0]:r;
-    if(cfg.data){ data.cotizC=+cfg.data.cotiz_c; data.cotizV=+cfg.data.cotiz_v; data.deudaTC=+cfg.data.deuda_tc; data.sueldo=+cfg.data.sueldo; try{ if(cfg.data.presupuestos_json) data.presupuestos=JSON.parse(cfg.data.presupuestos_json); if(cfg.data.metas_json) data.metas=JSON.parse(cfg.data.metas_json); }catch(e){} }
+    if(cfg.data){
+      data.cotizC=+cfg.data.cotiz_c; data.cotizV=+cfg.data.cotiz_v; data.deudaTC=+cfg.data.deuda_tc; data.sueldo=+cfg.data.sueldo;
+      try{ if(cfg.data.presupuestos_json) data.presupuestos=JSON.parse(cfg.data.presupuestos_json); if(cfg.data.metas_json) data.metas=JSON.parse(cfg.data.metas_json); }catch(e){}
+      try{
+        if(cfg.data.instrumentos_json){
+          const ic=JSON.parse(cfg.data.instrumentos_json);
+          INSTRUMENTOS=ic.instrumentos||[]; COLORS=ic.colors||{}; ICONS=ic.icons||{}; ARS_INSTR=new Set(ic.ars_instr||[]);
+          if(!selCuenta.in && INSTRUMENTOS[0]) selCuenta={in:INSTRUMENTOS[0],eg:INSTRUMENTOS[0],tp:INSTRUMENTOS[0],trde:INSTRUMENTOS[0],trha:INSTRUMENTOS[1]||INSTRUMENTOS[0]};
+          const ahTipo=document.getElementById('ah-tipo');
+          if(ahTipo) ahTipo.innerHTML=Object.keys(COLORS).map(i=>`<option>${i}</option>`).join('');
+        }
+      }catch(e){}
+    }
     data.ingresos=(ing.data||[]).map(r=>({id:r.id,concepto:r.concepto,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,cat:r.cat,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta}));
     data.egresos=(eg.data||[]).map(r=>({id:r.id,concepto:r.concepto,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,cat:r.cat,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta}));
     data.ahorros=(ah.data||[]).map(r=>({id:r.id,tipo:r.tipo,usd:+r.usd,ars:+r.ars,fecha:fd(r.fecha),nota:r.nota||'',mov:r.mov}));
@@ -1675,9 +1687,9 @@ async function init(){
   document.getElementById('fecha-hoy').textContent=now.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'});
   document.getElementById('hero-label').textContent='Balance total al '+now.toLocaleDateString('es-AR',{day:'numeric',month:'numeric'});
   ['in-fecha','eg-fecha','tc-fecha','tp-fecha','ah-fecha','tr-fecha'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=today(); });
-  updateDeudaChip(); renderResumen();
   await loadFromSupabase();
   updateCotizDisplay();
+  updateDeudaChip(); renderResumen();
   renderAll();
   renderCuentas('in'); renderCuentas('eg'); renderCuentas('trde'); renderCuentas('trha'); updateDeudaChip();
   fetchDolar();
