@@ -310,6 +310,13 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
   .acct-pill { font-size: 14px; }
 }
 
+/* ── TOAST ── */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:9999; padding:11px 22px; border-radius:12px; font-size:13px; font-weight:600; font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif; box-shadow:0 4px 24px rgba(0,0,0,0.45); white-space:nowrap; pointer-events:none; transition:opacity 0.3s,transform 0.3s; }
+.toast.success { background:var(--green); color:#fff; }
+.toast.error { background:var(--red); color:#fff; }
+.toast.info { background:var(--surface3); color:var(--text); border:1px solid var(--border2); }
+@media(max-width:860px){ .toast { bottom:calc(82px + env(safe-area-inset-bottom,0px)); } }
+
 /* ── EDIT MODAL ── */
 .edit-modal-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); align-items: flex-end; justify-content: center; }
 .edit-modal-overlay.open { display: flex; }
@@ -483,10 +490,15 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
             <button id="rango-clear" onclick="clearRangoResumen()" style="font-size:11px;padding:4px 9px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;display:none">✕ Todo</button>
           </div>
         </div>
-        <div class="grid-3" style="margin-bottom:0" id="pnl-block"></div>
+        <div class="grid-4" style="margin-bottom:0" id="pnl-block"></div>
       </div>
 
       <div id="presupuesto-block"></div>
+
+      <div class="card">
+        <div class="card-title">Ingresos vs Egresos · últimos 6 meses</div>
+        <div class="chart-wrap" style="height:200px"><canvas id="chartFlujoMes" role="img" aria-label="Flujo mensual">Flujo mensual.</canvas></div>
+      </div>
 
       <div class="grid-2">
         <div class="card">
@@ -589,6 +601,7 @@ tbody tr:hover { background: rgba(52,131,250,0.04); }
         </div>
       </div>
 
+      <div id="cuotas-proximas-block"></div>
       <div class="section-title">Historial tarjeta</div>
       <div id="tc-historial-egresos"></div>
 
@@ -838,7 +851,7 @@ let data = {
 let selCuenta={in:'', eg:'', tp:'', trde:'', trha:''};
 let curMode={in:'usd', eg:'usd', tc:'usd', tp:'usd', tr:'usd', sueldo:'usd'};
 let rangoResumen={desde:'',hasta:''}, mesFiltros={ingresos:'',egresos:'',ahorros:''};
-let chartFlujo=null, chartPatrim=null, chartEvo=null, chartCat=null, chartPatEvo=null;
+let chartFlujo=null, chartPatrim=null, chartEvo=null, chartCat=null, chartPatEvo=null, chartFlujoMes=null;
 
 /* ── PERSISTENCE ── */
 function saveData(){ try{ localStorage.setItem('finanzas_v1', JSON.stringify(data)); }catch(e){} syncSupabase(); }
@@ -913,7 +926,7 @@ async function loadFromSupabase(){
 function updateCotiz(){
   const c=parseFloat(document.getElementById('cotiz-c').value)||0;
   const v=parseFloat(document.getElementById('cotiz-v').value)||0;
-  if(!c||!v){ alert('Ingresá valores válidos.'); return; }
+  if(!c||!v){ toast('Ingresá valores válidos.','error'); return; }
   data.cotizC=c; data.cotizV=v;
   USD_C=c; USD_V=v; USD_ARS=(c+v)/2;
   saveData();
@@ -948,6 +961,15 @@ async function fetchDolar(){
   }finally{
     if(btn){ btn.textContent='↻ Traer cotización'; btn.disabled=false; }
   }
+}
+
+/* ── TOAST ── */
+function toast(msg,type='info'){
+  const t=document.createElement('div');
+  t.className='toast '+type;
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(8px)'; setTimeout(()=>t.remove(),300); },2500);
 }
 
 /* ── FORMATTERS ── */
@@ -995,13 +1017,6 @@ function getSaldos(){
 }
 function getTotActivosUSD(){ return Object.values(getSaldos()).reduce((s,x)=>s+Math.max(0,x.usd),0); }
 function getBalanceUSD(){ return getTotActivosUSD()-data.deudaTC; }
-function getBalanceSplit(){
-  const saldos=getSaldos();
-  let ars=0,usd=0;
-  Object.entries(saldos).forEach(([inst,v])=>{ if(ARS_INSTR.has(inst))ars+=v.ars; else usd+=v.usd; });
-  const tc=getTCRawTotales();
-  return{ars:ars-tc.ars, usd:usd-tc.usd};
-}
 function getTCRawTotales(){
   let usd=0,ars=0;
   data.movTC.forEach(m=>{
@@ -1070,7 +1085,7 @@ function agregarGastoTC(){
   const fecha=document.getElementById('tc-fecha').value||today();
   const nota=document.getElementById('tc-nota').value;
   const tarjeta=document.getElementById('tc-tarjeta').value;
-  if(isNaN(raw)||raw<=0){alert('Ingresá un monto válido.');return;}
+  if(isNaN(raw)||raw<=0){toast('Ingresá un monto válido.','error');return;}
   const usdTotal=curMode.tc==='ars'?raw/USD_ARS:raw;
   const usdCuota=usdTotal/cuotas, rawCuota=raw/cuotas;
   for(let i=0;i<cuotas;i++){
@@ -1084,9 +1099,9 @@ function agregarGastoTC(){
   document.getElementById('tc-monto').value='';
   document.getElementById('tc-cuotas').value='1';
   document.getElementById('tc-hint').textContent='';
-  saveData(); updateDeudaChip(); renderAll();
+  toast('Gasto sumado a la deuda','success'); saveData(); updateDeudaChip(); renderAll();
 }
-function pagarTC(){ const raw=parseFloat(document.getElementById('tp-monto').value); const fecha=document.getElementById('tp-fecha').value||today(); const nota=document.getElementById('tp-nota').value||'Pago tarjeta'; const cuenta=selCuenta.tp; if(isNaN(raw)||raw<=0){alert('Ingresá un monto válido.');return;} const usd=curMode.tp==='ars'?raw/USD_ARS:raw; if(usd>data.deudaTC+0.001){alert('El monto supera la deuda actual.');return;} data.deudaTC=Math.max(0,data.deudaTC-usd); data.movTC.push({id:Date.now(),tipo:'pago',concepto:'Pago tarjeta',usd,rawMonto:raw,rawCur:curMode.tp,fecha,nota,cuenta}); document.getElementById('tp-monto').value=''; document.getElementById('tp-hint').textContent=''; saveData(); updateDeudaChip(); renderAll(); renderCuentas('tp'); }
+function pagarTC(){ const raw=parseFloat(document.getElementById('tp-monto').value); const fecha=document.getElementById('tp-fecha').value||today(); const nota=document.getElementById('tp-nota').value||'Pago tarjeta'; const cuenta=selCuenta.tp; if(isNaN(raw)||raw<=0){toast('Ingresá un monto válido.','error');return;} const usd=curMode.tp==='ars'?raw/USD_ARS:raw; if(usd>data.deudaTC+0.001){toast('El monto supera la deuda actual.','error');return;} data.deudaTC=Math.max(0,data.deudaTC-usd); data.movTC.push({id:Date.now(),tipo:'pago',concepto:'Pago tarjeta',usd,rawMonto:raw,rawCur:curMode.tp,fecha,nota,cuenta}); document.getElementById('tp-monto').value=''; document.getElementById('tp-hint').textContent=''; toast('Pago registrado','success'); saveData(); updateDeudaChip(); renderAll(); renderCuentas('tp'); }
 
 /* ── SIDEBAR TOGGLE ── */
 function toggleSidebar(){ document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.sidebar-overlay').classList.toggle('open'); }
@@ -1102,7 +1117,7 @@ function showSection(id){
   if(id==='resumen') renderResumen();
   if(id==='patrimonio') renderPatrimonio();
   if(id==='metas') renderMetas();
-  if(id==='inversiones'){ renderInversiones(); fetchMercados(); }
+  if(id==='inversiones'){ fetchMercados(); }
   if(id==='ingresos'){ renderCuentas('in'); renderIngresos(); }
   if(id==='egresos'){ renderCuentas('eg'); updateDeudaChip(); renderEgresos(); }
   if(id==='ahorro') renderAhorros();
@@ -1210,10 +1225,12 @@ function renderResumen(){
   const totalIn=inMes.reduce((s,i)=>s+i.usd,0);
   const totalEg=egMes.reduce((s,e)=>s+e.usd,0);
   const diff=totalIn-totalEg;
+  const tasaAhorro=totalIn>0?Math.round((diff/totalIn)*100):null;
   document.getElementById('pnl-block').innerHTML=`
     <div class="metric-card"><div class="mc-label">Ingresos</div><div class="mc-val green">${fmtARS(totalIn*USD_ARS)}</div><div class="mc-sub">${fmtUSD(totalIn)}</div></div>
     <div class="metric-card"><div class="mc-label">Egresos</div><div class="mc-val red">${fmtARS(totalEg*USD_ARS)}</div><div class="mc-sub">${fmtUSD(totalEg)}</div></div>
-    <div class="metric-card"><div class="mc-label">Diferencia</div><div class="mc-val ${diff>=0?'green':'red'}">${diff>=0?'':'-'}${fmtARS(Math.abs(diff)*USD_ARS)}</div><div class="mc-sub">${fmtUSD(diff)}</div></div>`;
+    <div class="metric-card"><div class="mc-label">Diferencia</div><div class="mc-val ${diff>=0?'green':'red'}">${diff>=0?'':'-'}${fmtARS(Math.abs(diff)*USD_ARS)}</div><div class="mc-sub">${fmtUSD(diff)}</div></div>
+    <div class="metric-card"><div class="mc-label">Tasa de ahorro</div><div class="mc-val ${tasaAhorro===null?'':''}${tasaAhorro>=0?'green':'red'}" style="font-size:clamp(20px,3vw,26px)">${tasaAhorro===null?'—':tasaAhorro+'%'}</div><div class="mc-sub">${diff>=0?'Superávit del período':'Déficit del período'}</div></div>`;
 
   // Asset charts
   const saldos=getSaldos(), entries=Object.entries(saldos).filter(([,v])=>v.usd>0), colors=entries.map(([k])=>COLORS[k]||'#888');
@@ -1236,6 +1253,7 @@ function renderResumen(){
     chartCat=new Chart(document.getElementById('chartCat').getContext('2d'),{type:'bar',data:{labels:catEntries.map(([k])=>k),datasets:[{data:catEntries.map(([,v])=>v*USD_ARS),backgroundColor:catEntries.map(([k])=>CAT_COLORS[k]||'#888'),borderRadius:6,borderSkipped:false,borderWidth:0,hoverBackgroundColor:catEntries.map(([k])=>(CAT_COLORS[k]||'#888')+'cc')}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:{x:{ticks:{color:'#555F78',callback:v=>fmtARS(v),font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'},border:{display:false}},y:{ticks:{color:'#8B93A8',font:{size:11}},grid:{display:false},border:{display:false}}}}});
   } else { chartCat=null; }
 
+  renderFlujoMensual();
   renderUltimos();
   renderPresupuestos();
 }
@@ -1254,6 +1272,52 @@ function renderUltimos(){
       const acct=x.cuenta?`<span class="acct-pill" style="background:${COLORS[x.cuenta]||'#888'}22;color:${COLORS[x.cuenta]||'#888'}">${x.cuenta}</span>`:'-';
       return`<tr><td style="color:var(--text3)">${fmtDate(x.fecha)}</td><td>${x.concepto||'—'}</td><td>${badge}</td><td>${acct}</td><td style="text-align:right"><div class="td-main" style="color:${color}">${signo}${fmtARS(x.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(x.usd)}</div></td></tr>`;
     }).join('')+`</tbody></table>`;
+}
+
+function renderFlujoMensual(){
+  const now=new Date();
+  const months=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    months.push({ym:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleDateString('es-AR',{month:'short'})});
+  }
+  const inByM={},egByM={};
+  months.forEach(({ym})=>{ inByM[ym]=0; egByM[ym]=0; });
+  data.ingresos.forEach(x=>{ const ym=x.fecha.slice(0,7); if(inByM[ym]!==undefined) inByM[ym]+=x.usd; });
+  data.egresos.forEach(x=>{ const ym=x.fecha.slice(0,7); if(egByM[ym]!==undefined) egByM[ym]+=x.usd; });
+  if(chartFlujoMes) chartFlujoMes.destroy();
+  const canv=document.getElementById('chartFlujoMes');
+  if(!canv) return;
+  chartFlujoMes=new Chart(canv.getContext('2d'),{type:'bar',data:{labels:months.map(m=>m.label),datasets:[
+    {label:'Ingresos',data:months.map(m=>inByM[m.ym]*USD_ARS),backgroundColor:'rgba(0,166,80,0.75)',borderRadius:6,borderSkipped:false,borderWidth:0},
+    {label:'Egresos', data:months.map(m=>egByM[m.ym]*USD_ARS),backgroundColor:'rgba(242,61,79,0.75)',borderRadius:6,borderSkipped:false,borderWidth:0}
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:true,labels:{color:'#8B93A8',font:{size:11},padding:16,boxWidth:10,usePointStyle:true,pointStyle:'rect'}},tooltip:{...ttARS(),callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmtARS(ctx.raw)}  (${fmtUSD(ctx.raw/USD_ARS)})`}}},scales:scalesARS()}});
+}
+
+function getCuotasProximas(dias=45){
+  const hoy=today();
+  const lim=new Date(); lim.setDate(lim.getDate()+dias);
+  const limStr=lim.toISOString().split('T')[0];
+  return data.movTC.filter(m=>m.tipo==='gasto'&&m.fecha>=hoy&&m.fecha<=limStr).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+}
+
+function renderCuotasProximas(){
+  const el=document.getElementById('cuotas-proximas-block');
+  if(!el) return;
+  const prox=getCuotasProximas();
+  if(!prox.length){ el.innerHTML=''; return; }
+  const total=prox.reduce((s,m)=>s+m.usd,0);
+  el.innerHTML=`<div class="card" style="padding:16px 20px;margin-bottom:0;border-color:rgba(242,61,79,0.22);background:rgba(242,61,79,0.03)">
+    <div class="card-title" style="margin-bottom:12px"><span>⏰ Cuotas próximas · 45 días</span><span style="font-size:11px;color:var(--red);font-weight:600;text-transform:none;letter-spacing:0">${fmtARS(total*USD_ARS)} · ${fmtUSD(total)}</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px">${prox.slice(0,6).map(m=>{
+      const tc=TC_COLORS[m.tarjeta]||'var(--text3)';
+      const dias=Math.ceil((new Date(m.fecha+'T12:00')-new Date())/(1000*60*60*24));
+      return`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface2);border-radius:9px;border-left:3px solid ${tc}">
+        <div><div style="font-size:12px;font-weight:600;color:var(--text)">${m.concepto}</div><div style="font-size:11px;color:var(--text3);margin-top:2px">${fmtDate(m.fecha)}${m.tarjeta?` · ${m.tarjeta}`:''}</div></div>
+        <div style="text-align:right"><div style="font-size:13px;font-weight:600;color:var(--red)">${fmtARS(m.usd*USD_ARS)}</div><div style="font-size:10px;color:var(--text3)">${dias===0?'hoy':dias===1?'mañana':'en '+dias+' días'}</div></div>
+      </div>`;
+    }).join('')}${prox.length>6?`<div style="font-size:11px;color:var(--text3);text-align:center;padding:4px">+${prox.length-6} más</div>`:''}</div>
+  </div>`;
 }
 
 /* ── PATRIMONIO ── */
@@ -1296,24 +1360,25 @@ function agregarMovimiento(form){
   const fecha=document.getElementById(form+'-fecha').value||today();
   const nota=document.getElementById(form+'-nota').value;
   const cuenta=selCuenta[form];
-  if(!concepto||isNaN(raw)||raw<=0){alert('Completá concepto y monto.');return;}
+  if(!concepto||isNaN(raw)||raw<=0){toast('Completá concepto y monto.','error');return;}
   const usd=curMode[form]==='ars'?raw/USD_ARS:raw;
   const rec={id:Date.now(),concepto,usd,rawMonto:raw,rawCur:curMode[form],cat,fecha,nota,cuenta};
   if(form==='in')data.ingresos.push(rec); else data.egresos.push(rec);
   document.getElementById(form+'-concepto').value='';
   document.getElementById(form+'-monto').value='';
   document.getElementById(form+'-hint').textContent='';
+  toast(form==='in'?'Ingreso agregado':'Egreso agregado','success');
   saveData(); renderAll(); renderCuentas(form);
 }
 
 function agregarAhorro(){
   const tipo=document.getElementById('ah-tipo').value, monto=parseFloat(document.getElementById('ah-monto').value), mov=document.getElementById('ah-mov').value, fecha=document.getElementById('ah-fecha').value||today(), nota=document.getElementById('ah-nota').value;
-  if(isNaN(monto)||monto<=0){alert('Ingresá un monto válido.');return;}
+  if(isNaN(monto)||monto<=0){toast('Ingresá un monto válido.','error');return;}
   const isARS=ARS_INSTR.has(tipo);
   const usd=isARS?monto/USD_ARS:monto, ars=isARS?monto:monto*USD_ARS;
   data.ahorros.push({id:Date.now(),tipo,usd,ars,mov,fecha,nota});
   document.getElementById('ah-monto').value=''; document.getElementById('ah-nota').value='';
-  saveData(); renderAll();
+  toast('Movimiento registrado','success'); saveData(); renderAll();
 }
 
 function agregarTransferencia(){
@@ -1321,12 +1386,12 @@ function agregarTransferencia(){
   const fecha=document.getElementById('tr-fecha').value||today();
   const nota=document.getElementById('tr-nota').value;
   const desde=selCuenta.trde, hacia=selCuenta.trha;
-  if(isNaN(raw)||raw<=0){alert('Ingresá un monto válido.');return;}
-  if(desde===hacia){alert('Las cuentas origen y destino deben ser distintas.');return;}
+  if(isNaN(raw)||raw<=0){toast('Ingresá un monto válido.','error');return;}
+  if(desde===hacia){toast('Las cuentas deben ser distintas.','error');return;}
   const usd=curMode.tr==='ars'?raw/USD_ARS:raw;
   data.transferencias.push({id:Date.now(),desde,hacia,usd,rawMonto:raw,rawCur:curMode.tr,fecha,nota});
   document.getElementById('tr-monto').value=''; document.getElementById('tr-hint').textContent='';
-  saveData(); renderAll(); renderCuentas('trde'); renderCuentas('trha');
+  toast('Transferencia registrada','success'); saveData(); renderAll(); renderCuentas('trde'); renderCuentas('trha');
 }
 
 /* ── ELIMINAR ── */
@@ -1339,10 +1404,10 @@ function saveEditTC(id){
   const nuevoUSD=parseFloat(document.getElementById('edr-tc-monto-'+id).value);
   const fecha=document.getElementById('edr-tc-fecha-'+id).value||m.fecha;
   const tarjeta=document.getElementById('edr-tc-tarjeta-'+id)?.value||m.tarjeta;
-  if(isNaN(nuevoUSD)||nuevoUSD<=0){alert('Monto inválido.');return;}
+  if(isNaN(nuevoUSD)||nuevoUSD<=0){toast('Monto inválido.','error');return;}
   data.deudaTC=Math.max(0,data.deudaTC-m.usd+nuevoUSD);
-  m.concepto=concepto; m.usd=nuevoUSD; m.fecha=fecha; m.tarjeta=tarjeta;
-  saveData(); updateDeudaChip(); renderAll();
+  m.concepto=concepto; m.usd=nuevoUSD; m.rawMonto=nuevoUSD; m.rawCur='usd'; m.fecha=fecha; m.tarjeta=tarjeta;
+  saveData(); toast('Cambios guardados','success'); updateDeudaChip(); renderAll();
 }
 function eliminarTransferencia(id){ data.transferencias=data.transferencias.filter(t=>t.id!==id); saveData(); renderAll(); renderCuentas('trde'); renderCuentas('trha'); }
 
@@ -1407,6 +1472,7 @@ function renderIngresos(){
 }
 
 function renderEgresos(){
+  renderCuotasProximas();
   renderTCHistorial(document.getElementById('tc-historial-egresos'));
   const meses=getMesesDe(data.egresos);
   document.getElementById('filtro-bar-egresos').innerHTML=buildFiltroSelect('egresos',meses);
@@ -1537,39 +1603,6 @@ function getPatrimonioMensual(){
   return months;
 }
 
-/* ── COMPARATIVA ── */
-function renderComparativa(){
-  const now=new Date();
-  const ty=now.getFullYear(),tm=now.getMonth()+1;
-  const py=tm===1?ty-1:ty, pm=tm===1?12:tm-1;
-  const ts=`${ty}-${String(tm).padStart(2,'0')}-01`, te=`${ty}-${String(tm).padStart(2,'0')}-31`;
-  const ps=`${py}-${String(pm).padStart(2,'0')}-01`, pe=`${py}-${String(pm).padStart(2,'0')}-31`;
-  const sum=(arr,f,t)=>arr.filter(x=>x.fecha>=f&&x.fecha<=t).reduce((s,x)=>s+x.usd,0);
-  const inT=sum(data.ingresos,ts,te),inP=sum(data.ingresos,ps,pe);
-  const egT=sum(data.egresos,ts,te),egP=sum(data.egresos,ps,pe);
-  const difT=inT-egT,difP=inP-egP;
-  function row(label,cur,prev){
-    const pct=prev>0?((cur-prev)/prev*100):cur>0?100:0;
-    const up=cur>=prev;
-    const col=label==='Egresos'?(up?'var(--red)':'var(--green)'):(up?'var(--green)':'var(--red)');
-    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-      <span style="font-size:12px;color:var(--text2)">${label}</span>
-      <div style="display:flex;align-items:center;gap:14px">
-        <span style="font-size:11px;color:var(--text3)">${fmtARS(prev*USD_ARS)}</span>
-        <span style="font-size:11px;color:var(--text3)">→</span>
-        <span style="font-size:13px;font-weight:600;font-family:'SF Pro Display',-apple-system,sans-serif">${fmtARS(cur*USD_ARS)}</span>
-        <span style="font-size:11px;font-weight:700;color:${col};min-width:52px;text-align:right">${up?'↑':'↓'} ${Math.abs(pct).toFixed(1)}%</span>
-      </div>
-    </div>`;
-  }
-  const mesP=new Date(py,pm-1).toLocaleDateString('es-AR',{month:'long'});
-  const mesT=new Date(ty,tm-1).toLocaleDateString('es-AR',{month:'long'});
-  const el=document.getElementById('comparativa-block');
-  if(el) el.innerHTML=`<div class="card" style="padding:16px 20px;margin-bottom:18px">
-    <div class="card-title" style="margin-bottom:14px"><span>Comparativa · ${mesP} vs ${mesT}</span></div>
-    ${row('Ingresos',inT,inP)}${row('Egresos',egT,egP)}${row('Balance',difT,difP)}
-  </div>`;
-}
 
 /* ── PRESUPUESTOS ── */
 function renderPresupuestos(){
@@ -1618,7 +1651,7 @@ function agregarMeta(){
   const fecha=document.getElementById('meta-fecha').value;
   const color=document.getElementById('meta-color').value;
   const nota=document.getElementById('meta-nota').value.trim();
-  if(!nombre||!objetivo){ alert('Ingresá nombre y objetivo.'); return; }
+  if(!nombre||!objetivo){ toast('Ingresá nombre y objetivo.','error'); return; }
   data.metas.push({id:Date.now(),nombre,objetivo,logrado:0,fecha,color,nota});
   saveData();
   ['meta-nombre','meta-objetivo','meta-fecha','meta-nota'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
@@ -1673,8 +1706,6 @@ function renderMetas(){
 }
 
 /* ── INVERSIONES ── */
-function renderInversiones(){ /* cards ya están en HTML, fetchMercados llena los datos */ }
-
 async function fetchMercados(){
   const btn=document.getElementById('fetch-mercados-btn');
   const timeEl=document.getElementById('mercados-time');
@@ -1860,7 +1891,7 @@ function saveEditModal() {
     const cuenta = document.getElementById('em-cuenta').value;
     const fecha = document.getElementById('em-fecha').value;
     const nota = document.getElementById('em-nota').value;
-    if (!concepto || isNaN(raw) || raw <= 0) { alert('Completá concepto y monto.'); return; }
+    if (!concepto || isNaN(raw) || raw <= 0) { toast('Completá concepto y monto.','error'); return; }
     item.concepto = concepto; item.usd = cur === 'ars' ? raw / USD_ARS : raw;
     item.rawMonto = raw; item.rawCur = cur; item.cat = cat; item.cuenta = cuenta;
     item.fecha = fecha; item.nota = nota;
@@ -1872,12 +1903,12 @@ function saveEditModal() {
     const mov = document.getElementById('em-ah-mov').value;
     const fecha = document.getElementById('em-ah-fecha').value;
     const nota = document.getElementById('em-ah-nota').value;
-    if (isNaN(raw) || raw <= 0) { alert('Ingresá un monto válido.'); return; }
+    if (isNaN(raw) || raw <= 0) { toast('Ingresá un monto válido.','error'); return; }
     const isARS = ARS_INSTR.has(nuevoTipo);
     item.tipo = nuevoTipo; item.usd = isARS ? raw / USD_ARS : raw;
     item.ars = isARS ? raw : raw * USD_ARS; item.mov = mov; item.fecha = fecha; item.nota = nota;
   }
-  saveData(); renderAll(); closeEditModal();
+  toast('Cambios guardados','success'); saveData(); renderAll(); closeEditModal();
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEditModal(); });
