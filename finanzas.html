@@ -1179,12 +1179,10 @@ function renderHero(){
   document.getElementById('hs-activos').textContent=fmtARS(aUSD*USD_ARS);
   document.getElementById('hs-activos-usd').textContent=fmtUSD(aUSD);
   const _tc=getTCRawTotales();
-  const deudaParts=[];
-  if(_tc.ars>0.5) deudaParts.push(fmtARS(_tc.ars));
-  if(_tc.usd>0.005) deudaParts.push(fmtUSD(_tc.usd));
-  document.getElementById('hs-deuda').textContent=deudaParts.join(' + ')||'Sin deuda';
   const totalDeudaARS=_tc.ars+_tc.usd*USD_ARS;
-  document.getElementById('hs-deuda-usd').textContent=totalDeudaARS>0.5?'≈ '+fmtARS(totalDeudaARS)+' total':'';
+  const totalDeudaUSD=_tc.usd+_tc.ars/USD_ARS;
+  document.getElementById('hs-deuda').textContent=totalDeudaARS>0.5?fmtARS(totalDeudaARS):'Sin deuda';
+  document.getElementById('hs-deuda-usd').textContent=totalDeudaUSD>0.005?fmtUSD(totalDeudaUSD):'';
   document.getElementById('hs-mqv').textContent=fmtARS(mqv*USD_ARS);
   document.getElementById('hs-mqv-usd').textContent=fmtUSD(mqv);
 }
