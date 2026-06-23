@@ -1992,7 +1992,7 @@ ${isCurrentMonth?`<h2>Balance al día de hoy</h2>
 <div class="grid-3">
   <div class="card has-${bUSD>=0?'green':'red'}"><div class="card-label">Balance neto</div><div class="card-val ${bUSD>=0?'green':'red'}">${fmtARS(bUSD*USD_ARS)}</div><div class="card-sub">${fmtUSD(bUSD)}</div></div>
   <div class="card has-green"><div class="card-label">Activos totales</div><div class="card-val green">${fmtARS(aUSD*USD_ARS)}</div><div class="card-sub">${fmtUSD(aUSD)}</div></div>
-  <div class="card has-red"><div class="card-label">Deuda tarjeta</div><div class="card-val red">${(()=>{const p=[];if(tc.ars>0.5)p.push(fmtARS(tc.ars));if(tc.usd>0.005)p.push(fmtUSD(tc.usd));return p.join(' + ')||'Sin deuda';})()}</div></div>
+  <div class="card has-red"><div class="card-label">Deuda tarjeta</div><div class="card-val red">${tc.ars+tc.usd*USD_ARS>0.5?fmtARS(tc.ars+tc.usd*USD_ARS):'Sin deuda'}</div><div class="card-sub">${tc.usd+tc.ars/USD_ARS>0.005?fmtUSD(tc.usd+tc.ars/USD_ARS):''}</div></div>
 </div>`:''}
 <h2>Ingresos vs egresos</h2>
 <div class="grid-3">
