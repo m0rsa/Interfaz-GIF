@@ -839,8 +839,8 @@ const TC_COLORS={Visa:'#1A56DB',Mastercard:'#E25718',Amex:'#00A4A6'};
 let ARS_INSTR=new Set();
 
 /* ── SUPABASE ── */
-const SUPA_URL='https://axwxdiweiqxuqrbqmuwo.supabase.co';
-const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4d3hkaXdlaXF4dXFyYnFtdXdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MjU3OTEsImV4cCI6MjA5NzQwMTc5MX0.X22UlXYmEZr3I4AV6iHgOvfaM3HSnSNriSAVWGtwAJs';
+const SUPA_URL='__SUPA_URL__';
+const SUPA_KEY='__SUPA_KEY__';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
 /* ── EXCHANGE RATE (mutable, loaded from data) ── */
@@ -2021,8 +2021,8 @@ function calcInteres(){
 }
 
 /* ── AUTH ── */
-// Hash SHA-256 de la clave de acceso. Debe coincidir con login.html.
-const GATE_HASH='783f65ce837f04ad0d5bd6badcdb4b7d41a1f1dae61f4472f858c10d806514d4';
+// Inyectado por GitHub Actions desde Secrets — no figura en el repo
+const GATE_HASH='__GATE_HASH__';
 
 function _hideOverlay(){
   const o=document.getElementById('auth-overlay');
