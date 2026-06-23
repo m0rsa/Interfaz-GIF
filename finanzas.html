@@ -465,35 +465,9 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
     <!-- RESUMEN -->
     <div id="sec-resumen" class="section active">
 
-      <!-- P&L mensual -->
-      <div class="card" style="padding:16px 20px;margin-bottom:20px">
-        <div class="card-title" style="margin-bottom:14px">
-          <span>Flujo del período</span>
-          <div class="filter-bar" style="margin:0;gap:6px;align-items:center">
-            <span class="fb-label">Desde</span>
-            <input type="date" id="rango-desde" onchange="setRangoResumen()" style="font-size:11px;padding:4px 8px;width:auto">
-            <span class="fb-label" style="margin-left:4px">Hasta</span>
-            <input type="date" id="rango-hasta" onchange="setRangoResumen()" style="font-size:11px;padding:4px 8px;width:auto">
-            <button id="rango-clear" onclick="clearRangoResumen()" style="font-size:11px;padding:4px 9px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;display:none">✕ Todo</button>
-          </div>
-        </div>
-        <div class="grid-4" style="margin-bottom:0" id="pnl-block"></div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
-          <span style="font-size:9px;color:var(--text3);font-weight:800;letter-spacing:0.12em;text-transform:uppercase">Resumen mensual</span>
-          <select id="resumen-mes-sel" style="width:auto;padding:6px 10px;font-size:12px">
-            <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option>
-            <option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option>
-            <option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option>
-            <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
-          </select>
-          <select id="resumen-anio-sel" style="width:auto;padding:6px 10px;font-size:12px"></select>
-          <button class="btn sm primary" onclick="downloadResumenMes()">📄 Descargar</button>
-        </div>
-      </div>
+      <div id="flujo-mensual-card" class="card" style="padding:0;overflow:hidden"></div>
 
       <div id="presupuesto-block"></div>
-
-      <div id="flujo-mensual-card" class="card" style="padding:0;overflow:hidden"></div>
 
       <div class="grid-2">
         <div class="card">
@@ -1246,7 +1220,7 @@ function renderResumen(){
   const diff=totalInReal-totalEgNeto;
   const tasaAhorro=totalInReal>0?Math.round((diff/totalInReal)*100):null;
   const repSubtxt=totalRepago>0?`Repagos: -${fmtARS(totalRepago*USD_ARS)}`:'';
-  document.getElementById('pnl-block').innerHTML=`
+  const _pnl=document.getElementById('pnl-block'); if(_pnl) _pnl.innerHTML=`
     <div class="metric-card"><div class="mc-label">Ingresos reales</div><div class="mc-val green">${fmtARS(totalInReal*USD_ARS)}</div><div class="mc-sub">${fmtUSD(totalInReal)}</div></div>
     <div class="metric-card"><div class="mc-label">Egresos netos</div><div class="mc-val red">${fmtARS(totalEgNeto*USD_ARS)}</div><div class="mc-sub">${repSubtxt||fmtUSD(totalEgNeto)}</div></div>
     <div class="metric-card"><div class="mc-label">Diferencia</div><div class="mc-val ${diff>=0?'green':'red'}">${diff>=0?'':'-'}${fmtARS(Math.abs(diff)*USD_ARS)}</div><div class="mc-sub">${fmtUSD(diff)}</div></div>
