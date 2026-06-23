@@ -1318,9 +1318,11 @@ function renderFlujoMensual(){
     periodoLabel=now.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
   }
   const totalIn=data.ingresos.filter(x=>x.fecha>=desde&&x.fecha<=hasta&&x.cat!=='Repago').reduce((s,x)=>s+x.usd,0);
+  const totalRepago=data.ingresos.filter(x=>x.fecha>=desde&&x.fecha<=hasta&&x.cat==='Repago').reduce((s,x)=>s+x.usd,0);
   const totalEg=data.egresos.filter(x=>x.fecha>=desde&&x.fecha<=hasta).reduce((s,x)=>s+x.usd,0);
+  const egNeto=Math.max(0,totalEg-totalRepago);
   const totalTC=data.movTC.filter(x=>x.tipo==='gasto'&&x.fecha>=desde&&x.fecha<=hasta).reduce((s,x)=>s+x.usd,0);
-  const totalPasivos=totalEg+totalTC;
+  const totalPasivos=egNeto+totalTC;
   const neto=totalIn-totalPasivos;
   const pos=neto>=0;
   const pill=(id,txt)=>{
@@ -1357,7 +1359,7 @@ function renderFlujoMensual(){
       <div style="background:var(--border)"></div>
       <div style="padding:16px 20px">
         <div style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);margin-bottom:4px">↓ Pasivos</div>
-        ${row('Egresos netos',totalEg,'var(--red)')}
+        ${row('Egresos netos',egNeto,'var(--red)')}
         ${row('Deuda TC',totalTC,'#FF7040')}
         <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px">
           <span style="font-size:12px;font-weight:700;color:var(--text)">Total pasivos</span>
