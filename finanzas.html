@@ -266,83 +266,84 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
   .hero-stat { padding-right: 20px; margin-right: 20px; }
   /* content */
   .content { padding: 18px 16px; }
-  .card { padding: 18px 18px; overflow-x: auto; }
+  .card { padding: 16px 14px; overflow-x: auto; }
   .pat-grid { grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); }
-  thead th { font-size: 10px; padding: 10px 12px; }
-  tbody td { padding: 11px 12px; }
+  table { width: max-content; min-width: 100%; }
+  thead th { font-size: 10px; padding: 9px 10px; }
+  tbody td { padding: 10px 10px; }
   .fm-pills { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
   .fm-pills::-webkit-scrollbar { display: none; }
   .filter-bar { flex-wrap: wrap; gap: 6px 8px; }
 }
 
 @media (max-width: 500px) {
-  .grid-3, .grid-form-3, .grid-form-4, .grid-4 { grid-template-columns: 1fr; }
-  .hero-stats { flex-wrap: wrap; gap: 14px 0; }
+  .grid-3, .grid-form-2, .grid-form-3, .grid-form-4, .grid-4 { grid-template-columns: 1fr; }
+  .hero-stats { flex-wrap: wrap; gap: 10px 0; }
   .hero-stat { border-right: none !important; padding-right: 0; margin-right: 0; width: 50%; }
-  .hero-stat:nth-child(odd) { border-right: 1px solid var(--border) !important; padding-right: 16px; margin-right: 0; }
-  .content { padding: 16px 16px; }
-  .header-hero { padding: 22px 18px 18px; }
+  .hero-stat:nth-child(odd) { border-right: 1px solid var(--border) !important; padding-right: 12px; margin-right: 0; }
+  .content { padding: 12px 12px; }
+  .header-hero { padding: 18px 14px 16px; }
 
-  /* Tipografía mobile — escala general */
-  body { font-size: 18px; }
-  label { font-size: 15px; }
-  .section-title { font-size: 14px; }
-  .card-title { font-size: 14px; }
-  .hint { font-size: 14px; }
+  /* Tipografía general */
+  body { font-size: 15px; }
+  label { font-size: 12px; }
+  .section-title { font-size: 11px; }
+  .card-title { font-size: 11px; }
+  .hint { font-size: 12px; }
 
   /* Hero */
-  .hero-balance { font-size: clamp(28px, 9vw, 44px); }
-  .hero-sub { font-size: 15px; }
-  .hero-mqv-val { font-size: clamp(22px, 7vw, 34px); }
-  .hero-mqv-sub { font-size: 14px; }
-  .hero-stat .hs-label { font-size: 12px; }
-  .hero-stat .hs-val { font-size: clamp(18px, 6vw, 26px); }
-  .hero-stat .hs-sub { font-size: 13px; }
+  .hero-balance { font-size: clamp(22px, 7.5vw, 34px); }
+  .hero-sub { font-size: 13px; }
+  .hero-mqv-val { font-size: clamp(18px, 6vw, 28px); }
+  .hero-mqv-sub { font-size: 12px; }
+  .hero-stat .hs-label { font-size: 10px; }
+  .hero-stat .hs-val { font-size: clamp(14px, 4.5vw, 20px); }
+  .hero-stat .hs-sub { font-size: 11px; }
 
   /* Cards y métricas */
-  .card { padding: 26px 20px; }
-  .metric-card { padding: 24px 20px; }
-  .metric-card .mc-label { font-size: 13px; }
-  .metric-card .mc-val { font-size: 34px; }
-  .metric-card .mc-sub { font-size: 15px; }
+  .card { padding: 16px 14px; }
+  .metric-card { padding: 14px 12px; }
+  .metric-card .mc-label { font-size: 10px; }
+  .metric-card .mc-val { font-size: clamp(17px, 5.5vw, 22px); }
+  .metric-card .mc-sub { font-size: 12px; }
 
   /* MQV */
-  .mqv-main .mqv-val { font-size: clamp(24px, 8vw, 38px); }
-  .mqv-main .mqv-sub { font-size: 14px; }
-  .mqv-detail { font-size: 14px; }
-  .mqv-card { gap: 20px; }
-
-  /* Metric cards */
-  .metric-card .mc-val { font-size: clamp(20px, 6vw, 30px); }
+  .mqv-main .mqv-val { font-size: clamp(20px, 6.5vw, 30px); }
+  .mqv-main .mqv-sub { font-size: 12px; }
+  .mqv-detail { font-size: 12px; }
+  .mqv-card { gap: 14px; padding: 16px 14px; }
 
   /* Botones */
-  .btn { font-size: 15px; padding: 13px 20px; }
+  .btn { font-size: 13px; padding: 10px 16px; }
 
   /* Filas de transacciones */
-  .td-main { font-size: 17px; }
-  .td-sub { font-size: 15px; }
-  .acct-pill { font-size: 14px; }
-  /* Flujo card — grid → columna única */
+  .td-main { font-size: 14px; }
+  .td-sub { font-size: 12px; }
+  .acct-pill { font-size: 11px; padding: 2px 7px; }
+  .badge { font-size: 9px; }
+
+  /* Flujo card — columna única */
   .fm-grid { grid-template-columns: 1fr !important; }
   .fm-divider { display: none; }
   .fm-side-left { border-bottom: 1px solid var(--border); }
-  /* Tipografía interna del flujo card */
-  .fm-section-label { font-size: 11px !important; }
-  .fm-main-val { font-size: 32px !important; }
-  .fm-main-sub { font-size: 14px !important; }
-  .fm-row-label { font-size: 15px !important; }
-  .fm-row-ars { font-size: 17px !important; }
-  .fm-row-usd { font-size: 13px !important; }
-  .fm-total-label { font-size: 15px !important; }
-  .fm-total-ars { font-size: 21px !important; }
-  .fm-total-usd { font-size: 13px !important; }
-  .fm-result-label { font-size: 13px !important; }
-  .fm-result-val { font-size: 26px !important; }
-  .fm-result-usd { font-size: 13px !important; }
+  .fm-section-label { font-size: 10px !important; }
+  .fm-main-val { font-size: clamp(20px, 6.5vw, 28px) !important; }
+  .fm-main-sub { font-size: 12px !important; }
+  .fm-row-label { font-size: 13px !important; }
+  .fm-row-ars { font-size: 14px !important; }
+  .fm-row-usd { font-size: 11px !important; }
+  .fm-total-label { font-size: 13px !important; }
+  .fm-total-ars { font-size: 17px !important; }
+  .fm-total-usd { font-size: 11px !important; }
+  .fm-result-label { font-size: 11px !important; }
+  .fm-result-val { font-size: clamp(18px, 5.5vw, 24px) !important; }
+  .fm-result-usd { font-size: 11px !important; }
+
   /* Tablas */
-  thead th { font-size: 10px; padding: 10px 10px; }
-  tbody td { padding: 12px 10px; }
-  /* Pills de período — scroll horizontal sin wrap */
+  thead th { font-size: 9px; padding: 8px 8px; }
+  tbody td { padding: 10px 8px; font-size: 13px; }
+
+  /* Pills */
   .fm-pills { flex-wrap: nowrap !important; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
   .fm-pills::-webkit-scrollbar { display: none; }
 }
