@@ -1057,7 +1057,7 @@ function getSaldos(){
   return s;
 }
 function getTotActivosUSD(){ return Object.values(getSaldos()).reduce((s,x)=>s+Math.max(0,x.usd),0); }
-function getBalanceUSD(){ return getTotActivosUSD()-data.deudaTC; }
+function getBalanceUSD(){ const tc=getTCRawTotales(); return getTotActivosUSD()-(tc.usd+tc.ars/USD_ARS); }
 function getTCRawTotales(){
   let usd=0,ars=0;
   data.movTC.forEach(m=>{
