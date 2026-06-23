@@ -469,7 +469,8 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
     <div id="cotiz-update-time" style="font-size:10px;color:var(--text3);font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-bottom:6px;min-height:14px"></div>
     <button id="fetch-dolar-btn" class="cotiz-btn" onclick="fetchDolar()" style="margin-bottom:6px">↻ Traer cotización</button>
     <button class="cotiz-btn" onclick="updateCotiz()" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text2)">Aplicar manual</button>
-    <button onclick="openMFAModal()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">🔑 Gestionar 2FA</button>
+    <button onclick="openResumenModal()" style="width:100%;font-size:11px;padding:8px 10px;margin-top:8px;border-radius:8px;border:1px solid rgba(74,140,245,0.3);background:rgba(74,140,245,0.08);color:var(--blue);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:600;transition:background 0.15s" onmouseover="this.style.background='rgba(74,140,245,0.16)'" onmouseout="this.style.background='rgba(74,140,245,0.08)'">↓ Descargar resumen PDF</button>
+    <button onclick="openMFAModal()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">🔑 Gestionar 2FA</button>
     <button onclick="doLogout()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">→ Cerrar sesión</button>
   </div>
 </nav>
@@ -1847,12 +1848,53 @@ function renderMetas(){
 }
 
 /* ── RESUMEN MENSUAL (DESCARGA) ── */
-function downloadResumenMes(){
-  const mes=document.getElementById('resumen-mes-sel')?.value||String(new Date().getMonth()+1).padStart(2,'0');
-  const anio=document.getElementById('resumen-anio-sel')?.value||new Date().getFullYear();
-  const ym=`${anio}-${mes}`;
-  const desde=`${ym}-01`, hasta=`${ym}-31`;
-  const mesLabel=new Date(ym+'-15').toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+let _resumenPeriodo='mes-actual';
+function openResumenModal(){
+  document.getElementById('resumen-modal').style.display='flex';
+  setResumenPeriodo('mes-actual');
+}
+function closeResumenModal(){ document.getElementById('resumen-modal').style.display='none'; }
+function setResumenPeriodo(tipo){
+  _resumenPeriodo=tipo;
+  ['mes-actual','mes-anterior','30dias','custom'].forEach(k=>{
+    const btn=document.getElementById('rpbtn-'+k);
+    if(!btn) return;
+    const on=k===tipo;
+    btn.style.border=on?'1px solid var(--blue)':'1px solid var(--border2)';
+    btn.style.background=on?'rgba(74,140,245,0.12)':'transparent';
+    btn.style.color=on?'var(--blue)':'var(--text2)';
+  });
+  const ci=document.getElementById('rp-custom-inputs');
+  if(ci) ci.style.display=tipo==='custom'?'grid':'none';
+}
+function descargarResumenPDF(){
+  const t=today();
+  let desde,hasta,label;
+  if(_resumenPeriodo==='mes-actual'){
+    const ym=t.slice(0,7);
+    desde=ym+'-01'; hasta=ym+'-31';
+    label=new Date(ym+'-15').toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+  } else if(_resumenPeriodo==='mes-anterior'){
+    const d=new Date(t+'T12:00:00'); d.setMonth(d.getMonth()-1);
+    const ym=d.toISOString().slice(0,7);
+    desde=ym+'-01'; hasta=ym+'-31';
+    label=new Date(ym+'-15').toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+  } else if(_resumenPeriodo==='30dias'){
+    const d=new Date(t+'T12:00:00'); d.setDate(d.getDate()-30);
+    desde=d.toISOString().slice(0,10); hasta=t;
+    label='Últimos 30 días';
+  } else {
+    desde=document.getElementById('rp-desde').value;
+    hasta=document.getElementById('rp-hasta').value;
+    if(!desde||!hasta){ toast('Completá las dos fechas.','error'); return; }
+    if(desde>hasta){ toast('La fecha "desde" debe ser anterior a "hasta".','error'); return; }
+    label=fmtDate(desde)+' — '+fmtDate(hasta);
+  }
+  closeResumenModal();
+  downloadResumenMes(desde,hasta,label);
+}
+
+function downloadResumenMes(desde, hasta, label){
   const inMes=data.ingresos.filter(i=>i.fecha>=desde&&i.fecha<=hasta).sort((a,b)=>b.fecha.localeCompare(a.fecha));
   const egMes=data.egresos.filter(e=>e.fecha>=desde&&e.fecha<=hasta).sort((a,b)=>b.fecha.localeCompare(a.fecha));
   const ahMes=data.ahorros.filter(a=>a.fecha>=desde&&a.fecha<=hasta).sort((a,b)=>b.fecha.localeCompare(a.fecha));
@@ -1864,7 +1906,7 @@ function downloadResumenMes(){
   const diff=totalIn-totalEgNeto;
   const tasaAhorro=totalIn>0?Math.round(diff/totalIn*100):null;
   const bUSD=getBalanceUSD(), aUSD=getTotActivosUSD(), tc=getTCRawTotales();
-  const isCurrentMonth=ym===today().slice(0,7);
+  const isCurrentMonth=desde<=today()&&today()<=hasta;
   // Egresos por categoría
   const egCats={};
   egMes.forEach(e=>{ egCats[e.cat]=(egCats[e.cat]||0)+e.usd; });
@@ -1876,7 +1918,7 @@ function downloadResumenMes(){
   const inCatRows=Object.entries(inCats).sort((a,b)=>b[1]-a[1])
     .map(([k,v])=>`<tr><td><span class="badge ${k==='Repago'?'b-rep':'b-ing'}">${k}</span></td><td class="ta-right"><strong>${fmtARS(v*USD_ARS)}</strong></td><td class="ta-right text-sm">${fmtUSD(v)}</td></tr>`).join('');
   const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-<title>Resumen financiero · ${mesLabel}</title>
+<title>Resumen financiero · ${label}</title>
 <style>
 @font-face{font-family:'Inter';font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-400-normal.woff2') format('woff2')}
 @font-face{font-family:'Inter';font-weight:600;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-600-normal.woff2') format('woff2')}
@@ -1921,7 +1963,7 @@ tbody tr:hover{background:rgba(74,140,245,.04)}
 <body>
 <button class="print-btn" onclick="window.print()">🖨️ Guardar como PDF</button>
 <div class="header">
-  <div class="header-title">Resumen financiero · ${mesLabel.charAt(0).toUpperCase()+mesLabel.slice(1)}</div>
+  <div class="header-title">Resumen financiero · ${label.charAt(0).toUpperCase()+label.slice(1)}</div>
   <div class="header-sub">Generado el ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})} · TC 1 USD = ${fmtARS(USD_ARS)}</div>
 </div>
 ${isCurrentMonth?`<h2>Balance al día de hoy</h2>
@@ -2381,6 +2423,28 @@ checkAuth();
     <div id="idle-countdown" style="font-size:36px;font-weight:800;font-family:'SF Mono',ui-monospace,monospace;color:var(--blue);margin:14px 0;letter-spacing:-0.02em">2:00</div>
     <button onclick="continueSession()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;box-shadow:0 2px 12px rgba(74,140,245,0.35)">Continuar sesión</button>
     <button onclick="doLogout()" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:13px;cursor:pointer;font-family:inherit">Cerrar sesión ahora</button>
+  </div>
+</div>
+
+<!-- RESUMEN PDF MODAL -->
+<div id="resumen-modal" onclick="if(event.target===this)closeResumenModal()" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(6,9,17,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:18px;padding:26px 28px 28px;max-width:360px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.55)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.02em">Resumen PDF</div>
+      <button onclick="closeResumenModal()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:0;line-height:1;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-family:inherit" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">×</button>
+    </div>
+    <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--text3);margin-bottom:10px">Período</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px">
+      <button id="rpbtn-mes-actual" onclick="setResumenPeriodo('mes-actual')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--blue);background:rgba(74,140,245,0.12);color:var(--blue);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Mes actual</button>
+      <button id="rpbtn-mes-anterior" onclick="setResumenPeriodo('mes-anterior')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Mes anterior</button>
+      <button id="rpbtn-30dias" onclick="setResumenPeriodo('30dias')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Últimos 30 días</button>
+      <button id="rpbtn-custom" onclick="setResumenPeriodo('custom')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Personalizado</button>
+    </div>
+    <div id="rp-custom-inputs" style="display:none;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);display:block;margin-bottom:5px">Desde</label><input type="date" id="rp-desde" style="width:100%;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12px;font-family:inherit"></div>
+      <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);display:block;margin-bottom:5px">Hasta</label><input type="date" id="rp-hasta" style="width:100%;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12px;font-family:inherit"></div>
+    </div>
+    <button onclick="descargarResumenPDF()" style="width:100%;padding:11px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:-0.01em;box-shadow:0 2px 12px rgba(74,140,245,0.35)">↓ Descargar PDF</button>
   </div>
 </div>
 
