@@ -266,8 +266,14 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
   .hero-stat { padding-right: 20px; margin-right: 20px; }
   /* content */
   .content { padding: 18px 16px; }
-  .card { padding: 18px 18px; }
+  .card { padding: 18px 18px; overflow-x: auto; }
   .pat-grid { grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); }
+  table { min-width: 460px; }
+  thead th { font-size: 10px; padding: 10px 12px; }
+  tbody td { padding: 11px 12px; }
+  .fm-pills { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+  .fm-pills::-webkit-scrollbar { display: none; }
+  .filter-bar { flex-wrap: wrap; gap: 6px 8px; }
 }
 
 @media (max-width: 500px) {
@@ -313,7 +319,51 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
   .td-main { font-size: 17px; }
   .td-sub { font-size: 15px; }
   .acct-pill { font-size: 14px; }
+  /* Flujo card — grid → columna única */
+  .fm-grid { grid-template-columns: 1fr !important; }
+  .fm-divider { display: none; }
+  .fm-side-left { border-bottom: 1px solid var(--border); }
+  /* Tipografía interna del flujo card */
+  .fm-section-label { font-size: 11px !important; }
+  .fm-main-val { font-size: 32px !important; }
+  .fm-main-sub { font-size: 14px !important; }
+  .fm-row-label { font-size: 15px !important; }
+  .fm-row-ars { font-size: 17px !important; }
+  .fm-row-usd { font-size: 13px !important; }
+  .fm-total-label { font-size: 15px !important; }
+  .fm-total-ars { font-size: 21px !important; }
+  .fm-total-usd { font-size: 13px !important; }
+  .fm-result-label { font-size: 13px !important; }
+  .fm-result-val { font-size: 26px !important; }
+  .fm-result-usd { font-size: 13px !important; }
+  /* Tablas */
+  table { min-width: 480px; }
+  .card { overflow-x: auto; }
+  thead th { font-size: 10px; padding: 10px 12px; }
+  tbody td { padding: 11px 12px; }
+  /* Pills de período — scroll horizontal sin wrap */
+  .fm-pills { flex-wrap: nowrap !important; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+  .fm-pills::-webkit-scrollbar { display: none; }
 }
+
+/* ── FLUJO CARD base classes ── */
+.fm-grid { display: grid; grid-template-columns: 1fr 1px 1fr; }
+.fm-divider { background: var(--border); }
+.fm-pills { display: flex; gap: 5px; flex-wrap: wrap; }
+.fm-section-label { font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
+.fm-main-val { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.fm-main-sub { font-size: 12px; margin-top: 5px; }
+.fm-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.fm-row-label { font-size: 12px; color: var(--text2); }
+.fm-row-ars { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.fm-row-usd { font-size: 10px; color: var(--text3); margin-top: 1px; }
+.fm-total-row { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; }
+.fm-total-label { font-size: 12px; font-weight: 700; color: var(--text); }
+.fm-total-ars { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; }
+.fm-total-usd { font-size: 10px; color: var(--text3); margin-top: 1px; }
+.fm-result-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text3); }
+.fm-result-val { font-size: 19px; font-weight: 700; letter-spacing: -0.03em; }
+.fm-result-usd { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
 /* ── TOAST ── */
 .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:9999; padding:10px 20px; border-radius:10px; font-size:13px; font-weight:600; font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif; box-shadow:0 8px 32px rgba(0,0,0,0.55); white-space:nowrap; pointer-events:none; transition:opacity 0.3s,transform 0.3s; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
@@ -1301,54 +1351,54 @@ function renderFlujoMensual(){
   const pos=neto>=0;
   const pill=(id,txt)=>{
     const a=flujoPeriodo===id;
-    return `<button onclick="flujoPeriodo='${id}';renderFlujoMensual()" style="font-size:10px;font-weight:${a?700:500};padding:3px 9px;border-radius:99px;border:1px solid ${a?'var(--green)':'var(--border)'};background:${a?'rgba(18,201,138,0.12)':'transparent'};color:${a?'var(--green)':'var(--text3)'};cursor:pointer;transition:all 0.15s;white-space:nowrap">${txt}</button>`;
+    return `<button onclick="flujoPeriodo='${id}';renderFlujoMensual()" style="font-size:11px;font-weight:${a?700:500};padding:5px 12px;border-radius:99px;border:1px solid ${a?'var(--green)':'var(--border)'};background:${a?'rgba(18,201,138,0.12)':'transparent'};color:${a?'var(--green)':'var(--text3)'};cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0">${txt}</button>`;
   };
   const row=(label,usd,color)=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-      <span style="font-size:12px;color:var(--text2)">${label}</span>
+    <div class="fm-row">
+      <span class="fm-row-label">${label}</span>
       <div style="text-align:right">
-        <div style="font-size:14px;font-weight:600;color:${color};letter-spacing:-0.01em">${fmtARS(usd*USD_ARS)}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:1px">${fmtUSD(usd)}</div>
+        <div class="fm-row-ars" style="color:${color}">${fmtARS(usd*USD_ARS)}</div>
+        <div class="fm-row-usd">${fmtUSD(usd)}</div>
       </div>
     </div>`;
   el.innerHTML=`
-    <div style="padding:12px 18px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="padding:13px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px">
       <span style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);white-space:nowrap">Ingresos vs Egresos</span>
-      <div style="display:flex;gap:5px;flex-wrap:wrap">
+      <div class="fm-pills">
         ${pill('mes','Este mes')}
         ${pill('anterior','Anterior')}
         ${pill('30d','30 días')}
         ${pill('ytd','Mayo–Dic')}
       </div>
     </div>
-    <div style="padding:4px 18px 6px;border-bottom:1px solid var(--border)">
-      <span style="font-size:10px;color:var(--text3);font-family:'SF Mono',ui-monospace,monospace">${periodoLabel}</span>
+    <div style="padding:5px 18px 7px;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;color:var(--text3);font-family:'SF Mono',ui-monospace,monospace">${periodoLabel}</span>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1px 1fr">
-      <div style="padding:16px 20px">
-        <div style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:10px">↑ Ingresos</div>
-        <div style="font-size:26px;font-weight:700;color:var(--green);letter-spacing:-0.03em;line-height:1.1">${fmtARS(totalIn*USD_ARS)}</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:5px">${fmtUSD(totalIn)}</div>
+    <div class="fm-grid">
+      <div class="fm-side-left" style="padding:16px 20px">
+        <div class="fm-section-label" style="color:var(--green)">↑ Ingresos</div>
+        <div class="fm-main-val" style="color:var(--green)">${fmtARS(totalIn*USD_ARS)}</div>
+        <div class="fm-main-sub" style="color:var(--text3)">${fmtUSD(totalIn)}</div>
       </div>
-      <div style="background:var(--border)"></div>
+      <div class="fm-divider"></div>
       <div style="padding:16px 20px">
-        <div style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);margin-bottom:4px">↓ Pasivos</div>
+        <div class="fm-section-label" style="color:var(--red);margin-bottom:4px">↓ Pasivos</div>
         ${row('Egresos netos',egNeto,'var(--red)')}
         ${row('Deuda TC',totalTC,'#FF7040')}
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px">
-          <span style="font-size:12px;font-weight:700;color:var(--text)">Total pasivos</span>
+        <div class="fm-total-row">
+          <span class="fm-total-label">Total pasivos</span>
           <div style="text-align:right">
-            <div style="font-size:16px;font-weight:700;color:var(--red);letter-spacing:-0.02em">${fmtARS(totalPasivos*USD_ARS)}</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:1px">${fmtUSD(totalPasivos)}</div>
+            <div class="fm-total-ars" style="color:var(--red)">${fmtARS(totalPasivos*USD_ARS)}</div>
+            <div class="fm-total-usd">${fmtUSD(totalPasivos)}</div>
           </div>
         </div>
       </div>
     </div>
-    <div style="padding:13px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:${pos?'rgba(18,201,138,0.05)':'rgba(239,72,88,0.05)'}">
-      <span style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3)">Resultado del período</span>
+    <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:${pos?'rgba(18,201,138,0.05)':'rgba(239,72,88,0.05)'}">
+      <span class="fm-result-label">Resultado del período</span>
       <div style="text-align:right">
-        <div style="font-size:19px;font-weight:700;letter-spacing:-0.03em;color:${pos?'var(--green)':'var(--red)'}">${pos?'+':''}${fmtARS(neto*USD_ARS)}</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px">${fmtUSD(neto)}</div>
+        <div class="fm-result-val" style="color:${pos?'var(--green)':'var(--red)'}">${pos?'+':''}${fmtARS(neto*USD_ARS)}</div>
+        <div class="fm-result-usd">${fmtUSD(neto)}</div>
       </div>
     </div>`;
 }
