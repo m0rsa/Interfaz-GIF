@@ -25,32 +25,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Inyectar secrets en los HTML
+      - name: Inyectar secrets
         env:
           SUPA_URL: ${{ secrets.SUPA_URL }}
           SUPA_KEY: ${{ secrets.SUPA_KEY }}
           GATE_HASH: ${{ secrets.GATE_HASH }}
-        run: |
-          python3 - <<'EOF'
-          import os
-
-          files = ['login.html', 'finanzas.html']
-          replacements = {
-              '__SUPA_URL__':  os.environ['SUPA_URL'],
-              '__SUPA_KEY__':  os.environ['SUPA_KEY'],
-              '__GATE_HASH__': os.environ['GATE_HASH'],
-          }
-
-          for fname in files:
-              with open(fname, encoding='utf-8') as f:
-                  content = f.read()
-              for placeholder, value in replacements.items():
-                  content = content.replace(placeholder, value)
-              with open(fname, 'w', encoding='utf-8') as f:
-                  f.write(content)
-
-          print("Secrets inyectados correctamente.")
-          EOF
+        run: python3 inject_secrets.py
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
