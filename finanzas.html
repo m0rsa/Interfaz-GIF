@@ -2005,9 +2005,6 @@ ${isCurrentMonth?`<h2>Balance al día de hoy</h2>
   <div class="card has-red"><div class="card-label">Total en pesos</div><div class="card-val red">${fmtARS(tc.ars+tc.usd*USD_ARS)}</div><div class="card-sub">${(()=>{const p=[];if(tc.usd>0.005)p.push(fmtUSD(tc.usd)+' USD');if(tc.ars>0.5)p.push(fmtARS(tc.ars)+' ARS');return p.join(' + ')||'Sin deuda';})()}</div></div>
   <div class="card"><div class="card-label">Equivalente USD</div><div class="card-val">${fmtUSD(tc.usd+tc.ars/USD_ARS)}</div><div class="card-sub">al TC ${fmtARS(USD_ARS)}</div></div>
 </div>
-<h2>Ingresos por categoría</h2>
-<table><thead><tr><th>Categoría</th><th class="ta-right">ARS</th><th class="ta-right">USD</th></tr></thead>
-<tbody>${inCatRows||'<tr class="empty-row"><td colspan="3">Sin ingresos en el período</td></tr>'}</tbody></table>
 <h2>Ingresos · detalle</h2>
 <table><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Cuenta</th><th class="ta-right">Monto</th></tr></thead>
 <tbody>${inMes.map(i=>`<tr>
@@ -2016,9 +2013,6 @@ ${isCurrentMonth?`<h2>Balance al día de hoy</h2>
   <td class="tx3">${i.cuenta||'—'}</td>
   <td class="ta-right"><span class="green" style="font-weight:700">${fmtARS(i.usd*USD_ARS)}</span><div class="tx3">${fmtUSD(i.usd)}</div></td>
 </tr>`).join('')||'<tr class="empty-row"><td colspan="5">Sin ingresos</td></tr>'}</tbody></table>
-<h2>Egresos por categoría</h2>
-<table><thead><tr><th>Categoría</th><th class="ta-right">ARS</th><th class="ta-right">USD</th></tr></thead>
-<tbody>${egCatRows||'<tr class="empty-row"><td colspan="3">Sin egresos en el período</td></tr>'}</tbody></table>
 <h2>Egresos · detalle</h2>
 <table><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Cuenta</th><th class="ta-right">Monto</th></tr></thead>
 <tbody>${egMes.map(e=>`<tr>
