@@ -1320,19 +1320,19 @@ function renderFlujoMensual(){
   const canv=document.getElementById('chartFlujoMes');
   if(!canv) return;
   chartFlujoMes=new Chart(canv.getContext('2d'),{type:'bar',data:{labels:months.map(m=>m.label),datasets:[
-    {label:'Ingresos',data:months.map(m=>inByM[m.ym]*USD_ARS),backgroundColor:'rgba(0,166,80,0.75)',borderRadius:5,borderSkipped:false,borderWidth:0,stack:'in'},
-    {label:'Egresos efectivo',data:months.map(m=>Math.max(0,egByM[m.ym]-repByM[m.ym])*USD_ARS),backgroundColor:'rgba(239,72,88,0.90)',borderRadius:0,borderSkipped:false,borderWidth:0,stack:'eg'},
-    {label:'Gastos TC',data:months.map(m=>tcByM[m.ym]*USD_ARS),backgroundColor:'rgba(239,72,88,0.55)',borderRadius:0,borderSkipped:false,borderWidth:0,stack:'eg'}
+    {label:'Ingresos',        data:months.map(m=>inByM[m.ym]*USD_ARS),                                      backgroundColor:'rgba(18,201,138,0.72)', borderRadius:5, borderSkipped:false, borderWidth:0, stack:'in'},
+    {label:'Egresos efectivo',data:months.map(m=>Math.max(0,egByM[m.ym]-repByM[m.ym])*USD_ARS),             backgroundColor:'rgba(239,72,88,0.90)',   borderRadius:0, borderSkipped:false, borderWidth:0, stack:'eg'},
+    {label:'Deuda TC',        data:months.map(m=>tcByM[m.ym]*USD_ARS),                                      backgroundColor:'rgba(255,110,65,0.82)',  borderRadius:5, borderSkipped:false, borderWidth:2, borderColor:'rgba(6,9,17,0.75)', stack:'eg'}
   ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:true,labels:{color:'#8B93A8',font:{size:11},padding:16,boxWidth:10,usePointStyle:true,pointStyle:'rect'}},tooltip:{...ttARS(),mode:'index',intersect:false,callbacks:{
     label:ctx=>ctx.dataset.stack!=='in'?null:(ctx.raw>0?` Ingresos: ${fmtARS(ctx.raw)}  (${fmtUSD(ctx.raw/USD_ARS)})`:null),
     footer:items=>{
       const egEf=items.find(i=>i.dataset.label==='Egresos efectivo')?.raw||0;
-      const egTC=items.find(i=>i.dataset.label==='Gastos TC')?.raw||0;
+      const egTC=items.find(i=>i.dataset.label==='Deuda TC')?.raw||0;
       const tot=egEf+egTC;
       if(!tot) return;
       const lines=['Total egresos: '+fmtARS(tot)+'  ('+fmtUSD(tot/USD_ARS)+')'];
       if(egEf>0) lines.push('  · Efectivo: '+fmtARS(egEf));
-      if(egTC>0) lines.push('  · Tarjeta: '+fmtARS(egTC));
+      if(egTC>0) lines.push('  · Deuda TC: '+fmtARS(egTC));
       return lines;
     }
   }}},scales:{y:{...scalesARS().y,stacked:true,max:yMax},x:{...scalesARS().x,stacked:true}}}});
