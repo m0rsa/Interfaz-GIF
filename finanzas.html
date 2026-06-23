@@ -1983,7 +1983,7 @@ tbody tr:hover{background:rgba(74,140,245,.04)}
 }
 </style></head>
 <body>
-<button class="print-btn" onclick="window.print()">↓ Guardar como PDF</button>
+<button class="print-btn" id="pdf-btn" onclick="guardarPDF()">↓ Guardar como PDF</button>
 <div class="header">
   <div class="header-title">Resumen financiero · ${label.charAt(0).toUpperCase()+label.slice(1)}</div>
   <div class="header-sub">Generado el ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})} · TC 1 USD = ${fmtARS(USD_ARS)}</div>
@@ -2037,6 +2037,25 @@ ${ahMes.length?`<h2>Ahorros · movimientos</h2>
   <td><span class="badge ${a.mov==='deposito'?'b-dep':'b-eg'}">${a.mov==='deposito'?'Depósito':'Retiro'}</span></td>
   <td class="ta-right"><span class="${a.mov==='deposito'?'blue':'red'}" style="font-weight:700">${a.mov==='deposito'?'':'-'}${fmtARS(a.usd*USD_ARS)}</span><div class="tx3">${fmtUSD(a.usd)}</div></td>
 </tr>`).join('')}</tbody></table>`:''}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
+<script>
+async function guardarPDF(){
+  var btn=document.getElementById('pdf-btn');
+  btn.textContent='Generando…'; btn.disabled=true;
+  var el=document.body;
+  var W=860, H=el.scrollHeight, MM=0.264583;
+  try{
+    await html2pdf().set({
+      margin:0,
+      filename:'${pdfFilename}',
+      image:{type:'jpeg',quality:0.98},
+      html2canvas:{scale:2,useCORS:true,backgroundColor:'#06080F',logging:false,width:W,windowWidth:W,scrollX:0,scrollY:0},
+      jsPDF:{unit:'mm',format:[W*MM,H*MM],orientation:'portrait'}
+    }).from(el).save();
+  }catch(e){ alert('No se pudo generar el PDF.'); }
+  btn.textContent='↓ Guardar como PDF'; btn.disabled=false;
+}
+<\/script>
 </body></html>`;
   const w=window.open('','_blank');
   if(!w){toast('Bloqueador de ventanas activo — permitilo para ver el resumen.','error');return;}
