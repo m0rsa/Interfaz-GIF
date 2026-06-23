@@ -1912,7 +1912,9 @@ function downloadResumenMes(desde, hasta, label){
   const totalIn=inMes.filter(i=>i.cat!=='Repago').reduce((s,i)=>s+i.usd,0);
   const totalEg=egMes.reduce((s,e)=>s+e.usd,0);
   const totalEgNeto=Math.max(0,totalEg-totalRepago);
-  const diff=totalIn-totalEgNeto;
+  const totalTCGastos=tcMes.filter(m=>m.tipo==='gasto').reduce((s,m)=>s+m.usd,0);
+  const totalEgConTC=totalEgNeto+totalTCGastos;
+  const diff=totalIn-totalEgConTC;
   const tasaAhorro=totalIn>0?Math.round(diff/totalIn*100):null;
   const bUSD=getBalanceUSD(), aUSD=getTotActivosUSD(), tc=getTCRawTotales();
   const isCurrentMonth=desde<=today()&&today()<=hasta;
@@ -1997,7 +1999,7 @@ ${isCurrentMonth?`<h2>Balance al día de hoy</h2>
 <h2>Ingresos vs egresos</h2>
 <div class="grid-3">
   <div class="card has-green"><div class="card-label">Ingresos reales</div><div class="card-val green">${fmtARS(totalIn*USD_ARS)}</div><div class="card-sub">${fmtUSD(totalIn)}</div></div>
-  <div class="card has-red"><div class="card-label">Egresos netos${totalRepago>0?' · -'+fmtARS(totalRepago*USD_ARS)+' repagos':''}</div><div class="card-val red">${fmtARS(totalEgNeto*USD_ARS)}</div><div class="card-sub">${fmtUSD(totalEgNeto)}</div></div>
+  <div class="card has-red"><div class="card-label">Egresos netos${totalTCGastos>0?' · +'+fmtARS(totalTCGastos*USD_ARS)+' TC':''}</div><div class="card-val red">${fmtARS(totalEgConTC*USD_ARS)}</div><div class="card-sub">${fmtUSD(totalEgConTC)}</div></div>
   <div class="card has-${diff>=0?'green':'red'}"><div class="card-label">Diferencia${tasaAhorro!==null?' · '+tasaAhorro+'% ahorro':''}</div><div class="card-val ${diff>=0?'green':'red'}">${diff>=0?'':'-'}${fmtARS(Math.abs(diff)*USD_ARS)}</div><div class="card-sub">${diff>=0?'':'-'}${fmtUSD(Math.abs(diff))}</div></div>
 </div>
 <h2>Deuda tarjeta</h2>
