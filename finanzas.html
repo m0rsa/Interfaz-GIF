@@ -866,6 +866,7 @@ let rendPeriodo='mes-actual', rendCustom={desde:'',hasta:''};
 let curMode={in:'usd', eg:'usd', tc:'usd', tp:'usd', tr:'usd', sueldo:'usd'};
 let rangoResumen={desde:'',hasta:''}, mesFiltros={ingresos:'',egresos:'',ahorros:''};
 let chartFlujo=null, chartPatrim=null, chartEvo=null, chartCat=null, chartPatEvo=null, chartFlujoMes=null;
+let flujoPeriodo='mes';
 
 /* ── PERSISTENCE ── */
 function saveData(){ try{ localStorage.setItem('finanzas_v1', JSON.stringify(data)); }catch(e){} syncSupabase(); }
@@ -1296,14 +1297,36 @@ function renderUltimos(){
 function renderFlujoMensual(){
   const el=document.getElementById('flujo-mensual-card');
   if(!el) return;
-  const year=new Date().getFullYear();
-  const desde=`${year}-05-01`, hasta=`${year}-12-31`;
+  const now=new Date();
+  const year=now.getFullYear(), mo=now.getMonth();
+  let desde,hasta,periodoLabel;
+  if(flujoPeriodo==='anterior'){
+    const ult=new Date(year,mo,0);
+    const py=ult.getFullYear(), pm=String(ult.getMonth()+1).padStart(2,'0'), pd=String(ult.getDate()).padStart(2,'0');
+    desde=`${py}-${pm}-01`; hasta=`${py}-${pm}-${pd}`;
+    periodoLabel=ult.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+  } else if(flujoPeriodo==='30d'){
+    const d30=new Date(now); d30.setDate(d30.getDate()-30);
+    desde=d30.toISOString().split('T')[0]; hasta=now.toISOString().split('T')[0];
+    periodoLabel='Últimos 30 días';
+  } else if(flujoPeriodo==='ytd'){
+    desde=`${year}-05-01`; hasta=`${year}-12-31`;
+    periodoLabel=`Mayo – Dic ${year}`;
+  } else {
+    const cm=String(mo+1).padStart(2,'0');
+    desde=`${year}-${cm}-01`; hasta=`${year}-${cm}-31`;
+    periodoLabel=now.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+  }
   const totalIn=data.ingresos.filter(x=>x.fecha>=desde&&x.fecha<=hasta&&x.cat!=='Repago').reduce((s,x)=>s+x.usd,0);
   const totalEg=data.egresos.filter(x=>x.fecha>=desde&&x.fecha<=hasta).reduce((s,x)=>s+x.usd,0);
   const totalTC=data.movTC.filter(x=>x.tipo==='gasto'&&x.fecha>=desde&&x.fecha<=hasta).reduce((s,x)=>s+x.usd,0);
   const totalPasivos=totalEg+totalTC;
   const neto=totalIn-totalPasivos;
   const pos=neto>=0;
+  const pill=(id,txt)=>{
+    const a=flujoPeriodo===id;
+    return `<button onclick="flujoPeriodo='${id}';renderFlujoMensual()" style="font-size:10px;font-weight:${a?700:500};padding:3px 9px;border-radius:99px;border:1px solid ${a?'var(--green)':'var(--border)'};background:${a?'rgba(18,201,138,0.12)':'transparent'};color:${a?'var(--green)':'var(--text3)'};cursor:pointer;transition:all 0.15s;white-space:nowrap">${txt}</button>`;
+  };
   const row=(label,usd,color)=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
       <span style="font-size:12px;color:var(--text2)">${label}</span>
@@ -1313,34 +1336,42 @@ function renderFlujoMensual(){
       </div>
     </div>`;
   el.innerHTML=`
-    <div style="padding:14px 22px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3)">Ingresos vs Egresos</span>
-      <span style="font-size:10px;color:var(--text3);font-family:'SF Mono',ui-monospace,monospace">Mayo – Dic ${year}</span>
+    <div style="padding:12px 18px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <span style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);white-space:nowrap">Ingresos vs Egresos</span>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${pill('mes','Este mes')}
+        ${pill('anterior','Anterior')}
+        ${pill('30d','30 días')}
+        ${pill('ytd','Mayo–Dic')}
+      </div>
+    </div>
+    <div style="padding:4px 18px 6px;border-bottom:1px solid var(--border)">
+      <span style="font-size:10px;color:var(--text3);font-family:'SF Mono',ui-monospace,monospace">${periodoLabel}</span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1px 1fr">
-      <div style="padding:18px 22px">
-        <div style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:12px">↑ Ingresos</div>
-        <div style="font-size:28px;font-weight:700;color:var(--green);letter-spacing:-0.03em;line-height:1.1">${fmtARS(totalIn*USD_ARS)}</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:6px">${fmtUSD(totalIn)}</div>
+      <div style="padding:16px 20px">
+        <div style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:10px">↑ Ingresos</div>
+        <div style="font-size:26px;font-weight:700;color:var(--green);letter-spacing:-0.03em;line-height:1.1">${fmtARS(totalIn*USD_ARS)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:5px">${fmtUSD(totalIn)}</div>
       </div>
       <div style="background:var(--border)"></div>
-      <div style="padding:18px 22px">
+      <div style="padding:16px 20px">
         <div style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);margin-bottom:4px">↓ Pasivos</div>
         ${row('Egresos efectivo',totalEg,'var(--red)')}
         ${row('Deuda TC',totalTC,'#FF7040')}
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px">
           <span style="font-size:12px;font-weight:700;color:var(--text)">Total pasivos</span>
           <div style="text-align:right">
-            <div style="font-size:17px;font-weight:700;color:var(--red);letter-spacing:-0.02em">${fmtARS(totalPasivos*USD_ARS)}</div>
+            <div style="font-size:16px;font-weight:700;color:var(--red);letter-spacing:-0.02em">${fmtARS(totalPasivos*USD_ARS)}</div>
             <div style="font-size:10px;color:var(--text3);margin-top:1px">${fmtUSD(totalPasivos)}</div>
           </div>
         </div>
       </div>
     </div>
-    <div style="padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:${pos?'rgba(18,201,138,0.05)':'rgba(239,72,88,0.05)'}">
+    <div style="padding:13px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:${pos?'rgba(18,201,138,0.05)':'rgba(239,72,88,0.05)'}">
       <span style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3)">Resultado del período</span>
       <div style="text-align:right">
-        <div style="font-size:20px;font-weight:700;letter-spacing:-0.03em;color:${pos?'var(--green)':'var(--red)'}">${pos?'+':''}${fmtARS(neto*USD_ARS)}</div>
+        <div style="font-size:19px;font-weight:700;letter-spacing:-0.03em;color:${pos?'var(--green)':'var(--red)'}">${pos?'+':''}${fmtARS(neto*USD_ARS)}</div>
         <div style="font-size:11px;color:var(--text3);margin-top:2px">${fmtUSD(neto)}</div>
       </div>
     </div>`;
