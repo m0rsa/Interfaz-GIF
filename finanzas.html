@@ -1315,28 +1315,27 @@ function renderFlujoMensual(){
   data.egresos.forEach(x=>{ const ym=x.fecha.slice(0,7); if(egByM[ym]!==undefined) egByM[ym]+=x.usd; });
   data.movTC.filter(m=>m.tipo==='gasto').forEach(x=>{ const ym=x.fecha.slice(0,7); if(tcByM[ym]!==undefined) tcByM[ym]+=x.usd; });
   // eje Y escalado al total apilado (egresos efectivo + gastos TC combinados)
-  const ySuggestMax=Math.max(0,...months.map(m=>(Math.max(0,egByM[m.ym]-repByM[m.ym])+tcByM[m.ym])*USD_ARS))*1.12;
+  const yMax=Math.max(0.01,...months.map(m=>inByM[m.ym]*USD_ARS),...months.map(m=>(Math.max(0,egByM[m.ym]-repByM[m.ym])+tcByM[m.ym])*USD_ARS))*1.12;
   if(chartFlujoMes) chartFlujoMes.destroy();
   const canv=document.getElementById('chartFlujoMes');
   if(!canv) return;
   chartFlujoMes=new Chart(canv.getContext('2d'),{type:'bar',data:{labels:months.map(m=>m.label),datasets:[
-    {label:'Ingresos',data:months.map(m=>inByM[m.ym]*USD_ARS),backgroundColor:'rgba(0,166,80,0.75)',borderRadius:6,borderSkipped:false,borderWidth:0,stack:'in'},
-    {label:'Egresos efectivo',data:months.map(m=>Math.max(0,egByM[m.ym]-repByM[m.ym])*USD_ARS),backgroundColor:'rgba(239,72,88,0.88)',borderRadius:{topLeft:0,topRight:0,bottomLeft:5,bottomRight:5},borderSkipped:false,borderWidth:0,stack:'eg'},
-    {label:'Gastos TC',data:months.map(m=>tcByM[m.ym]*USD_ARS),backgroundColor:'rgba(239,72,88,0.42)',borderRadius:{topLeft:5,topRight:5,bottomLeft:0,bottomRight:0},borderSkipped:false,borderWidth:0,stack:'eg'}
-  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:true,labels:{color:'#8B93A8',font:{size:11},padding:16,boxWidth:10,usePointStyle:true,pointStyle:'rect'}},tooltip:{...ttARS(),callbacks:{
-    label:ctx=>{
-      if(ctx.dataset.stack==='in') return ctx.raw>0?` Ingresos: ${fmtARS(ctx.raw)}  (${fmtUSD(ctx.raw/USD_ARS)})`:null;
-      const egEf=ctx.chart.data.datasets.find(d=>d.label==='Egresos efectivo')?.data[ctx.dataIndex]||0;
-      const egTC=ctx.chart.data.datasets.find(d=>d.label==='Gastos TC')?.data[ctx.dataIndex]||0;
+    {label:'Ingresos',data:months.map(m=>inByM[m.ym]*USD_ARS),backgroundColor:'rgba(0,166,80,0.75)',borderRadius:5,borderSkipped:false,borderWidth:0,stack:'in'},
+    {label:'Egresos efectivo',data:months.map(m=>Math.max(0,egByM[m.ym]-repByM[m.ym])*USD_ARS),backgroundColor:'rgba(239,72,88,0.90)',borderRadius:0,borderSkipped:false,borderWidth:0,stack:'eg'},
+    {label:'Gastos TC',data:months.map(m=>tcByM[m.ym]*USD_ARS),backgroundColor:'rgba(239,72,88,0.55)',borderRadius:0,borderSkipped:false,borderWidth:0,stack:'eg'}
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:true,labels:{color:'#8B93A8',font:{size:11},padding:16,boxWidth:10,usePointStyle:true,pointStyle:'rect'}},tooltip:{...ttARS(),mode:'index',intersect:false,callbacks:{
+    label:ctx=>ctx.dataset.stack!=='in'?null:(ctx.raw>0?` Ingresos: ${fmtARS(ctx.raw)}  (${fmtUSD(ctx.raw/USD_ARS)})`:null),
+    footer:items=>{
+      const egEf=items.find(i=>i.dataset.label==='Egresos efectivo')?.raw||0;
+      const egTC=items.find(i=>i.dataset.label==='Gastos TC')?.raw||0;
       const tot=egEf+egTC;
-      if(ctx.dataset.label!=='Egresos efectivo') return null;
-      return[
-        ` Total egresos: ${fmtARS(tot)}  (${fmtUSD(tot/USD_ARS)})`,
-        `   · Efectivo: ${fmtARS(egEf)}`,
-        `   · Gastos TC: ${fmtARS(egTC)}`
-      ];
+      if(!tot) return;
+      const lines=['Total egresos: '+fmtARS(tot)+'  ('+fmtUSD(tot/USD_ARS)+')'];
+      if(egEf>0) lines.push('  · Efectivo: '+fmtARS(egEf));
+      if(egTC>0) lines.push('  · Tarjeta: '+fmtARS(egTC));
+      return lines;
     }
-  }}},scales:{y:{...scalesARS().y,stacked:true,suggestedMax:ySuggestMax},x:{...scalesARS().x,stacked:true}}}});
+  }}},scales:{y:{...scalesARS().y,stacked:true,max:yMax},x:{...scalesARS().x,stacked:true}}}});
 }
 
 function getCuotasProximas(dias=45){
