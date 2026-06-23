@@ -493,10 +493,7 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
 
       <div id="presupuesto-block"></div>
 
-      <div class="card">
-        <div class="card-title">Ingresos vs Egresos · últimos 6 meses</div>
-        <div class="chart-wrap" style="height:200px"><canvas id="chartFlujoMes" role="img" aria-label="Flujo mensual">Flujo mensual.</canvas></div>
-      </div>
+      <div id="flujo-mensual-card" class="card" style="padding:0;overflow:hidden"></div>
 
       <div class="grid-2">
         <div class="card">
@@ -1297,45 +1294,56 @@ function renderUltimos(){
 }
 
 function renderFlujoMensual(){
-  const now=new Date();
-  const months=[];
-  const year=now.getFullYear();
-  for(let mo=5;mo<=12;mo++){
-    const ym=`${year}-${String(mo).padStart(2,'0')}`;
-    months.push({ym,label:new Date(year,mo-1).toLocaleDateString('es-AR',{month:'short'})});
-  }
-  const inByM={},egByM={},repByM={},tcByM={};
-  months.forEach(({ym})=>{ inByM[ym]=0; egByM[ym]=0; repByM[ym]=0; tcByM[ym]=0; });
-  data.ingresos.forEach(x=>{
-    const ym=x.fecha.slice(0,7);
-    if(inByM[ym]===undefined) return;
-    if(x.cat==='Repago') repByM[ym]+=x.usd;
-    else inByM[ym]+=x.usd;
-  });
-  data.egresos.forEach(x=>{ const ym=x.fecha.slice(0,7); if(egByM[ym]!==undefined) egByM[ym]+=x.usd; });
-  data.movTC.filter(m=>m.tipo==='gasto').forEach(x=>{ const ym=x.fecha.slice(0,7); if(tcByM[ym]!==undefined) tcByM[ym]+=x.usd; });
-  // eje Y escalado al total apilado (egresos efectivo + gastos TC combinados)
-  const yMax=Math.max(0.01,...months.map(m=>inByM[m.ym]*USD_ARS),...months.map(m=>(Math.max(0,egByM[m.ym]-repByM[m.ym])+tcByM[m.ym])*USD_ARS))*1.12;
-  if(chartFlujoMes) chartFlujoMes.destroy();
-  const canv=document.getElementById('chartFlujoMes');
-  if(!canv) return;
-  chartFlujoMes=new Chart(canv.getContext('2d'),{type:'bar',data:{labels:months.map(m=>m.label),datasets:[
-    {label:'Ingresos',        data:months.map(m=>inByM[m.ym]*USD_ARS),                                      backgroundColor:'rgba(18,201,138,0.72)', borderRadius:5, borderSkipped:false, borderWidth:0, stack:'in'},
-    {label:'Egresos efectivo',data:months.map(m=>Math.max(0,egByM[m.ym]-repByM[m.ym])*USD_ARS),             backgroundColor:'rgba(239,72,88,0.90)',   borderRadius:0, borderSkipped:false, borderWidth:0, stack:'eg'},
-    {label:'Deuda TC',        data:months.map(m=>tcByM[m.ym]*USD_ARS),                                      backgroundColor:'rgba(255,110,65,0.82)',  borderRadius:5, borderSkipped:false, borderWidth:2, borderColor:'rgba(6,9,17,0.75)', stack:'eg'}
-  ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:true,labels:{color:'#8B93A8',font:{size:11},padding:16,boxWidth:10,usePointStyle:true,pointStyle:'rect'}},tooltip:{...ttARS(),mode:'index',intersect:false,callbacks:{
-    label:ctx=>ctx.dataset.stack!=='in'?null:(ctx.raw>0?` Ingresos: ${fmtARS(ctx.raw)}  (${fmtUSD(ctx.raw/USD_ARS)})`:null),
-    footer:items=>{
-      const egEf=items.find(i=>i.dataset.label==='Egresos efectivo')?.raw||0;
-      const egTC=items.find(i=>i.dataset.label==='Deuda TC')?.raw||0;
-      const tot=egEf+egTC;
-      if(!tot) return;
-      const lines=['Total egresos: '+fmtARS(tot)+'  ('+fmtUSD(tot/USD_ARS)+')'];
-      if(egEf>0) lines.push('  · Efectivo: '+fmtARS(egEf));
-      if(egTC>0) lines.push('  · Deuda TC: '+fmtARS(egTC));
-      return lines;
-    }
-  }}},scales:{y:{...scalesARS().y,stacked:true,max:yMax},x:{...scalesARS().x,stacked:true}}}});
+  const el=document.getElementById('flujo-mensual-card');
+  if(!el) return;
+  const year=new Date().getFullYear();
+  const desde=`${year}-05-01`, hasta=`${year}-12-31`;
+  const totalIn=data.ingresos.filter(x=>x.fecha>=desde&&x.fecha<=hasta&&x.cat!=='Repago').reduce((s,x)=>s+x.usd,0);
+  const totalEg=data.egresos.filter(x=>x.fecha>=desde&&x.fecha<=hasta).reduce((s,x)=>s+x.usd,0);
+  const totalTC=data.movTC.filter(x=>x.tipo==='gasto'&&x.fecha>=desde&&x.fecha<=hasta).reduce((s,x)=>s+x.usd,0);
+  const totalPasivos=totalEg+totalTC;
+  const neto=totalIn-totalPasivos;
+  const pos=neto>=0;
+  const row=(label,usd,color)=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:12px;color:var(--text2)">${label}</span>
+      <div style="text-align:right">
+        <div style="font-size:14px;font-weight:600;color:${color};letter-spacing:-0.01em">${fmtARS(usd*USD_ARS)}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px">${fmtUSD(usd)}</div>
+      </div>
+    </div>`;
+  el.innerHTML=`
+    <div style="padding:14px 22px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3)">Ingresos vs Egresos</span>
+      <span style="font-size:10px;color:var(--text3);font-family:'SF Mono',ui-monospace,monospace">Mayo – Dic ${year}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1px 1fr">
+      <div style="padding:18px 22px">
+        <div style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);margin-bottom:12px">↑ Ingresos</div>
+        <div style="font-size:28px;font-weight:700;color:var(--green);letter-spacing:-0.03em;line-height:1.1">${fmtARS(totalIn*USD_ARS)}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px">${fmtUSD(totalIn)}</div>
+      </div>
+      <div style="background:var(--border)"></div>
+      <div style="padding:18px 22px">
+        <div style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);margin-bottom:4px">↓ Pasivos</div>
+        ${row('Egresos efectivo',totalEg,'var(--red)')}
+        ${row('Deuda TC',totalTC,'#FF7040')}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px">
+          <span style="font-size:12px;font-weight:700;color:var(--text)">Total pasivos</span>
+          <div style="text-align:right">
+            <div style="font-size:17px;font-weight:700;color:var(--red);letter-spacing:-0.02em">${fmtARS(totalPasivos*USD_ARS)}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:1px">${fmtUSD(totalPasivos)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:${pos?'rgba(18,201,138,0.05)':'rgba(239,72,88,0.05)'}">
+      <span style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3)">Resultado del período</span>
+      <div style="text-align:right">
+        <div style="font-size:20px;font-weight:700;letter-spacing:-0.03em;color:${pos?'var(--green)':'var(--red)'}">${pos?'+':''}${fmtARS(neto*USD_ARS)}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${fmtUSD(neto)}</div>
+      </div>
+    </div>`;
 }
 
 function getCuotasProximas(dias=45){
