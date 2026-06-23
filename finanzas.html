@@ -1994,11 +1994,16 @@ ${isCurrentMonth?`<h2>Balance al día de hoy</h2>
   <div class="card has-green"><div class="card-label">Activos totales</div><div class="card-val green">${fmtARS(aUSD*USD_ARS)}</div><div class="card-sub">${fmtUSD(aUSD)}</div></div>
   <div class="card has-red"><div class="card-label">Deuda tarjeta</div><div class="card-val red">${(()=>{const p=[];if(tc.ars>0.5)p.push(fmtARS(tc.ars));if(tc.usd>0.005)p.push(fmtUSD(tc.usd));return p.join(' + ')||'Sin deuda';})()}</div></div>
 </div>`:''}
-<h2>Flujo del mes</h2>
+<h2>Ingresos vs egresos</h2>
 <div class="grid-3">
   <div class="card has-green"><div class="card-label">Ingresos reales</div><div class="card-val green">${fmtARS(totalIn*USD_ARS)}</div><div class="card-sub">${fmtUSD(totalIn)}</div></div>
   <div class="card has-red"><div class="card-label">Egresos netos${totalRepago>0?' · -'+fmtARS(totalRepago*USD_ARS)+' repagos':''}</div><div class="card-val red">${fmtARS(totalEgNeto*USD_ARS)}</div><div class="card-sub">${fmtUSD(totalEgNeto)}</div></div>
   <div class="card has-${diff>=0?'green':'red'}"><div class="card-label">Diferencia${tasaAhorro!==null?' · '+tasaAhorro+'% ahorro':''}</div><div class="card-val ${diff>=0?'green':'red'}">${diff>=0?'':'-'}${fmtARS(Math.abs(diff)*USD_ARS)}</div><div class="card-sub">${diff>=0?'':'-'}${fmtUSD(Math.abs(diff))}</div></div>
+</div>
+<h2>Deuda tarjeta</h2>
+<div class="grid-2">
+  <div class="card has-red"><div class="card-label">Total en pesos</div><div class="card-val red">${fmtARS(tc.ars+tc.usd*USD_ARS)}</div><div class="card-sub">${(()=>{const p=[];if(tc.usd>0.005)p.push(fmtUSD(tc.usd)+' USD');if(tc.ars>0.5)p.push(fmtARS(tc.ars)+' ARS');return p.join(' + ')||'Sin deuda';})()}</div></div>
+  <div class="card"><div class="card-label">Equivalente USD</div><div class="card-val">${fmtUSD(tc.usd+tc.ars/USD_ARS)}</div><div class="card-sub">al TC ${fmtARS(USD_ARS)}</div></div>
 </div>
 <h2>Ingresos por categoría</h2>
 <table><thead><tr><th>Categoría</th><th class="ta-right">ARS</th><th class="ta-right">USD</th></tr></thead>
