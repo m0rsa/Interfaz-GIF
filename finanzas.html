@@ -1315,10 +1315,7 @@ function renderFlujoMensual(){
   data.egresos.forEach(x=>{ const ym=x.fecha.slice(0,7); if(egByM[ym]!==undefined) egByM[ym]+=x.usd; });
   data.movTC.filter(m=>m.tipo==='gasto').forEach(x=>{ const ym=x.fecha.slice(0,7); if(tcByM[ym]!==undefined) tcByM[ym]+=x.usd; });
   // eje Y escalado al total apilado (egresos efectivo + gastos TC combinados)
-  const ySuggestMax=Math.max(
-    ...months.map(m=>inByM[m.ym]*USD_ARS),
-    ...months.map(m=>(Math.max(0,egByM[m.ym]-repByM[m.ym])+tcByM[m.ym])*USD_ARS)
-  )*1.12;
+  const ySuggestMax=Math.max(0,...months.map(m=>(Math.max(0,egByM[m.ym]-repByM[m.ym])+tcByM[m.ym])*USD_ARS))*1.12;
   if(chartFlujoMes) chartFlujoMes.destroy();
   const canv=document.getElementById('chartFlujoMes');
   if(!canv) return;
