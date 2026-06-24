@@ -180,7 +180,7 @@ select option { background: var(--surface2); }
 /* ── TABLES ── */
 .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 18px; background: var(--surface); }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead th { background: rgba(37,26,19,0.9); color: var(--text3); font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; padding: 11px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+thead th { background: rgba(30,27,38,0.9); color: var(--text3); font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; padding: 11px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
 tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rgba(157,92,245,0.35); }
@@ -277,7 +277,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
 
 @media (max-width: 860px) {
   /* topbar */
-  .topbar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: calc(64px + env(safe-area-inset-top, 0px)); background: rgba(28,20,16,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 150; align-items: flex-end; padding: 0 18px 12px; gap: 12px; }
+  .topbar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: calc(64px + env(safe-area-inset-top, 0px)); background: rgba(15,13,20,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 150; align-items: flex-end; padding: 0 18px 12px; gap: 12px; }
   .topbar-brand { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, #C9A6FF 0%, var(--blue) 100%); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; font-family: 'SF Mono', ui-monospace, monospace; letter-spacing: -0.04em; box-shadow: 0 3px 10px rgba(157,92,245,0.35); flex-shrink: 0; }
   .topbar-logo { font-size: 18px; font-weight: 700; color: var(--text); flex: 1; letter-spacing: -0.02em; }
   .hamburger { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 12px; color: var(--text2); border-radius: 10px; transition: background 0.15s; }
@@ -428,7 +428,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
 .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:9999; padding:10px 20px; border-radius:10px; font-size:13px; font-weight:600; font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif; box-shadow:0 8px 32px rgba(0,0,0,0.55); white-space:nowrap; pointer-events:none; transition:opacity 0.3s,transform 0.3s; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
 .toast.success { background:rgba(111,184,92,0.92); color:#fff; }
 .toast.error { background:rgba(240,87,60,0.92); color:#fff; }
-.toast.info { background:rgba(37,26,19,0.92); color:var(--text); border:1px solid var(--border2); }
+.toast.info { background:rgba(30,27,38,0.92); color:var(--text); border:1px solid var(--border2); }
 @media(max-width:860px){ .toast { bottom:calc(78px + env(safe-area-inset-bottom,0px)); } }
 
 /* ── EDIT MODAL ── */
@@ -449,7 +449,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
 /* ── BOTTOM NAV ── */
 .bottom-nav { display: none; }
 @media (max-width: 860px) {
-  .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(28,20,16,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15,13,20,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); }
   .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: none; border: none; color: var(--text3); cursor: pointer; font-size: 13px; padding: 10px 2px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 500; transition: color 0.14s; min-height: 66px; position: relative; }
   .bn-item.active { color: var(--blue); }
   .bn-item::before { content: ''; position: absolute; top: 7px; left: 50%; transform: translateX(-50%); width: 46px; height: 30px; border-radius: 11px; background: transparent; transition: background 0.18s, transform 0.18s; z-index: 0; }
@@ -1383,7 +1383,7 @@ function renderUltimos(){
       let badge='',color='',signo='';
       if(x._tipo==='ingreso'){badge=`<span class="badge ${x.cat==='Repago'?'repago':'ingreso'}">${x.cat==='Repago'?'Repago':'Ingreso'}</span>`;color=x.cat==='Repago'?'#8B7CF6':'var(--green)';signo='+';}
       else if(x._tipo==='egreso'){badge='<span class="badge egreso">Egreso</span>';color='var(--red)';signo='-';}
-      else if(x._tipo==='gasto_tc'){badge='<span class="badge tarjeta">Gasto TC</span>';color='#ff9478';signo='+';}
+      else if(x._tipo==='gasto_tc'){badge='<span class="badge tarjeta">Gasto TC</span>';color='#F0573C';signo='+';}
       else{badge='<span class="badge pago">Pago TC</span>';color='var(--green)';signo='-';}
       const acct=x.cuenta?`<span class="acct-pill" style="background:${COLORS[x.cuenta]||'#888'}22;color:${COLORS[x.cuenta]||'#888'}">${x.cuenta}</span>`:'-';
       return`<tr><td style="color:var(--text3)">${fmtDate(x.fecha)}</td><td>${x.concepto||'—'}</td><td>${badge}</td><td>${acct}</td><td style="text-align:right"><div class="td-main" style="color:${color}">${signo}${fmtARS(x.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(x.usd)}</div></td></tr>`;
@@ -1456,7 +1456,7 @@ function renderFlujoMensual(){
       <div style="padding:16px 20px">
         <div class="fm-section-label" style="color:var(--red);margin-bottom:4px">↓ Pasivos</div>
         ${row('Egresos netos',egNeto,'var(--red)')}
-        ${row('Deuda TC',totalTC,'#FF7040')}
+        ${row('Deuda TC',totalTC,'#F0573C')}
         <div class="fm-total-row">
           <span class="fm-total-label">Total pasivos</span>
           <div style="text-align:right">
@@ -1776,7 +1776,7 @@ Chart.register(doughnutCenterPlugin);
 
 function ttARS() {
   return {
-    backgroundColor: 'rgba(26,18,12,0.97)',
+    backgroundColor: 'rgba(20,18,27,0.97)',
     borderColor: 'rgba(255,255,255,0.08)',
     borderWidth: 1,
     padding: { x: 14, y: 10 },
@@ -1792,7 +1792,7 @@ function ttARS() {
 }
 function ttUSD() {
   return {
-    backgroundColor: 'rgba(26,18,12,0.97)',
+    backgroundColor: 'rgba(20,18,27,0.97)',
     borderColor: 'rgba(255,255,255,0.08)',
     borderWidth: 1,
     padding: { x: 14, y: 10 },
@@ -1840,8 +1840,7 @@ function getPatrimonioMensual(){
   return months;
 }
 
-
-/* ── PRESUPUESTOS ── */
+/* ── GASTO POR DÍA ── */
 function renderGastoDiario(){
   const canvas=document.getElementById('chartGastoDia');
   if(!canvas) return;
@@ -1938,15 +1937,6 @@ function renderMetas(){
 }
 
 /* ── RESUMEN MENSUAL (DESCARGA) ── */
-function loadHtml2Pdf(){
-  return new Promise((resolve,reject)=>{
-    if(window.html2pdf){resolve();return;}
-    const s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-    s.onload=resolve; s.onerror=()=>reject(new Error('No se pudo cargar html2pdf'));
-    document.head.appendChild(s);
-  });
-}
 let _resumenPeriodo='mes-actual';
 function openResumenModal(){
   document.getElementById('resumen-modal').style.display='flex';
@@ -2044,7 +2034,7 @@ h2::after{content:'';flex:1;height:1px;background:var(--bd)}
 .green{color:var(--green)}.red{color:var(--red)}.blue{color:var(--blue)}
 .card.has-green{border-left:2px solid rgba(111,184,92,.35)}.card.has-red{border-left:2px solid rgba(240,87,60,.35)}
 table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:4px}
-thead th{background:rgba(37,26,19,.9);color:var(--tx3);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;padding:9px 14px;text-align:left;border-bottom:1px solid var(--bd)}
+thead th{background:rgba(30,27,38,.9);color:var(--tx3);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;padding:9px 14px;text-align:left;border-bottom:1px solid var(--bd)}
 tbody td{padding:10px 14px;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--tx)}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover{background:rgba(157,92,245,.04)}
