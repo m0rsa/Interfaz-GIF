@@ -689,7 +689,6 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
         </div>
       </div>
 
-      <div id="cuotas-proximas-block"></div>
       <div class="section-title">Historial tarjeta</div>
       <div id="tc-historial-egresos"></div>
 
@@ -1473,32 +1472,6 @@ function renderFlujoMensual(){
     </div>`;
 }
 
-function getCuotasProximas(dias=45){
-  const hoy=today();
-  const lim=new Date(); lim.setDate(lim.getDate()+dias);
-  const limStr=lim.toISOString().split('T')[0];
-  return data.movTC.filter(m=>m.tipo==='gasto'&&m.fecha>=hoy&&m.fecha<=limStr).sort((a,b)=>a.fecha.localeCompare(b.fecha));
-}
-
-function renderCuotasProximas(){
-  const el=document.getElementById('cuotas-proximas-block');
-  if(!el) return;
-  const prox=getCuotasProximas();
-  if(!prox.length){ el.innerHTML=''; return; }
-  const total=prox.reduce((s,m)=>s+m.usd,0);
-  el.innerHTML=`<div class="card" style="padding:16px 20px;margin-bottom:0;border-color:rgba(242,61,79,0.22);background:rgba(242,61,79,0.03)">
-    <div class="card-title" style="margin-bottom:12px"><span>⏰ Cuotas próximas · 45 días</span><span style="font-size:11px;color:var(--red);font-weight:600;text-transform:none;letter-spacing:0">${fmtARS(total*USD_ARS)} · ${fmtUSD(total)}</span></div>
-    <div style="display:flex;flex-direction:column;gap:8px">${prox.slice(0,6).map(m=>{
-      const tc=TC_COLORS[m.tarjeta]||'var(--text3)';
-      const dias=Math.ceil((new Date(m.fecha+'T12:00')-new Date())/(1000*60*60*24));
-      return`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface2);border-radius:9px;border-left:3px solid ${tc}">
-        <div><div style="font-size:12px;font-weight:600;color:var(--text)">${m.concepto}</div><div style="font-size:11px;color:var(--text3);margin-top:2px">${fmtDate(m.fecha)}${m.tarjeta?` · ${m.tarjeta}`:''}</div></div>
-        <div style="text-align:right"><div style="font-size:13px;font-weight:600;color:var(--red)">${fmtARS(m.usd*USD_ARS)}</div><div style="font-size:10px;color:var(--text3)">${dias===0?'hoy':dias===1?'mañana':'en '+dias+' días'}</div></div>
-      </div>`;
-    }).join('')}${prox.length>6?`<div style="font-size:11px;color:var(--text3);text-align:center;padding:4px">+${prox.length-6} más</div>`:''}</div>
-  </div>`;
-}
-
 /* ── PATRIMONIO ── */
 function renderPatrimonio(){
   renderHero();
@@ -1732,7 +1705,6 @@ function renderIngresos(){
 }
 
 function renderEgresos(){
-  renderCuotasProximas();
   renderTCHistorial(document.getElementById('tc-historial-egresos'));
   const meses=getMesesDe(data.egresos);
   document.getElementById('filtro-bar-egresos').innerHTML=buildFiltroSelect('egresos',meses);
