@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#060911">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Finanzas">
 <title>Finanzas personales</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -49,10 +55,10 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow-x: hidden; }
-body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; font-size: 14px; line-height: 1.5; }
+body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; min-height: 100dvh; font-size: 14px; line-height: 1.5; }
 
 /* ── SIDEBAR ── */
-.sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
+.sidebar { width: var(--sidebar-w); min-height: 100vh; min-height: 100dvh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
 .sidebar-logo { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
 .logo-brand { display: flex; align-items: center; gap: 10px; }
 .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #5C9FFF 0%, var(--blue) 100%); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0; letter-spacing: -0.04em; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; box-shadow: 0 4px 12px rgba(74,140,245,0.35); }
@@ -78,7 +84,7 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .cotiz-btn:hover { background: var(--blue-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(74,140,245,0.35); }
 
 /* ── MAIN ── */
-.main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+.main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 
 /* ── HERO ── */
 .header-hero { background: linear-gradient(145deg, #101D35 0%, #0B1526 55%, #080E1C 100%); border: 1px solid rgba(74,140,245,0.16); border-radius: var(--radius); padding: 30px 34px 26px; position: relative; overflow: hidden; margin-bottom: 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 20px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06); }
@@ -346,6 +352,31 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
   /* Pills */
   .fm-pills { flex-wrap: nowrap !important; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
   .fm-pills::-webkit-scrollbar { display: none; }
+
+  /* #8 Gráficos más bajos */
+  .chart-wrap { height: 180px !important; }
+  /* #6 Grid de Metas sin overflow */
+  #metas-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ── #4 TABLAS COMO CARDS (mobile) ── */
+@media (max-width: 600px) {
+  .table-wrap { overflow: visible; border: none; background: transparent; border-radius: 0; }
+  .table-wrap table { width: 100% !important; min-width: 0 !important; }
+  .table-wrap thead { display: none; }
+  .table-wrap tbody, .table-wrap tr, .table-wrap td { display: block; width: auto; }
+  .table-wrap tr { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; padding: 12px 14px; }
+  .table-wrap tr:hover { background: var(--surface); box-shadow: none; }
+  .table-wrap td { border: none !important; padding: 2px 0 !important; text-align: left !important; white-space: normal !important; }
+  .table-wrap td .td-main, .table-wrap td .td-sub { white-space: normal !important; }
+  /* celda de monto (lleva inline text-align:right) → izquierda y resaltada */
+  .table-wrap td[style*="text-align:right"], .table-wrap td[style*="text-align: right"] { text-align: left !important; margin-top: 6px; }
+  /* fila de acciones */
+  .table-wrap tr td:last-child { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  /* #3 edición inline: inputs a ancho completo, sin scroll horizontal */
+  .edit-date-row { flex-basis: 100%; gap: 8px 8px; }
+  .edit-date-row input, .edit-date-row select { flex: 1 1 100% !important; min-width: 0 !important; }
+  .edit-date-row .btn { flex: 1 1 100%; }
 }
 
 /* ── FLUJO CARD base classes ── */
@@ -403,6 +434,10 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
   .cs-opt { font-size: 13px; padding: 9px 16px; }
   .cs-options { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
   .cuenta-selector { overflow: hidden; }
+  /* targets táctiles más cómodos (≥40px) */
+  .cur-toggle button { padding: 9px 18px; font-size: 13px; }
+  .mode-tab { padding: 9px 16px; font-size: 13px; }
+  .btn.sm { padding: 9px 16px; font-size: 13px; }
 }
 </style>
 </head>
@@ -486,7 +521,7 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
     <button class="hamburger" onclick="toggleSidebar()" aria-label="Menú">
       <span></span><span></span><span></span>
     </button>
-    <span class="topbar-logo">Finanzas</span>
+    <span class="topbar-logo" id="topbar-title">Resumen</span>
   </div>
 
   <div class="content">
@@ -826,9 +861,9 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
       <span>Ahorros</span>
     </button>
-    <button class="bn-item" id="bn-patrimonio" onclick="showSection('patrimonio')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
-      <span>Patrimonio</span>
+    <button class="bn-item" id="bn-mas" onclick="toggleSidebar()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <span>Más</span>
     </button>
   </nav>
 
@@ -1166,7 +1201,11 @@ function showSection(id){
   if(id==='ahorro') renderAhorros();
   if(id==='transferencias'){ renderCuentas('trde'); renderCuentas('trha'); renderTransferencias(); }
   document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
-  const bn=document.getElementById('bn-'+id); if(bn)bn.classList.add('active');
+  const bn=document.getElementById('bn-'+id);
+  if(bn) bn.classList.add('active');
+  else { const mas=document.getElementById('bn-mas'); if(mas) mas.classList.add('active'); }
+  const labels={resumen:'Resumen',ingresos:'Ingresos',egresos:'Egresos',ahorro:'Ahorros',transferencias:'Transferencias',patrimonio:'Patrimonio',metas:'Metas',inversiones:'Inversiones'};
+  const tt=document.getElementById('topbar-title'); if(tt) tt.textContent=labels[id]||'Finanzas';
   closeSidebar();
 }
 
@@ -1580,7 +1619,7 @@ function renderTCHistorial(el){
     `<div style="font-size:22px;font-weight:600;margin-bottom:4px">${_rparts.join('<span style="color:var(--text3);margin:0 6px">+</span>')||'Sin deuda'}</div>`+
     `<div style="font-size:13px;color:var(--text3);margin-bottom:16px">≈ ${fmtARS(_rars+_rusd*USD_ARS)} total en pesos al TC actual</div>`+
     cardBreakdown+
-    (movs.length?`<table><thead><tr>${thFecha('tc')}<th>Concepto</th><th>Tipo</th><th>Categoría</th><th>Tarjeta / Cuenta</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
+    (movs.length?`<div class="table-wrap" style="margin-top:4px"><table><thead><tr>${thFecha('tc')}<th>Concepto</th><th>Tipo</th><th>Categoría</th><th>Tarjeta / Cuenta</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
     movs.map(m=>{
       const acct=m.tipo==='gasto'
         ? (m.tarjeta?`<span class="acct-pill" style="background:${TC_COLORS[m.tarjeta]||'#888'}22;color:${TC_COLORS[m.tarjeta]||'#888'}">${m.tarjeta}</span>`:'-')
@@ -1595,7 +1634,7 @@ function renderTCHistorial(el){
         ?`<button class="action-btn" onclick="toggleEditTC(${m.id})" title="Editar">✏️</button><button class="action-btn" onclick="eliminarTC(${m.id})" title="Eliminar">🗑</button><div class="edit-date-row" id="edr-tc-${m.id}"><input type="text" id="edr-tc-concepto-${m.id}" value="${(m.concepto||'').replace(/"/g,'&quot;')}" placeholder="Concepto" style="flex:2;min-width:120px"><input type="number" id="edr-tc-monto-${m.id}" value="${m.usd.toFixed(2)}" step="0.01" placeholder="USD" style="flex:1;min-width:70px"><input type="date" id="edr-tc-fecha-${m.id}" value="${m.fecha}" style="flex:1;min-width:120px"><select id="edr-tc-tarjeta-${m.id}" style="flex:1;min-width:100px">${tarjOpts}</select><select id="edr-tc-cat-${m.id}" style="flex:1;min-width:110px">${catOpts}</select><button class="btn sm primary" onclick="saveEditTC(${m.id})">✓</button></div>`
         :`<button class="action-btn" onclick="eliminarTC(${m.id})" title="Eliminar">🗑</button>`;
       return`<tr><td style="color:var(--text3)">${fmtDate(m.fecha)}</td><td>${m.concepto}</td><td><span class="badge ${m.tipo==='pago'?'pago':'tarjeta'}">${m.tipo==='pago'?'Pago':'Gasto'}</span></td><td>${catCell}</td><td>${acct}</td><td style="text-align:right"><div class="td-main" style="color:${m.tipo==='pago'?'var(--green)':'var(--red)'}">${m.tipo==='pago'?'-':'+'}${fmtARS(m.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(m.usd)}</div></td><td>${editBtn}</td></tr>`;
-    }).join('')+'</tbody></table>':'<div class="empty">Sin movimientos de tarjeta.</div>');
+    }).join('')+'</tbody></table></div>':'<div class="empty">Sin movimientos de tarjeta.</div>');
 }
 
 function renderIngresos(){
@@ -1929,9 +1968,7 @@ function downloadResumenMes(desde, hasta, label){
   const inCatRows=Object.entries(inCats).sort((a,b)=>b[1]-a[1])
     .map(([k,v])=>`<tr><td><span class="badge ${k==='Repago'?'b-rep':'b-ing'}">${k}</span></td><td class="ta-right"><strong>${fmtARS(v*USD_ARS)}</strong></td><td class="ta-right text-sm">${fmtUSD(v)}</td></tr>`).join('');
   const pdfFilename='resumen-'+label.replace(/[^a-z0-9]/gi,'-').replace(/-+/g,'-').replace(/^-|-$/g,'').toLowerCase()+'.pdf';
-  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-<title>Resumen financiero · ${label}</title>
-<style>
+  const styleBlock=`<style>
 @font-face{font-family:'Inter';font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-400-normal.woff2') format('woff2')}
 @font-face{font-family:'Inter';font-weight:600;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-600-normal.woff2') format('woff2')}
 @font-face{font-family:'Inter';font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-700-normal.woff2') format('woff2')}
@@ -1983,10 +2020,8 @@ tbody tr:hover{background:rgba(74,140,245,.04)}
   tr{page-break-inside:avoid;page-break-after:auto}
   thead{display:table-header-group}
 }
-</style></head>
-<body>
-<button class="print-btn" id="pdf-btn" onclick="guardarPDF()">↓ Guardar como PDF</button>
-<div class="header">
+</style>`;
+  const bodyContent=`<div class="header">
   <div class="header-title">Resumen financiero · ${label.charAt(0).toUpperCase()+label.slice(1)}</div>
   <div class="header-sub">Generado el ${new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})} · TC 1 USD = ${fmtARS(USD_ARS)}</div>
 </div>
@@ -2038,6 +2073,16 @@ ${ahMes.length?`<h2>Ahorros · movimientos</h2>
   <td><span class="badge ${a.mov==='deposito'?'b-dep':'b-eg'}">${a.mov==='deposito'?'Depósito':'Retiro'}</span></td>
   <td class="ta-right"><span class="${a.mov==='deposito'?'blue':'red'}" style="font-weight:700">${a.mov==='deposito'?'':'-'}${fmtARS(a.usd*USD_ARS)}</span><div class="tx3">${fmtUSD(a.usd)}</div></td>
 </tr>`).join('')}</tbody></table>`:''}
+`;
+  // En mobile los popups suelen estar bloqueados (Safari iOS) y el PDF sale ancho:
+  // generamos directo desde un iframe oculto, sin window.open.
+  const isMobile=window.matchMedia('(max-width: 860px)').matches;
+  if(isMobile){ generateResumenPDFDirect(styleBlock,bodyContent,pdfFilename); return; }
+  // Desktop: ventana de preview con botón de descarga (html2pdf embebido)
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Resumen financiero · ${label}</title>${styleBlock}</head>
+<body>
+<button class="print-btn" id="pdf-btn" onclick="guardarPDF()">↓ Guardar como PDF</button>
+${bodyContent}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
 <script>
 async function guardarPDF(){
@@ -2063,6 +2108,37 @@ async function guardarPDF(){
   if(!w){toast('Bloqueador de ventanas activo — permitilo para ver el resumen.','error');return;}
   w.document.write(html);
   w.document.close();
+}
+
+// Genera el PDF directamente (mobile): renderiza en un iframe oculto y descarga, sin popup.
+async function generateResumenPDFDirect(styleBlock, bodyContent, filename){
+  toast('Generando PDF…','info');
+  try{ await loadHtml2Pdf(); }catch(e){ toast('No se pudo cargar el generador de PDF.','error'); return; }
+  const iframe=document.createElement('iframe');
+  iframe.setAttribute('aria-hidden','true');
+  iframe.style.cssText='position:fixed;left:-99999px;top:0;width:860px;height:200px;border:0;opacity:0.01;pointer-events:none;z-index:-1';
+  document.body.appendChild(iframe);
+  try{
+    const idoc=iframe.contentDocument||iframe.contentWindow.document;
+    idoc.open();
+    idoc.write('<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'+styleBlock+'</head><body style="width:860px;margin:0">'+bodyContent+'</body></html>');
+    idoc.close();
+    try{ if(idoc.fonts&&idoc.fonts.ready) await idoc.fonts.ready; }catch(e){}
+    await new Promise(r=>setTimeout(r,450));
+    const b=idoc.body;
+    b.style.margin='0'; b.style.maxWidth='none'; b.style.width='860px';
+    const H=b.scrollHeight, MM=0.264583;
+    iframe.style.height=(H+40)+'px'; // asegura render completo para html2canvas
+    await html2pdf().set({
+      margin:0,
+      filename:filename,
+      image:{type:'jpeg',quality:0.98},
+      html2canvas:{scale:2,useCORS:true,backgroundColor:'#06080F',logging:false,width:860,windowWidth:860},
+      jsPDF:{unit:'mm',format:[860*MM,H*MM],orientation:'portrait'}
+    }).from(b).save();
+    toast('PDF descargado.','success');
+  }catch(e){ toast('No se pudo generar el PDF.','error'); }
+  finally{ iframe.remove(); }
 }
 
 /* ── RENDIMIENTOS ── */
