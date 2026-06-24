@@ -2077,7 +2077,7 @@ ${ahMes.length?`<h2>Ahorros · movimientos</h2>
   // En mobile los popups suelen estar bloqueados (Safari iOS) y el PDF sale ancho:
   // generamos directo desde un iframe oculto, sin window.open.
   const isMobile=window.matchMedia('(max-width: 860px)').matches;
-  if(isMobile){ generateResumenPDFDirect(styleBlock,bodyContent,pdfFilename); return; }
+  if(isMobile){ generateResumenPDFNative({label,pdfFilename,inMes,egMes,ahMes,tcMes,totalIn,totalEgConTC,totalTCGastos,diff,tasaAhorro,bUSD,aUSD,tc,isCurrentMonth}); return; }
   // Desktop: ventana de preview con botón de descarga (html2pdf embebido)
   const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Resumen financiero · ${label}</title>${styleBlock}</head>
 <body>
@@ -2110,53 +2110,137 @@ async function guardarPDF(){
   w.document.close();
 }
 
-// Genera el PDF directamente (mobile): renderiza en un iframe VISIBLE (a tamaño real,
-// como hace el popup en desktop) tapado por un overlay de carga, y descarga sin popup.
-async function generateResumenPDFDirect(styleBlock, bodyContent, filename){
-  // Overlay de carga (tapa el iframe de render para que el usuario no vea el "flash")
-  const overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#06080F;display:flex;align-items:center;justify-content:center;gap:10px;color:#ECF1FF;font-family:\'SF Pro\',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-size:15px;font-weight:600';
-  overlay.innerHTML='<div style="width:16px;height:16px;border:2px solid rgba(74,140,245,0.3);border-top-color:#4A8CF5;border-radius:50%;animation:authSpin 0.7s linear infinite"></div> Generando PDF…';
-  document.body.appendChild(overlay);
+// Carga jsPDF (UMD) on-demand
+function loadJsPDF(){
+  return new Promise((resolve,reject)=>{
+    if(window.jspdf&&window.jspdf.jsPDF) return resolve();
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload=resolve; s.onerror=()=>reject(new Error('No se pudo cargar jsPDF'));
+    document.head.appendChild(s);
+  });
+}
 
-  try{ await loadHtml2Pdf(); }catch(e){ overlay.remove(); toast('No se pudo cargar el generador de PDF.','error'); return; }
-
-  // iframe de render: VISIBLE y a tamaño real (debajo del overlay). Esto evita que
-  // html2canvas capture un elemento off-screen y salga en blanco/cortado en mobile.
-  const iframe=document.createElement('iframe');
-  iframe.setAttribute('aria-hidden','true');
-  iframe.style.cssText='position:fixed;top:0;left:0;width:860px;height:'+window.innerHeight+'px;border:0;z-index:99998;background:#06080F';
-  document.body.appendChild(iframe);
+// PDF nativo para mobile: dibuja el resumen con jsPDF (texto vectorial real).
+// Sin html2canvas → sin capturas en blanco, sin límites de canvas: confiable en celular.
+async function generateResumenPDFNative(d){
+  toast('Generando PDF…','info');
+  try{ await loadJsPDF(); }catch(e){ toast('No se pudo cargar el generador de PDF.','error'); return; }
   try{
-    const idoc=iframe.contentDocument||iframe.contentWindow.document;
-    idoc.open();
-    idoc.write('<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'+styleBlock+'</head><body style="width:860px;margin:0">'+bodyContent+'</body></html>');
-    idoc.close();
-    // esperar fuentes + layout
-    try{ if(idoc.fonts&&idoc.fonts.ready) await idoc.fonts.ready; }catch(e){}
-    await new Promise(r=>setTimeout(r,500));
-    const b=idoc.body;
-    b.style.margin='0'; b.style.maxWidth='none'; b.style.width='860px';
-    const W=860, H=Math.ceil(b.scrollHeight), MM=0.264583;
-    iframe.style.height=H+'px'; // el iframe ocupa todo el alto del contenido (render completo)
-    await new Promise(r=>setTimeout(r,80));
-    // capar el scale para no exceder los límites de canvas del navegador mobile
-    // (iOS ~16.7M px de área y ~4096px por lado): si el canvas se pasa, sale en blanco.
-    const dpr=window.devicePixelRatio||1;
-    let scale=Math.min(2,Math.max(1,dpr));
-    const MAX_SIDE=4000, MAX_AREA=16000000;
-    scale=Math.min(scale, MAX_SIDE/Math.max(W,H), Math.sqrt(MAX_AREA/(W*H)));
-    if(scale<0.5) scale=0.5;
-    await html2pdf().set({
-      margin:0,
-      filename:filename,
-      image:{type:'jpeg',quality:0.96},
-      html2canvas:{scale,useCORS:true,backgroundColor:'#06080F',logging:false,width:W,height:H,windowWidth:W,windowHeight:H,scrollX:0,scrollY:0},
-      jsPDF:{unit:'mm',format:[W*MM,H*MM],orientation:'portrait'}
-    }).from(b).save();
+    const { jsPDF }=window.jspdf;
+    const doc=new jsPDF({unit:'pt',format:'a4',orientation:'portrait',compress:true});
+    const PW=doc.internal.pageSize.getWidth(), PH=doc.internal.pageSize.getHeight();
+    const M=34, CW=PW-M*2, F='helvetica';
+    const C={bg:[6,8,15],surf:[16,25,40],bd:[40,52,74],tx:[236,241,255],tx3:[106,130,168],blue:[74,140,245],green:[18,201,138],red:[239,72,88],violet:[159,143,255]};
+    // sanea caracteres fuera de Latin-1 (las fuentes estándar de jsPDF no los soportan)
+    const S=t=>String(t==null?'':t).replace(/—/g,'-').replace(/[…]/g,'...').replace(/≈/g,'~').replace(/[“”]/g,'"').replace(/[’]/g,"'");
+    const setTx=c=>doc.setTextColor(c[0],c[1],c[2]);
+    const setFill=c=>doc.setFillColor(c[0],c[1],c[2]);
+    const setDraw=c=>doc.setDrawColor(c[0],c[1],c[2]);
+    const paintBg=()=>{ setFill(C.bg); doc.rect(0,0,PW,PH,'F'); };
+    paintBg();
+    let y=M;
+    const ensure=h=>{ if(y+h>PH-M){ doc.addPage(); paintBg(); y=M; return true; } return false; };
+    const fit=(t,maxW)=>{ t=S(t); if(!t) return ''; if(doc.getTextWidth(t)<=maxW) return t; while(t.length>1&&doc.getTextWidth(t+'...')>maxW) t=t.slice(0,-1); return t+'...'; };
+    const T=(t,x,yy,opt)=>{ t=S(t); if(t!=='') doc.text(t,x,yy,opt); };
+    const sectionTitle=t=>{
+      ensure(22); setTx(C.tx3); doc.setFont(F,'bold'); doc.setFontSize(8);
+      T(t.toUpperCase(),M,y+8);
+      setDraw(C.bd); doc.setLineWidth(0.5);
+      doc.line(M+doc.getTextWidth(S(t.toUpperCase()))+10,y+5,M+CW,y+5);
+      y+=20;
+    };
+    // ── header ──
+    const hH=62;
+    setFill([13,22,40]); doc.roundedRect(M,y,CW,hH,8,8,'F');
+    setTx(C.blue); doc.setFont(F,'bold'); doc.setFontSize(16);
+    T(fit('Resumen financiero · '+(d.label.charAt(0).toUpperCase()+d.label.slice(1)),CW-32),M+16,y+27);
+    setTx(C.tx3); doc.setFont(F,'normal'); doc.setFontSize(8.5);
+    T('Generado el '+new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})+'  ·  TC 1 USD = '+fmtARS(USD_ARS),M+16,y+44);
+    y+=hH+18;
+    // ── cards ──
+    const drawCards=(title,cards)=>{
+      sectionTitle(title);
+      const n=cards.length, gap=8, cw=(CW-gap*(n-1))/n, ch=58;
+      ensure(ch+4);
+      cards.forEach((c,i)=>{
+        const x=M+i*(cw+gap);
+        setFill(C.surf); doc.roundedRect(x,y,cw,ch,6,6,'F');
+        if(c.color){ setFill(c.color); doc.roundedRect(x,y,3,ch,1.5,1.5,'F'); }
+        setTx(C.tx3); doc.setFont(F,'bold'); doc.setFontSize(6.6);
+        T(fit(c.label,cw-16),x+10,y+15);
+        setTx(c.color||C.tx); doc.setFont(F,'bold'); doc.setFontSize(13);
+        T(fit(c.val,cw-16),x+10,y+35);
+        if(c.sub){ setTx(C.tx3); doc.setFont(F,'normal'); doc.setFontSize(8); T(fit(c.sub,cw-16),x+10,y+49); }
+      });
+      y+=ch+16;
+    };
+    if(d.isCurrentMonth){
+      drawCards('Balance al día de hoy',[
+        {label:'Balance neto',val:fmtARS(d.bUSD*USD_ARS),sub:fmtUSD(d.bUSD),color:d.bUSD>=0?C.green:C.red},
+        {label:'Activos totales',val:fmtARS(d.aUSD*USD_ARS),sub:fmtUSD(d.aUSD),color:C.green},
+        {label:'Deuda tarjeta',val:(d.tc.ars+d.tc.usd*USD_ARS>0.5?fmtARS(d.tc.ars+d.tc.usd*USD_ARS):'Sin deuda'),sub:(d.tc.usd+d.tc.ars/USD_ARS>0.005?fmtUSD(d.tc.usd+d.tc.ars/USD_ARS):''),color:C.red},
+      ]);
+    }
+    drawCards('Ingresos vs egresos',[
+      {label:'Ingresos reales',val:fmtARS(d.totalIn*USD_ARS),sub:fmtUSD(d.totalIn),color:C.green},
+      {label:'Egresos netos'+(d.totalTCGastos>0?' · +'+fmtARS(d.totalTCGastos*USD_ARS)+' TC':''),val:fmtARS(d.totalEgConTC*USD_ARS),sub:fmtUSD(d.totalEgConTC),color:C.red},
+      {label:'Diferencia'+(d.tasaAhorro!==null?' · '+d.tasaAhorro+'% ahorro':''),val:(d.diff>=0?'':'-')+fmtARS(Math.abs(d.diff)*USD_ARS),sub:(d.diff>=0?'':'-')+fmtUSD(Math.abs(d.diff)),color:d.diff>=0?C.green:C.red},
+    ]);
+    drawCards('Deuda tarjeta',[
+      {label:'Total en pesos',val:fmtARS(d.tc.ars+d.tc.usd*USD_ARS),sub:(()=>{const p=[];if(d.tc.usd>0.005)p.push(fmtUSD(d.tc.usd)+' USD');if(d.tc.ars>0.5)p.push(fmtARS(d.tc.ars)+' ARS');return p.join(' + ')||'Sin deuda';})(),color:C.red},
+      {label:'Equivalente USD',val:fmtUSD(d.tc.usd+d.tc.ars/USD_ARS),sub:'al TC '+fmtARS(USD_ARS),color:null},
+    ]);
+    // ── tablas ──
+    const drawTable=(title,cols,rows)=>{
+      sectionTitle(title);
+      const rowH=24;
+      const header=()=>{
+        setFill(C.surf); doc.rect(M,y,CW,18,'F');
+        setTx(C.tx3); doc.setFont(F,'bold'); doc.setFontSize(7);
+        let x=M+8;
+        cols.forEach(c=>{ const w=c.w*CW; const t=S(c.h.toUpperCase()); T(t,c.r?x+w-8-doc.getTextWidth(t):x,y+12); x+=w; });
+        y+=18;
+      };
+      header();
+      if(!rows.length){ setTx(C.tx3); doc.setFont(F,'normal'); doc.setFontSize(8.5); T('Sin movimientos',M+8,y+13); y+=rowH+10; return; }
+      rows.forEach(r=>{ if(ensure(rowH)) header();
+        let x=M+8;
+        cols.forEach((c,ci)=>{ const w=c.w*CW, cell=r[ci]||{};
+          setTx(cell.color||C.tx); doc.setFont(F,cell.bold?'bold':'normal'); doc.setFontSize(cell.size||8.5);
+          const t=fit(cell.t,w-12); T(t,c.r?x+w-8-doc.getTextWidth(t):x,y+13);
+          if(cell.sub){ setTx(C.tx3); doc.setFont(F,'normal'); doc.setFontSize(7); const st=fit(cell.sub,w-12); T(st,c.r?x+w-8-doc.getTextWidth(st):x,y+21); }
+          x+=w;
+        });
+        y+=rowH; setDraw(C.bd); doc.setLineWidth(0.4); doc.line(M,y,M+CW,y);
+      });
+      y+=14;
+    };
+    const colsMov=[{h:'Fecha',w:.14},{h:'Concepto',w:.34},{h:'Categoría',w:.18},{h:'Cuenta',w:.16},{h:'Monto',w:.18,r:1}];
+    drawTable('Ingresos · detalle',colsMov,d.inMes.map(i=>[
+      {t:fmtDate(i.fecha),color:C.tx3},{t:i.concepto||'-'},{t:i.cat,color:i.cat==='Repago'?C.violet:C.green,bold:1,size:7.5},{t:i.cuenta||'-',color:C.tx3},
+      {t:fmtARS(i.usd*USD_ARS),sub:fmtUSD(i.usd),color:C.green,bold:1}]));
+    drawTable('Egresos · detalle',colsMov,d.egMes.map(e=>[
+      {t:fmtDate(e.fecha),color:C.tx3},{t:e.concepto||'-'},{t:e.cat,color:C.red,bold:1,size:7.5},{t:e.cuenta||'-',color:C.tx3},
+      {t:'-'+fmtARS(e.usd*USD_ARS),sub:fmtUSD(e.usd),color:C.red,bold:1}]));
+    if(d.tcMes.length){
+      const colsTC=[{h:'Fecha',w:.12},{h:'Concepto',w:.28},{h:'Tipo',w:.12},{h:'Categoría',w:.16},{h:'Tarjeta',w:.14},{h:'Monto',w:.18,r:1}];
+      drawTable('Tarjeta de crédito · movimientos',colsTC,d.tcMes.map(m=>[
+        {t:fmtDate(m.fecha),color:C.tx3},{t:m.concepto||'-'},
+        {t:m.tipo==='pago'?'Pago':'Gasto',color:m.tipo==='pago'?C.green:C.red,bold:1,size:7.5},
+        {t:m.cat||'-',color:C.tx3,size:7.5},{t:m.tarjeta||m.cuenta||'-',color:C.tx3},
+        {t:(m.tipo==='pago'?'-':'+')+fmtARS(m.usd*USD_ARS),sub:fmtUSD(m.usd),color:m.tipo==='pago'?C.green:C.red,bold:1}]));
+    }
+    if(d.ahMes.length){
+      const colsAh=[{h:'Fecha',w:.16},{h:'Instrumento',w:.40},{h:'Tipo',w:.20},{h:'Monto',w:.24,r:1}];
+      drawTable('Ahorros · movimientos',colsAh,d.ahMes.map(a=>[
+        {t:fmtDate(a.fecha),color:C.tx3},{t:a.inst||a.tipo||'-'},
+        {t:a.mov==='deposito'?'Depósito':'Retiro',color:a.mov==='deposito'?C.blue:C.red,bold:1,size:7.5},
+        {t:(a.mov==='deposito'?'':'-')+fmtARS(a.usd*USD_ARS),sub:fmtUSD(a.usd),color:a.mov==='deposito'?C.blue:C.red,bold:1}]));
+    }
+    doc.save(d.pdfFilename);
     toast('PDF descargado.','success');
-  }catch(e){ toast('No se pudo generar el PDF.','error'); }
-  finally{ iframe.remove(); overlay.remove(); }
+  }catch(e){ console.error('PDF nativo:',e); toast('No se pudo generar el PDF.','error'); }
 }
 
 /* ── RENDIMIENTOS ── */
