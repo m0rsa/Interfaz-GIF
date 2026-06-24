@@ -244,6 +244,32 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
 .action-btn { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 14px; padding: 4px 6px; border-radius: 6px; transition: all 0.15s; }
 .action-btn:hover { background: var(--surface3); color: var(--text2); }
 
+/* ── HISTORIAL POR DÍA (desplegable) ── */
+.table-wrap:has(.day-group) { border: none; background: transparent; overflow: visible; }
+.dg-sortbar { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.dg-sort { background: var(--surface2); border: 1px solid var(--border2); color: var(--text2); font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.dg-sort:hover { background: var(--surface3); color: var(--text); }
+.day-group { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); margin-bottom: 10px; overflow: hidden; }
+.day-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; background: none; border: none; cursor: pointer; color: var(--text); font-family: inherit; text-align: left; transition: background 0.15s; }
+.day-head:hover { background: rgba(255,255,255,0.025); }
+.day-head-l { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.day-chev { color: var(--text3); font-size: 11px; width: 12px; flex-shrink: 0; }
+.day-date { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; text-transform: capitalize; white-space: nowrap; }
+.day-count { font-size: 11px; color: var(--text3); white-space: nowrap; }
+.day-tot { text-align: right; flex-shrink: 0; line-height: 1.25; }
+.day-tot-ars { font-size: 14px; font-weight: 700; font-family: 'SF Pro Display', -apple-system, sans-serif; letter-spacing: -0.01em; display: block; }
+.day-tot-usd { font-size: 10px; color: var(--text3); }
+.day-body { display: none; border-top: 1px solid var(--border); }
+.day-body.open { display: block; }
+.day-row { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--border); }
+.day-row:last-child { border-bottom: none; }
+.day-row-main { flex: 1; min-width: 0; }
+.day-row-main .td-main { white-space: normal; }
+.day-row-tags { display: flex; gap: 6px; margin-top: 5px; flex-wrap: wrap; align-items: center; }
+.day-row-amt { text-align: right; flex-shrink: 0; white-space: nowrap; }
+.day-row-act { display: flex; gap: 2px; flex-shrink: 0; }
+@media (max-width: 500px) { .day-count { display: none; } .day-date { font-size: 14px; } }
+
 /* ── TOPBAR / HAMBURGER ── */
 .topbar { display: none; }
 .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 149; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
@@ -1640,6 +1666,42 @@ function renderTCHistorial(el){
     }).join('')+'</tbody></table></div>':'<div class="empty">Sin movimientos de tarjeta.</div>');
 }
 
+/* ── HISTORIAL AGRUPADO POR DÍA ── */
+const _openDays=new Set();
+const _dgInit={};
+function fmtDayLabel(f){ try{ return new Date(f+'T12:00:00').toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'}).replace(/\./g,''); }catch(e){ return fmtDate(f); } }
+function toggleDay(id){
+  const open=!_openDays.has(id);
+  if(open)_openDays.add(id); else _openDays.delete(id);
+  const body=document.getElementById('dg-'+id);
+  if(body) body.classList.toggle('open',open);
+  const grp=body?body.closest('.day-group'):null;
+  if(grp){ const ch=grp.querySelector('.day-chev'); if(ch)ch.textContent=open?'▾':'▸'; const h=grp.querySelector('.day-head'); if(h)h.setAttribute('aria-expanded',open); }
+}
+function renderDayGroups(el,items,tipo,rowFn,o){
+  const dir=sortDir[tipo]||'desc', sign=(o&&o.sign)||'', color=(o&&o.color)||'var(--text)';
+  const byDay={};
+  items.forEach(it=>{ (byDay[it.fecha]=byDay[it.fecha]||[]).push(it); });
+  const dias=Object.keys(byDay).sort((a,b)=>dir==='asc'?a.localeCompare(b):b.localeCompare(a));
+  // abrir el día más reciente la primera vez que se muestra cada historial
+  if(dias.length && !_dgInit[tipo]){ _openDays.add(tipo+'-'+dias[0]); _dgInit[tipo]=true; }
+  const arrow=dir==='desc'?'↓':'↑';
+  const groups=dias.map(fecha=>{
+    const movs=byDay[fecha];
+    const totUSD=movs.reduce((s,m)=>s+m.usd,0);
+    const id=tipo+'-'+fecha, open=_openDays.has(id);
+    const rows=movs.map(it=>`<div class="day-row">${rowFn(it)}<div class="day-row-act"><button class="action-btn" onclick="openEditModal('${tipo}',${it.id})" title="Editar">✏️</button><button class="action-btn" onclick="eliminar('${tipo}',${it.id})" title="Eliminar">🗑</button></div></div>`).join('');
+    return `<div class="day-group">
+      <button class="day-head" onclick="toggleDay('${id}')" aria-expanded="${open}">
+        <span class="day-head-l"><span class="day-chev">${open?'▾':'▸'}</span><span class="day-date">${fmtDayLabel(fecha)}</span><span class="day-count">${movs.length} mov.</span></span>
+        <span class="day-tot"><span class="day-tot-ars" style="color:${color}">${sign}${fmtARS(totUSD*USD_ARS)}</span><span class="day-tot-usd">${fmtUSD(totUSD)}</span></span>
+      </button>
+      <div class="day-body${open?' open':''}" id="dg-${id}">${rows}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div class="dg-sortbar"><button class="dg-sort" onclick="toggleSort('${tipo}')">Fecha ${arrow}</button></div>${groups}`;
+}
+
 function renderIngresos(){
   const meses=getMesesDe(data.ingresos);
   document.getElementById('filtro-bar-ingresos').innerHTML=buildFiltroSelect('ingresos',meses);
@@ -1649,8 +1711,9 @@ function renderIngresos(){
   if(busq)items=items.filter(i=>(i.concepto||'').toLowerCase().includes(busq));
   const el=document.getElementById('lista-ingresos');
   if(!items.length){el.innerHTML='<div class="empty">Sin ingresos registrados.</div>';return;}
-  el.innerHTML=`<table><thead><tr>${thFecha('ingresos')}<th>Concepto</th><th>Categoría</th><th>Cuenta destino</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
-    buildRows([...items],'ingresos',i=>`<td>${i.concepto}</td><td><span class="badge ${i.cat==='Repago'?'repago':'ingreso'}">${i.cat}</span></td><td>${i.cuenta?`<span class="acct-pill" style="background:${COLORS[i.cuenta]||'#888'}22;color:${COLORS[i.cuenta]||'#888'}">${i.cuenta}</span>`:'-'}</td><td style="text-align:right"><div class="td-main" style="color:var(--green)">${fmtARS(i.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(i.usd)}${i.rawCur==='ars'?' · en $':''}</div></td>`)+`</tbody></table>`;
+  renderDayGroups(el,items,'ingresos',
+    i=>`<div class="day-row-main"><div class="td-main">${i.concepto||'—'}</div><div class="day-row-tags"><span class="badge ${i.cat==='Repago'?'repago':'ingreso'}">${i.cat}</span>${i.cuenta?`<span class="acct-pill" style="background:${COLORS[i.cuenta]||'#888'}22;color:${COLORS[i.cuenta]||'#888'}">${i.cuenta}</span>`:''}</div></div><div class="day-row-amt"><div class="td-main" style="color:var(--green)">${fmtARS(i.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(i.usd)}${i.rawCur==='ars'?' · en $':''}</div></div>`,
+    {sign:'',color:'var(--green)'});
 }
 
 function renderEgresos(){
@@ -1664,8 +1727,9 @@ function renderEgresos(){
   if(busq)egFiltered=egFiltered.filter(e=>(e.concepto||'').toLowerCase().includes(busq));
   const el=document.getElementById('lista-egresos');
   if(!egFiltered.length){el.innerHTML='<div class="empty">Sin egresos en efectivo.</div>';return;}
-  el.innerHTML=`<table><thead><tr>${thFecha('egresos')}<th>Concepto</th><th>Categoría</th><th>Cuenta</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>`+
-    buildRows([...egFiltered],'egresos',i=>`<td>${i.concepto||'—'}</td><td><span class="badge egreso">${i.cat||'Otros'}</span></td><td>${i.cuenta?`<span class="acct-pill" style="background:${COLORS[i.cuenta]||'#888'}22;color:${COLORS[i.cuenta]||'#888'}">${i.cuenta}</span>`:'-'}</td><td style="text-align:right"><div class="td-main" style="color:var(--red)">-${fmtARS(i.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(i.usd)}${i.rawCur==='ars'?' · en $':''}</div></td>`)+`</tbody></table>`;
+  renderDayGroups(el,egFiltered,'egresos',
+    e=>`<div class="day-row-main"><div class="td-main">${e.concepto||'—'}</div><div class="day-row-tags"><span class="badge egreso">${e.cat||'Otros'}</span>${e.cuenta?`<span class="acct-pill" style="background:${COLORS[e.cuenta]||'#888'}22;color:${COLORS[e.cuenta]||'#888'}">${e.cuenta}</span>`:''}</div></div><div class="day-row-amt"><div class="td-main" style="color:var(--red)">-${fmtARS(e.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(e.usd)}${e.rawCur==='ars'?' · en $':''}</div></div>`,
+    {sign:'-',color:'var(--red)'});
 }
 
 function renderAhorros(){
