@@ -42,10 +42,10 @@
   --text: #F7EDE2;
   --text2: #BBA28E;
   --text3: #8A715E;
-  --blue: #FF7A1A;
-  --blue-hover: #E8660A;
-  --blue-bg: rgba(255,122,26,0.09);
-  --blue-border: rgba(255,122,26,0.20);
+  --blue: #9D5CF5;
+  --blue-hover: #8A45E8;
+  --blue-bg: rgba(157,92,245,0.09);
+  --blue-border: rgba(157,92,245,0.20);
   --green: #6FB85C;
   --red: #F0573C;
   --red-bg: rgba(240,87,60,0.09);
@@ -61,7 +61,7 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .sidebar { width: var(--sidebar-w); min-height: 100vh; min-height: 100dvh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
 .sidebar-logo { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
 .logo-brand { display: flex; align-items: center; gap: 10px; }
-.logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #FFB07A 0%, var(--blue) 100%); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0; letter-spacing: -0.04em; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; box-shadow: 0 4px 12px rgba(255,122,26,0.35); }
+.logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #C9A6FF 0%, var(--blue) 100%); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0; letter-spacing: -0.04em; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; box-shadow: 0 4px 12px rgba(157,92,245,0.35); }
 .logo-text { font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
 .logo-date { font-size: 10px; color: var(--text3); margin-top: 5px; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.02em; }
 .sidebar-nav { padding: 10px 8px; flex: 1; }
@@ -80,18 +80,18 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .cotiz-input { width: 60px !important; padding: 5px 7px !important; font-size: 11px !important; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace !important; border-radius: 7px !important; }
 .cotiz-prom { font-size: 11px; color: var(--text3); font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; margin-bottom: 8px; }
 .cotiz-prom strong { color: var(--text2); }
-.cotiz-btn { width: 100%; font-size: 12px; padding: 7px 10px; border-radius: 8px; border: none; background: var(--blue); color: #fff; cursor: pointer; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 600; transition: all 0.15s; box-shadow: 0 2px 8px rgba(255,122,26,0.25); }
-.cotiz-btn:hover { background: var(--blue-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,122,26,0.35); }
+.cotiz-btn { width: 100%; font-size: 12px; padding: 7px 10px; border-radius: 8px; border: none; background: var(--blue); color: #fff; cursor: pointer; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 600; transition: all 0.15s; box-shadow: 0 2px 8px rgba(157,92,245,0.25); }
+.cotiz-btn:hover { background: var(--blue-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(157,92,245,0.35); }
 
 /* ── MAIN ── */
 .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 
 /* ── HERO ── */
-.header-hero { background: linear-gradient(145deg, #2A1B10 0%, #1E1209 55%, #140D07 100%); border: 1px solid rgba(255,122,26,0.16); border-radius: var(--radius); padding: 30px 34px 26px; position: relative; overflow: hidden; margin-bottom: 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 20px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06); }
-.header-hero::before { content: ''; position: absolute; top: -100px; right: -80px; width: 450px; height: 450px; background: radial-gradient(ellipse, rgba(255,122,26,0.13) 0%, transparent 62%); pointer-events: none; }
+.header-hero { background: linear-gradient(145deg, #1E1330 0%, #160E24 55%, #0C0815 100%); border: 1px solid rgba(157,92,245,0.16); border-radius: var(--radius); padding: 30px 34px 26px; position: relative; overflow: hidden; margin-bottom: 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 20px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06); }
+.header-hero::before { content: ''; position: absolute; top: -100px; right: -80px; width: 450px; height: 450px; background: radial-gradient(ellipse, rgba(157,92,245,0.13) 0%, transparent 62%); pointer-events: none; }
 .header-hero::after { content: ''; position: absolute; bottom: -60px; left: 25%; width: 280px; height: 220px; background: radial-gradient(ellipse, rgba(111,184,92,0.07) 0%, transparent 65%); pointer-events: none; }
 .hero-label { font-size: 9px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); opacity: 0.8; margin-bottom: 12px; }
-.hero-balance { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 50px; font-weight: 700; letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 8px; word-break: break-word; background: linear-gradient(135deg, #FFC29A 0%, var(--blue) 70%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-balance { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 50px; font-weight: 700; letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 8px; word-break: break-word; background: linear-gradient(135deg, #D8C2FF 0%, var(--blue) 70%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .hero-balance.negative { background: linear-gradient(135deg, #FFA07A 0%, var(--red) 70%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .hero-sub { font-size: 12px; color: var(--text3); font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.01em; }
 .hero-mqv-section { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
@@ -137,7 +137,7 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .mc-val.purple { color: var(--blue); }
 
 /* ── MQV CARD ── */
-.mqv-card { background: linear-gradient(135deg, rgba(255,122,26,0.09) 0%, rgba(255,122,26,0.04) 100%); border: 1px solid var(--blue-border); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap; box-shadow: 0 0 0 1px rgba(255,122,26,0.06) inset; }
+.mqv-card { background: linear-gradient(135deg, rgba(157,92,245,0.09) 0%, rgba(157,92,245,0.04) 100%); border: 1px solid var(--blue-border); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap; box-shadow: 0 0 0 1px rgba(157,92,245,0.06) inset; }
 .mqv-main .mqv-label { font-size: 9px; color: var(--blue); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; opacity: 0.85; }
 .mqv-main .mqv-val { font-size: 32px; font-weight: 700; color: var(--text); font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; line-height: 1; word-break: break-all; letter-spacing: -0.03em; }
 .mqv-main .mqv-sub { font-size: 12px; color: var(--text3); margin-top: 6px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
@@ -147,15 +147,15 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 /* ── FORMS ── */
 label { font-size: 10px; color: var(--text3); display: block; margin-bottom: 5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 input[type=text], input[type=number], input[type=date], select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-size: 13px; padding: 10px 13px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
-input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(255,122,26,0.14); }
+input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(157,92,245,0.14); }
 select option { background: var(--surface2); }
 .hint { font-size: 11px; color: var(--text3); margin-top: 4px; min-height: 16px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 
 /* ── BUTTONS ── */
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border2); background: var(--surface2); color: var(--text); transition: all 0.16s; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.01em; }
 .btn:hover { background: var(--surface3); transform: translateY(-1px); }
-.btn.primary { background: var(--blue); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(255,122,26,0.30); }
-.btn.primary:hover { background: var(--blue-hover); box-shadow: 0 4px 16px rgba(255,122,26,0.42); transform: translateY(-1px); }
+.btn.primary { background: var(--blue); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(157,92,245,0.30); }
+.btn.primary:hover { background: var(--blue-hover); box-shadow: 0 4px 16px rgba(157,92,245,0.42); transform: translateY(-1px); }
 .btn.danger { background: var(--red); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(240,87,60,0.25); }
 .btn.danger:hover { opacity: 0.9; transform: translateY(-1px); }
 .btn.success { background: var(--green); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(111,184,92,0.25); }
@@ -183,7 +183,7 @@ table { width: 100%; border-collapse: collapse; font-size: 13px; }
 thead th { background: rgba(37,26,19,0.9); color: var(--text3); font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; padding: 11px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
 tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); }
 tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover { background: rgba(255,122,26,0.05); box-shadow: inset 3px 0 0 rgba(255,122,26,0.35); }
+tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rgba(157,92,245,0.35); }
 .td-main { font-weight: 600; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; white-space: nowrap; letter-spacing: -0.01em; }
 .td-sub { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; white-space: nowrap; }
 
@@ -191,7 +191,7 @@ tbody tr:hover { background: rgba(255,122,26,0.05); box-shadow: inset 3px 0 0 rg
 .badge { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; }
 .badge.ingreso { background: rgba(111,184,92,0.13); color: var(--green); }
 .badge.egreso { background: rgba(240,87,60,0.13); color: var(--red); }
-.badge.ahorro { background: rgba(255,122,26,0.13); color: var(--blue); }
+.badge.ahorro { background: rgba(157,92,245,0.13); color: var(--blue); }
 .badge.tarjeta { background: rgba(240,87,60,0.15); color: var(--red); }
 .badge.pago { background: rgba(111,184,92,0.13); color: var(--green); }
 .badge.repago { background: rgba(139,124,246,0.13); color: #9F8FFF; }
@@ -206,7 +206,7 @@ tbody tr:hover { background: rgba(255,122,26,0.05); box-shadow: inset 3px 0 0 rg
 .tarjeta-body.open { display: block; }
 .mode-tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
 .mode-tab { font-size: 12px; padding: 6px 15px; border-radius: 7px; border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 500; transition: all 0.15s; letter-spacing: -0.01em; }
-.mode-tab.active { background: var(--blue); color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(255,122,26,0.30); }
+.mode-tab.active { background: var(--blue); color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(157,92,245,0.30); }
 
 /* ── CHARTS ── */
 .chart-wrap { position: relative; width: 100%; height: 230px; }
@@ -278,7 +278,7 @@ tbody tr:hover { background: rgba(255,122,26,0.05); box-shadow: inset 3px 0 0 rg
 @media (max-width: 860px) {
   /* topbar */
   .topbar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: calc(64px + env(safe-area-inset-top, 0px)); background: rgba(28,20,16,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 150; align-items: flex-end; padding: 0 18px 12px; gap: 12px; }
-  .topbar-brand { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, #FFB07A 0%, var(--blue) 100%); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; font-family: 'SF Mono', ui-monospace, monospace; letter-spacing: -0.04em; box-shadow: 0 3px 10px rgba(255,122,26,0.35); flex-shrink: 0; }
+  .topbar-brand { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, #C9A6FF 0%, var(--blue) 100%); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; font-family: 'SF Mono', ui-monospace, monospace; letter-spacing: -0.04em; box-shadow: 0 3px 10px rgba(157,92,245,0.35); flex-shrink: 0; }
   .topbar-logo { font-size: 18px; font-weight: 700; color: var(--text); flex: 1; letter-spacing: -0.02em; }
   .hamburger { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 12px; color: var(--text2); border-radius: 10px; transition: background 0.15s; }
   .hamburger:hover { background: var(--surface2); }
@@ -474,7 +474,7 @@ tbody tr:hover { background: rgba(255,122,26,0.05); box-shadow: inset 3px 0 0 rg
 
 <!-- AUTH OVERLAY (se oculta al verificar sesión) -->
 <div id="auth-overlay" style="position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center">
-  <div style="width:14px;height:14px;border:2px solid rgba(255,122,26,0.3);border-top-color:var(--blue);border-radius:50%;animation:authSpin 0.7s linear infinite"></div>
+  <div style="width:14px;height:14px;border:2px solid rgba(157,92,245,0.3);border-top-color:var(--blue);border-radius:50%;animation:authSpin 0.7s linear infinite"></div>
 </div>
 <style>@keyframes authSpin{to{transform:rotate(360deg)}}</style>
 
@@ -533,7 +533,7 @@ tbody tr:hover { background: rgba(255,122,26,0.05); box-shadow: inset 3px 0 0 rg
     <div id="cotiz-update-time" style="font-size:10px;color:var(--text3);font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-bottom:6px;min-height:14px"></div>
     <button id="fetch-dolar-btn" class="cotiz-btn" onclick="fetchDolar()" style="margin-bottom:6px">↻ Traer cotización</button>
     <button class="cotiz-btn" onclick="updateCotiz()" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text2)">Aplicar manual</button>
-    <button onclick="openResumenModal()" style="width:100%;font-size:11px;padding:8px 10px;margin-top:8px;border-radius:8px;border:1px solid rgba(255,122,26,0.3);background:rgba(255,122,26,0.08);color:var(--blue);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:600;transition:background 0.15s" onmouseover="this.style.background='rgba(255,122,26,0.16)'" onmouseout="this.style.background='rgba(255,122,26,0.08)'">↓ Descargar resumen PDF</button>
+    <button onclick="openResumenModal()" style="width:100%;font-size:11px;padding:8px 10px;margin-top:8px;border-radius:8px;border:1px solid rgba(157,92,245,0.3);background:rgba(157,92,245,0.08);color:var(--blue);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:600;transition:background 0.15s" onmouseover="this.style.background='rgba(157,92,245,0.16)'" onmouseout="this.style.background='rgba(157,92,245,0.08)'">↓ Descargar resumen PDF</button>
     <button onclick="openMFAModal()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">🔑 Gestionar 2FA</button>
     <button onclick="doLogout()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">→ Cerrar sesión</button>
   </div>
@@ -795,9 +795,9 @@ tbody tr:hover { background: rgba(255,122,26,0.05); box-shadow: inset 3px 0 0 rg
           <div><label>Fecha límite</label><input type="date" id="meta-fecha"></div>
           <div><label>Color</label>
             <select id="meta-color">
-              <option value="#FF7A1A">Azul</option>
+              <option value="#9D5CF5">Azul</option>
               <option value="#00A650">Verde</option>
-              <option value="#FF7A1A">Naranja</option>
+              <option value="#9D5CF5">Naranja</option>
               <option value="#8B7CF6">Violeta</option>
               <option value="#F0573C">Rojo</option>
               <option value="#00D4A1">Turquesa</option>
@@ -926,7 +926,7 @@ Chart.defaults.font.size=12;
 let INSTRUMENTOS=[];
 let COLORS={};
 let ICONS={};
-const CAT_COLORS={'Alimentación':'#FF8A3D','Entretenimiento':'#C77DBB','Transporte':'#E2763C','Salud':'#F0573C','Vivienda':'#C2622A','Servicios':'#FFB066','Otros':'#A8907C'};
+const CAT_COLORS={'Alimentación':'#A06BFF','Entretenimiento':'#D07AD0','Transporte':'#7C6BFF','Salud':'#F0573C','Vivienda':'#6E4FC2','Servicios':'#C9A6FF','Otros':'#A8907C'};
 const TC_COLORS={Visa:'#1A56DB',Mastercard:'#E25718',Amex:'#00A4A6'};
 let ARS_INSTR=new Set();
 
@@ -1503,7 +1503,7 @@ function renderPatrimonio(){
   if(chartPatEvo) chartPatEvo.destroy();
   const canvPE=document.getElementById('chartPatEvo');
   if(canvPE && snaps.length>1){
-    chartPatEvo=new Chart(canvPE.getContext('2d'),{type:'line',data:{labels:snaps.map(s=>s.label),datasets:[{data:snaps.map(s=>s.usd*USD_ARS),borderColor:'#FF7A1A',borderWidth:2,backgroundColor:'rgba(255,122,26,0.08)',fill:true,tension:0.4,pointBackgroundColor:'#FF7A1A',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:scalesARS()}});
+    chartPatEvo=new Chart(canvPE.getContext('2d'),{type:'line',data:{labels:snaps.map(s=>s.label),datasets:[{data:snaps.map(s=>s.usd*USD_ARS),borderColor:'#9D5CF5',borderWidth:2,backgroundColor:'rgba(157,92,245,0.08)',fill:true,tension:0.4,pointBackgroundColor:'#9D5CF5',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:scalesARS()}});
   }
 }
 
@@ -1960,7 +1960,7 @@ function setResumenPeriodo(tipo){
     if(!btn) return;
     const on=k===tipo;
     btn.style.border=on?'1px solid var(--blue)':'1px solid var(--border2)';
-    btn.style.background=on?'rgba(255,122,26,0.12)':'transparent';
+    btn.style.background=on?'rgba(157,92,245,0.12)':'transparent';
     btn.style.color=on?'var(--blue)':'var(--text2)';
   });
   const ci=document.getElementById('rp-custom-inputs');
@@ -2025,15 +2025,15 @@ function downloadResumenMes(desde, hasta, label){
 @font-face{font-family:'Inter';font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-700-normal.woff2') format('woff2')}
 @font-face{font-family:'Inter';font-weight:800;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-800-normal.woff2') format('woff2')}
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#000000;--surf:#141210;--surf2:#1C1916;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.12);--tx:#F7EDE2;--tx2:#BBA28E;--tx3:#8A715E;--blue:#FF7A1A;--green:#6FB85C;--red:#F0573C}
+:root{--bg:#000000;--surf:#141210;--surf2:#1C1916;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.12);--tx:#F7EDE2;--tx2:#BBA28E;--tx3:#8A715E;--blue:#9D5CF5;--green:#6FB85C;--red:#F0573C}
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:13px;color:var(--tx);background:var(--bg);padding:36px 40px;max-width:860px;margin:0 auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 h1{font-size:22px;font-weight:800;color:var(--tx);letter-spacing:-0.03em;margin-bottom:3px}
 h2{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:var(--tx3);margin:26px 0 10px;display:flex;align-items:center;gap:8px}
 h2::before{content:'';width:3px;height:10px;background:var(--blue);border-radius:2px;opacity:.5;flex-shrink:0}
 h2::after{content:'';flex:1;height:1px;background:var(--bd)}
-.header{margin-bottom:26px;padding:20px 24px;background:linear-gradient(145deg,#2A1B10 0%,#1E1209 55%,#140D07 100%);border:1px solid rgba(255,122,26,0.16);border-radius:12px;position:relative;overflow:hidden}
-.header::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;background:radial-gradient(ellipse,rgba(255,122,26,0.12) 0%,transparent 65%);pointer-events:none}
-.header-title{font-size:22px;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#FFC29A 0%,var(--blue) 70%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+.header{margin-bottom:26px;padding:20px 24px;background:linear-gradient(145deg,#1E1330 0%,#160E24 55%,#0C0815 100%);border:1px solid rgba(157,92,245,0.16);border-radius:12px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;background:radial-gradient(ellipse,rgba(157,92,245,0.12) 0%,transparent 65%);pointer-events:none}
+.header-title{font-size:22px;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#D8C2FF 0%,var(--blue) 70%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
 .header-sub{font-size:11px;color:var(--tx3);margin-top:5px;position:relative}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
 .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
@@ -2047,7 +2047,7 @@ table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:4px}
 thead th{background:rgba(37,26,19,.9);color:var(--tx3);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;padding:9px 14px;text-align:left;border-bottom:1px solid var(--bd)}
 tbody td{padding:10px 14px;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--tx)}
 tbody tr:last-child td{border-bottom:none}
-tbody tr:hover{background:rgba(255,122,26,.04)}
+tbody tr:hover{background:rgba(157,92,245,.04)}
 .ta-right{text-align:right}
 .tx3{color:var(--tx3);font-size:11px}
 .badge{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:0.05em}
@@ -2055,8 +2055,8 @@ tbody tr:hover{background:rgba(255,122,26,.04)}
 .b-eg{background:rgba(240,87,60,.13);color:var(--red)}
 .b-rep{background:rgba(139,124,246,.13);color:#9F8FFF}
 .b-pago{background:rgba(111,184,92,.13);color:var(--green)}
-.b-dep{background:rgba(255,122,26,.13);color:var(--blue)}
-.print-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:22px;padding:9px 20px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 10px rgba(255,122,26,.3)}
+.b-dep{background:rgba(157,92,245,.13);color:var(--blue)}
+.print-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:22px;padding:9px 20px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 10px rgba(157,92,245,.3)}
 .empty-row td{color:var(--tx3);text-align:center;padding:16px;font-style:italic}
 @page{margin:14mm 16mm;size:A4 portrait}
 @media print{
@@ -2188,7 +2188,7 @@ async function generateResumenPDFNative(d){
     if(d.isCurrentMonth) PH+=cardSecH;
     PH=Math.ceil(PH)+4;
     const doc=new jsPDF({unit:'pt',format:[PW,PH],orientation:'portrait',compress:true});
-    const C={bg:[0,0,0],surf:[22,20,18],bd:[58,48,40],tx:[247,237,226],tx3:[138,113,94],blue:[255,122,26],green:[111,184,92],red:[240,87,60],violet:[199,125,187]};
+    const C={bg:[0,0,0],surf:[20,18,24],bd:[52,46,64],tx:[247,237,226],tx3:[140,124,150],blue:[157,92,245],green:[111,184,92],red:[240,87,60],violet:[208,122,208]};
     // sanea caracteres fuera de Latin-1 (las fuentes estándar de jsPDF no los soportan)
     const S=t=>String(t==null?'':t).replace(/—/g,'-').replace(/[…]/g,'...').replace(/≈/g,'~').replace(/[“”]/g,'"').replace(/[’]/g,"'");
     const setTx=c=>doc.setTextColor(c[0],c[1],c[2]);
@@ -2209,7 +2209,7 @@ async function generateResumenPDFNative(d){
     };
     // ── header ──
     const hH=62;
-    setFill([28,18,8]); doc.roundedRect(M,y,CW,hH,8,8,'F');
+    setFill([30,19,48]); doc.roundedRect(M,y,CW,hH,8,8,'F');
     setTx(C.blue); doc.setFont(F,'bold'); doc.setFontSize(16);
     T(fit('Resumen financiero · '+(d.label.charAt(0).toUpperCase()+d.label.slice(1)),CW-32),M+16,y+27);
     setTx(C.tx3); doc.setFont(F,'normal'); doc.setFontSize(8.5);
@@ -2529,7 +2529,7 @@ async function openMFAModal(){
       <div style="font-size:9px;color:var(--text3);margin-bottom:14px;font-family:'SF Mono',ui-monospace,monospace;word-break:break-all;text-align:center;letter-spacing:0.04em">${data.totp.secret}</div>
       <input id="mfa-enroll-code" type="text" inputmode="numeric" maxlength="6" placeholder="Código de 6 dígitos" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:20px;padding:12px;font-family:'SF Mono',monospace;text-align:center;letter-spacing:0.18em;outline:none;margin-bottom:8px">
       <div id="mfa-enroll-err" style="font-size:12px;color:var(--red);min-height:14px;text-align:center;margin-bottom:10px"></div>
-      <button onclick="enrollMFA()" id="mfa-enroll-btn" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 12px rgba(255,122,26,0.35)">Activar 2FA</button>`;
+      <button onclick="enrollMFA()" id="mfa-enroll-btn" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 12px rgba(157,92,245,0.35)">Activar 2FA</button>`;
     const inp=document.getElementById('mfa-enroll-code');
     inp.addEventListener('input',function(){ this.value=this.value.replace(/\D/g,''); });
     setTimeout(()=>inp.focus(),100);
@@ -2699,7 +2699,7 @@ checkAuth();
     <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:5px">¿Seguís ahí?</div>
     <div style="font-size:12px;color:var(--text2);margin-bottom:4px">Tu sesión se cerrará en</div>
     <div id="idle-countdown" style="font-size:36px;font-weight:800;font-family:'SF Mono',ui-monospace,monospace;color:var(--blue);margin:14px 0;letter-spacing:-0.02em">2:00</div>
-    <button onclick="continueSession()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;box-shadow:0 2px 12px rgba(255,122,26,0.35)">Continuar sesión</button>
+    <button onclick="continueSession()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;box-shadow:0 2px 12px rgba(157,92,245,0.35)">Continuar sesión</button>
     <button onclick="doLogout()" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:13px;cursor:pointer;font-family:inherit">Cerrar sesión ahora</button>
   </div>
 </div>
@@ -2713,7 +2713,7 @@ checkAuth();
     </div>
     <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--text3);margin-bottom:10px">Período</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px">
-      <button id="rpbtn-mes-actual" onclick="setResumenPeriodo('mes-actual')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--blue);background:rgba(255,122,26,0.12);color:var(--blue);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Mes actual</button>
+      <button id="rpbtn-mes-actual" onclick="setResumenPeriodo('mes-actual')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--blue);background:rgba(157,92,245,0.12);color:var(--blue);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Mes actual</button>
       <button id="rpbtn-mes-anterior" onclick="setResumenPeriodo('mes-anterior')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Mes anterior</button>
       <button id="rpbtn-30dias" onclick="setResumenPeriodo('30dias')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Últimos 30 días</button>
       <button id="rpbtn-custom" onclick="setResumenPeriodo('custom')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Personalizado</button>
@@ -2722,7 +2722,7 @@ checkAuth();
       <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);display:block;margin-bottom:5px">Desde</label><input type="date" id="rp-desde" style="width:100%;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12px;font-family:inherit"></div>
       <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);display:block;margin-bottom:5px">Hasta</label><input type="date" id="rp-hasta" style="width:100%;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12px;font-family:inherit"></div>
     </div>
-    <button onclick="descargarResumenPDF()" style="width:100%;padding:11px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:-0.01em;box-shadow:0 2px 12px rgba(255,122,26,0.35)">↓ Descargar PDF</button>
+    <button onclick="descargarResumenPDF()" style="width:100%;padding:11px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:-0.01em;box-shadow:0 2px 12px rgba(157,92,245,0.35)">↓ Descargar PDF</button>
   </div>
 </div>
 
