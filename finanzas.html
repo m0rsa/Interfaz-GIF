@@ -280,7 +280,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
   .topbar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: calc(64px + env(safe-area-inset-top, 0px)); background: rgba(15,13,20,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 150; align-items: flex-end; padding: 0 18px 12px; gap: 12px; }
   .topbar-brand { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, #C9A6FF 0%, var(--blue) 100%); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; font-family: 'SF Mono', ui-monospace, monospace; letter-spacing: -0.04em; box-shadow: 0 3px 10px rgba(157,92,245,0.35); flex-shrink: 0; }
   .topbar-logo { font-size: 18px; font-weight: 700; color: var(--text); flex: 1; letter-spacing: -0.02em; }
-  .hamburger { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 12px; color: var(--text2); border-radius: 10px; transition: background 0.15s; }
+  .hamburger { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 12px; color: var(--blue); border-radius: 10px; transition: background 0.15s; }
   .hamburger:hover { background: var(--surface2); }
   .hamburger span { width: 26px; height: 2.5px; background: currentColor; border-radius: 2px; display: block; transition: all 0.2s; }
   /* sidebar slides from left */
@@ -927,7 +927,7 @@ let INSTRUMENTOS=[];
 let COLORS={};
 let ICONS={};
 const CAT_COLORS={'Alimentación':'#A06BFF','Entretenimiento':'#D07AD0','Transporte':'#7C6BFF','Salud':'#F0573C','Vivienda':'#6E4FC2','Servicios':'#C9A6FF','Otros':'#A8907C'};
-const TC_COLORS={Visa:'#1A56DB',Mastercard:'#E25718',Amex:'#00A4A6'};
+const TC_COLORS={Visa:'#7C6BFF',Mastercard:'#C77DD6',Amex:'#9D5CF5'};
 let ARS_INSTR=new Set();
 
 /* ── SUPABASE ── */
