@@ -1014,7 +1014,7 @@ function updateCotizDisplay(){
   document.getElementById('cotiz-c').value=data.cotizC;
   document.getElementById('cotiz-v').value=data.cotizV;
   USD_C=data.cotizC; USD_V=data.cotizV; USD_ARS=(USD_C+USD_V)/2;
-  document.getElementById('cotiz-prom').innerHTML='Prom. <strong>$'+Math.round(USD_ARS).toLocaleString('es-AR')+'</strong>';
+  document.getElementById('cotiz-prom').innerHTML='Prom. <strong>'+fmtARS(USD_ARS)+'</strong>';
 }
 
 /* ── FETCH DOLAR API ── */
