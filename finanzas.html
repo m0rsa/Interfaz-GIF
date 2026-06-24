@@ -2110,35 +2110,53 @@ async function guardarPDF(){
   w.document.close();
 }
 
-// Genera el PDF directamente (mobile): renderiza en un iframe oculto y descarga, sin popup.
+// Genera el PDF directamente (mobile): renderiza en un iframe VISIBLE (a tamaño real,
+// como hace el popup en desktop) tapado por un overlay de carga, y descarga sin popup.
 async function generateResumenPDFDirect(styleBlock, bodyContent, filename){
-  toast('Generando PDF…','info');
-  try{ await loadHtml2Pdf(); }catch(e){ toast('No se pudo cargar el generador de PDF.','error'); return; }
+  // Overlay de carga (tapa el iframe de render para que el usuario no vea el "flash")
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:#06080F;display:flex;align-items:center;justify-content:center;gap:10px;color:#ECF1FF;font-family:\'SF Pro\',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-size:15px;font-weight:600';
+  overlay.innerHTML='<div style="width:16px;height:16px;border:2px solid rgba(74,140,245,0.3);border-top-color:#4A8CF5;border-radius:50%;animation:authSpin 0.7s linear infinite"></div> Generando PDF…';
+  document.body.appendChild(overlay);
+
+  try{ await loadHtml2Pdf(); }catch(e){ overlay.remove(); toast('No se pudo cargar el generador de PDF.','error'); return; }
+
+  // iframe de render: VISIBLE y a tamaño real (debajo del overlay). Esto evita que
+  // html2canvas capture un elemento off-screen y salga en blanco/cortado en mobile.
   const iframe=document.createElement('iframe');
   iframe.setAttribute('aria-hidden','true');
-  iframe.style.cssText='position:fixed;left:-99999px;top:0;width:860px;height:200px;border:0;opacity:0.01;pointer-events:none;z-index:-1';
+  iframe.style.cssText='position:fixed;top:0;left:0;width:860px;height:'+window.innerHeight+'px;border:0;z-index:99998;background:#06080F';
   document.body.appendChild(iframe);
   try{
     const idoc=iframe.contentDocument||iframe.contentWindow.document;
     idoc.open();
     idoc.write('<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'+styleBlock+'</head><body style="width:860px;margin:0">'+bodyContent+'</body></html>');
     idoc.close();
+    // esperar fuentes + layout
     try{ if(idoc.fonts&&idoc.fonts.ready) await idoc.fonts.ready; }catch(e){}
-    await new Promise(r=>setTimeout(r,450));
+    await new Promise(r=>setTimeout(r,500));
     const b=idoc.body;
     b.style.margin='0'; b.style.maxWidth='none'; b.style.width='860px';
-    const H=b.scrollHeight, MM=0.264583;
-    iframe.style.height=(H+40)+'px'; // asegura render completo para html2canvas
+    const W=860, H=Math.ceil(b.scrollHeight), MM=0.264583;
+    iframe.style.height=H+'px'; // el iframe ocupa todo el alto del contenido (render completo)
+    await new Promise(r=>setTimeout(r,80));
+    // capar el scale para no exceder los límites de canvas del navegador mobile
+    // (iOS ~16.7M px de área y ~4096px por lado): si el canvas se pasa, sale en blanco.
+    const dpr=window.devicePixelRatio||1;
+    let scale=Math.min(2,Math.max(1,dpr));
+    const MAX_SIDE=4000, MAX_AREA=16000000;
+    scale=Math.min(scale, MAX_SIDE/Math.max(W,H), Math.sqrt(MAX_AREA/(W*H)));
+    if(scale<0.5) scale=0.5;
     await html2pdf().set({
       margin:0,
       filename:filename,
-      image:{type:'jpeg',quality:0.98},
-      html2canvas:{scale:2,useCORS:true,backgroundColor:'#06080F',logging:false,width:860,windowWidth:860},
-      jsPDF:{unit:'mm',format:[860*MM,H*MM],orientation:'portrait'}
+      image:{type:'jpeg',quality:0.96},
+      html2canvas:{scale,useCORS:true,backgroundColor:'#06080F',logging:false,width:W,height:H,windowWidth:W,windowHeight:H,scrollX:0,scrollY:0},
+      jsPDF:{unit:'mm',format:[W*MM,H*MM],orientation:'portrait'}
     }).from(b).save();
     toast('PDF descargado.','success');
   }catch(e){ toast('No se pudo generar el PDF.','error'); }
-  finally{ iframe.remove(); }
+  finally{ iframe.remove(); overlay.remove(); }
 }
 
 /* ── RENDIMIENTOS ── */
