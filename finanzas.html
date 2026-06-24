@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#060911">
+<meta name="theme-color" content="#120C08">
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -33,22 +33,22 @@
 @font-face { font-family: 'SF Mono'; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-700-normal.woff2') format('woff2'); }
 
 :root {
-  --bg: #060911;
-  --surface: #0C1220;
-  --surface2: #101928;
-  --surface3: #172030;
-  --border: rgba(255,255,255,0.055);
-  --border2: rgba(255,255,255,0.10);
-  --text: #ECF1FF;
-  --text2: #6A82A8;
-  --text3: #3C5070;
-  --blue: #4A8CF5;
-  --blue-hover: #3878EE;
-  --blue-bg: rgba(74,140,245,0.09);
-  --blue-border: rgba(74,140,245,0.20);
-  --green: #12C98A;
-  --red: #EF4858;
-  --red-bg: rgba(239,72,88,0.09);
+  --bg: #120C08;
+  --surface: #1C1410;
+  --surface2: #251A13;
+  --surface3: #30231A;
+  --border: rgba(255,238,224,0.07);
+  --border2: rgba(255,238,224,0.13);
+  --text: #F7EDE2;
+  --text2: #BBA28E;
+  --text3: #8A715E;
+  --blue: #F59E3C;
+  --blue-hover: #E8861F;
+  --blue-bg: rgba(245,158,60,0.09);
+  --blue-border: rgba(245,158,60,0.20);
+  --green: #6FB85C;
+  --red: #F0573C;
+  --red-bg: rgba(240,87,60,0.09);
   --sidebar-w: 226px;
   --radius: 14px;
   --radius-sm: 9px;
@@ -61,7 +61,7 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .sidebar { width: var(--sidebar-w); min-height: 100vh; min-height: 100dvh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
 .sidebar-logo { padding: 24px 20px 18px; border-bottom: 1px solid var(--border); }
 .logo-brand { display: flex; align-items: center; gap: 10px; }
-.logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #5C9FFF 0%, var(--blue) 100%); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0; letter-spacing: -0.04em; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; box-shadow: 0 4px 12px rgba(74,140,245,0.35); }
+.logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #FFC074 0%, var(--blue) 100%); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0; letter-spacing: -0.04em; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; box-shadow: 0 4px 12px rgba(245,158,60,0.35); }
 .logo-text { font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
 .logo-date { font-size: 10px; color: var(--text3); margin-top: 5px; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; letter-spacing: 0.02em; }
 .sidebar-nav { padding: 10px 8px; flex: 1; }
@@ -80,27 +80,26 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .cotiz-input { width: 60px !important; padding: 5px 7px !important; font-size: 11px !important; font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace !important; border-radius: 7px !important; }
 .cotiz-prom { font-size: 11px; color: var(--text3); font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace; margin-bottom: 8px; }
 .cotiz-prom strong { color: var(--text2); }
-.cotiz-btn { width: 100%; font-size: 12px; padding: 7px 10px; border-radius: 8px; border: none; background: var(--blue); color: #fff; cursor: pointer; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 600; transition: all 0.15s; box-shadow: 0 2px 8px rgba(74,140,245,0.25); }
-.cotiz-btn:hover { background: var(--blue-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(74,140,245,0.35); }
+.cotiz-btn { width: 100%; font-size: 12px; padding: 7px 10px; border-radius: 8px; border: none; background: var(--blue); color: #fff; cursor: pointer; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 600; transition: all 0.15s; box-shadow: 0 2px 8px rgba(245,158,60,0.25); }
+.cotiz-btn:hover { background: var(--blue-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,158,60,0.35); }
 
 /* ── MAIN ── */
 .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 
 /* ── HERO ── */
-.header-hero { background: linear-gradient(145deg, #101D35 0%, #0B1526 55%, #080E1C 100%); border: 1px solid rgba(74,140,245,0.16); border-radius: var(--radius); padding: 30px 34px 26px; position: relative; overflow: hidden; margin-bottom: 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 20px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06); }
-.header-hero::before { content: ''; position: absolute; top: -100px; right: -80px; width: 450px; height: 450px; background: radial-gradient(ellipse, rgba(74,140,245,0.13) 0%, transparent 62%); pointer-events: none; }
-.header-hero::after { content: ''; position: absolute; bottom: -60px; left: 25%; width: 280px; height: 220px; background: radial-gradient(ellipse, rgba(18,201,138,0.07) 0%, transparent 65%); pointer-events: none; }
+.header-hero { background: linear-gradient(145deg, #2A1B10 0%, #1E1209 55%, #140D07 100%); border: 1px solid rgba(245,158,60,0.16); border-radius: var(--radius); padding: 30px 34px 26px; position: relative; overflow: hidden; margin-bottom: 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 20px 60px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06); }
+.header-hero::before { content: ''; position: absolute; top: -100px; right: -80px; width: 450px; height: 450px; background: radial-gradient(ellipse, rgba(245,158,60,0.13) 0%, transparent 62%); pointer-events: none; }
+.header-hero::after { content: ''; position: absolute; bottom: -60px; left: 25%; width: 280px; height: 220px; background: radial-gradient(ellipse, rgba(111,184,92,0.07) 0%, transparent 65%); pointer-events: none; }
 .hero-label { font-size: 9px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); opacity: 0.8; margin-bottom: 12px; }
-.hero-balance { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 50px; font-weight: 700; letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 8px; word-break: break-word; background: linear-gradient(135deg, #7EC0FF 0%, var(--blue) 70%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.hero-balance.negative { background: linear-gradient(135deg, #FF8898 0%, var(--red) 70%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-balance { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 50px; font-weight: 700; letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 8px; word-break: break-word; background: linear-gradient(135deg, #FFCB8C 0%, var(--blue) 70%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-balance.negative { background: linear-gradient(135deg, #FFA07A 0%, var(--red) 70%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .hero-sub { font-size: 12px; color: var(--text3); font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.01em; }
 .hero-mqv-section { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
 .hero-mqv-label { font-size: 9px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); opacity: 0.7; margin-bottom: 6px; }
 .hero-mqv-val { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.025em; line-height: 1; }
 .hero-mqv-sub { font-size: 11px; color: var(--text3); font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; margin-top: 4px; }
-.hero-stats { display: flex; gap: 0; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
-.hero-stat { padding-right: 30px; margin-right: 30px; border-right: 1px solid rgba(255,255,255,0.07); }
-.hero-stat:last-child { border-right: none; margin-right: 0; }
+.hero-stats { display: flex; gap: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.hero-stat { flex: 1 1 auto; min-width: 150px; background: rgba(255,238,224,0.04); border: 1px solid var(--border2); border-radius: 13px; padding: 13px 16px; }
 .hero-stat .hs-label { font-size: 9px; color: var(--text3); margin-bottom: 7px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
 .hero-stat .hs-val { font-size: 17px; font-weight: 600; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; line-height: 1.2; color: var(--text); }
 .hero-stat .hs-sub { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
@@ -122,14 +121,14 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .grid-form-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
 
 /* ── CARDS ── */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.35); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,238,224,0.035); }
 .card-title { font-size: 9px; font-weight: 800; color: var(--text3); margin-bottom: 18px; text-transform: uppercase; letter-spacing: 0.12em; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
 
 /* ── METRIC CARDS ── */
 .metric-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s; position: relative; overflow: hidden; }
 .metric-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-.metric-card:has(.mc-val.green) { border-left: 2px solid rgba(18,201,138,0.35); }
-.metric-card:has(.mc-val.red) { border-left: 2px solid rgba(239,72,88,0.35); }
+.metric-card:has(.mc-val.green) { border-left: 2px solid rgba(111,184,92,0.35); }
+.metric-card:has(.mc-val.red) { border-left: 2px solid rgba(240,87,60,0.35); }
 .metric-card .mc-label { font-size: 9px; color: var(--text3); margin-bottom: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
 .metric-card .mc-val { font-size: 21px; font-weight: 700; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; line-height: 1.15; word-break: break-all; letter-spacing: -0.02em; }
 .metric-card .mc-sub { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
@@ -138,7 +137,7 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .mc-val.purple { color: var(--blue); }
 
 /* ── MQV CARD ── */
-.mqv-card { background: linear-gradient(135deg, rgba(74,140,245,0.09) 0%, rgba(74,140,245,0.04) 100%); border: 1px solid var(--blue-border); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap; box-shadow: 0 0 0 1px rgba(74,140,245,0.06) inset; }
+.mqv-card { background: linear-gradient(135deg, rgba(245,158,60,0.09) 0%, rgba(245,158,60,0.04) 100%); border: 1px solid var(--blue-border); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap; box-shadow: 0 0 0 1px rgba(245,158,60,0.06) inset; }
 .mqv-main .mqv-label { font-size: 9px; color: var(--blue); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; opacity: 0.85; }
 .mqv-main .mqv-val { font-size: 32px; font-weight: 700; color: var(--text); font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; line-height: 1; word-break: break-all; letter-spacing: -0.03em; }
 .mqv-main .mqv-sub { font-size: 12px; color: var(--text3); margin-top: 6px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
@@ -148,18 +147,18 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 /* ── FORMS ── */
 label { font-size: 10px; color: var(--text3); display: block; margin-bottom: 5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 input[type=text], input[type=number], input[type=date], select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-size: 13px; padding: 10px 13px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
-input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(74,140,245,0.14); }
+input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(245,158,60,0.14); }
 select option { background: var(--surface2); }
 .hint { font-size: 11px; color: var(--text3); margin-top: 4px; min-height: 16px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 
 /* ── BUTTONS ── */
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border2); background: var(--surface2); color: var(--text); transition: all 0.16s; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.01em; }
 .btn:hover { background: var(--surface3); transform: translateY(-1px); }
-.btn.primary { background: var(--blue); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(74,140,245,0.30); }
-.btn.primary:hover { background: var(--blue-hover); box-shadow: 0 4px 16px rgba(74,140,245,0.42); transform: translateY(-1px); }
-.btn.danger { background: var(--red); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(239,72,88,0.25); }
+.btn.primary { background: var(--blue); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(245,158,60,0.30); }
+.btn.primary:hover { background: var(--blue-hover); box-shadow: 0 4px 16px rgba(245,158,60,0.42); transform: translateY(-1px); }
+.btn.danger { background: var(--red); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(240,87,60,0.25); }
 .btn.danger:hover { opacity: 0.9; transform: translateY(-1px); }
-.btn.success { background: var(--green); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(18,201,138,0.25); }
+.btn.success { background: var(--green); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(111,184,92,0.25); }
 .btn.success:hover { opacity: 0.9; transform: translateY(-1px); }
 .btn.sm { padding: 6px 14px; font-size: 12px; }
 .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
@@ -181,33 +180,33 @@ select option { background: var(--surface2); }
 /* ── TABLES ── */
 .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 18px; background: var(--surface); }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead th { background: rgba(16,25,40,0.9); color: var(--text3); font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; padding: 11px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+thead th { background: rgba(37,26,19,0.9); color: var(--text3); font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; padding: 11px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
 tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); }
 tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rgba(74,140,245,0.35); }
+tbody tr:hover { background: rgba(245,158,60,0.05); box-shadow: inset 3px 0 0 rgba(245,158,60,0.35); }
 .td-main { font-weight: 600; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; white-space: nowrap; letter-spacing: -0.01em; }
 .td-sub { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; white-space: nowrap; }
 
 /* ── BADGES ── */
 .badge { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; }
-.badge.ingreso { background: rgba(18,201,138,0.13); color: var(--green); }
-.badge.egreso { background: rgba(239,72,88,0.13); color: var(--red); }
-.badge.ahorro { background: rgba(74,140,245,0.13); color: var(--blue); }
-.badge.tarjeta { background: rgba(239,72,88,0.15); color: var(--red); }
-.badge.pago { background: rgba(18,201,138,0.13); color: var(--green); }
+.badge.ingreso { background: rgba(111,184,92,0.13); color: var(--green); }
+.badge.egreso { background: rgba(240,87,60,0.13); color: var(--red); }
+.badge.ahorro { background: rgba(245,158,60,0.13); color: var(--blue); }
+.badge.tarjeta { background: rgba(240,87,60,0.15); color: var(--red); }
+.badge.pago { background: rgba(111,184,92,0.13); color: var(--green); }
 .badge.repago { background: rgba(139,124,246,0.13); color: #9F8FFF; }
 .acct-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 9px; border-radius: 6px; font-weight: 600; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 
 /* ── TARJETA PANEL ── */
-.tarjeta-panel { background: rgba(239,72,88,0.04); border: 1px solid rgba(239,72,88,0.16); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
-.tarjeta-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid rgba(239,72,88,0.10); }
+.tarjeta-panel { background: rgba(240,87,60,0.04); border: 1px solid rgba(240,87,60,0.16); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
+.tarjeta-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid rgba(240,87,60,0.10); }
 .tarjeta-title { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; letter-spacing: -0.01em; }
-.deuda-chip { background: var(--red-bg); border: 1px solid rgba(239,72,88,0.20); color: var(--red); padding: 5px 13px; border-radius: 7px; font-size: 12px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 600; }
+.deuda-chip { background: var(--red-bg); border: 1px solid rgba(240,87,60,0.20); color: var(--red); padding: 5px 13px; border-radius: 7px; font-size: 12px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 600; }
 .tarjeta-body { padding: 20px 24px; display: none; }
 .tarjeta-body.open { display: block; }
 .mode-tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
 .mode-tab { font-size: 12px; padding: 6px 15px; border-radius: 7px; border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 500; transition: all 0.15s; letter-spacing: -0.01em; }
-.mode-tab.active { background: var(--blue); color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(74,140,245,0.30); }
+.mode-tab.active { background: var(--blue); color: #fff; border-color: transparent; box-shadow: 0 2px 8px rgba(245,158,60,0.30); }
 
 /* ── CHARTS ── */
 .chart-wrap { position: relative; width: 100%; height: 230px; }
@@ -278,8 +277,8 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
 
 @media (max-width: 860px) {
   /* topbar */
-  .topbar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: calc(64px + env(safe-area-inset-top, 0px)); background: rgba(12,18,32,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 150; align-items: flex-end; padding: 0 18px 12px; gap: 12px; }
-  .topbar-brand { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, #5C9FFF 0%, var(--blue) 100%); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; font-family: 'SF Mono', ui-monospace, monospace; letter-spacing: -0.04em; box-shadow: 0 3px 10px rgba(74,140,245,0.35); flex-shrink: 0; }
+  .topbar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: calc(64px + env(safe-area-inset-top, 0px)); background: rgba(28,20,16,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 150; align-items: flex-end; padding: 0 18px 12px; gap: 12px; }
+  .topbar-brand { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, #FFC074 0%, var(--blue) 100%); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; font-family: 'SF Mono', ui-monospace, monospace; letter-spacing: -0.04em; box-shadow: 0 3px 10px rgba(245,158,60,0.35); flex-shrink: 0; }
   .topbar-logo { font-size: 18px; font-weight: 700; color: var(--text); flex: 1; letter-spacing: -0.02em; }
   .hamburger { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 12px; color: var(--text2); border-radius: 10px; transition: background 0.15s; }
   .hamburger:hover { background: var(--surface2); }
@@ -298,7 +297,7 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
   .hero-balance { font-size: 32px; }
   .hero-mqv-val { font-size: 20px; }
   .hero-stats { gap: 10px; }
-  .hero-stat, .hero-stat:last-child { flex: 1 1 0; background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.075) !important; border-radius: 13px; padding: 12px 13px !important; margin: 0 !important; }
+  .hero-stat { flex: 1 1 0; min-width: 0; padding: 12px 13px; }
   /* content */
   .content { padding: 18px 16px; }
   .card { padding: 16px 15px; overflow-x: auto; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.035); }
@@ -427,9 +426,9 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
 
 /* ── TOAST ── */
 .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:9999; padding:10px 20px; border-radius:10px; font-size:13px; font-weight:600; font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif; box-shadow:0 8px 32px rgba(0,0,0,0.55); white-space:nowrap; pointer-events:none; transition:opacity 0.3s,transform 0.3s; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
-.toast.success { background:rgba(18,201,138,0.92); color:#fff; }
-.toast.error { background:rgba(239,72,88,0.92); color:#fff; }
-.toast.info { background:rgba(23,32,48,0.92); color:var(--text); border:1px solid var(--border2); }
+.toast.success { background:rgba(111,184,92,0.92); color:#fff; }
+.toast.error { background:rgba(240,87,60,0.92); color:#fff; }
+.toast.info { background:rgba(37,26,19,0.92); color:var(--text); border:1px solid var(--border2); }
 @media(max-width:860px){ .toast { bottom:calc(78px + env(safe-area-inset-bottom,0px)); } }
 
 /* ── EDIT MODAL ── */
@@ -450,7 +449,7 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
 /* ── BOTTOM NAV ── */
 .bottom-nav { display: none; }
 @media (max-width: 860px) {
-  .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(12,18,32,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(28,20,16,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); }
   .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: none; border: none; color: var(--text3); cursor: pointer; font-size: 13px; padding: 10px 2px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 500; transition: color 0.14s; min-height: 66px; position: relative; }
   .bn-item.active { color: var(--blue); }
   .bn-item::before { content: ''; position: absolute; top: 7px; left: 50%; transform: translateX(-50%); width: 46px; height: 30px; border-radius: 11px; background: transparent; transition: background 0.18s, transform 0.18s; z-index: 0; }
@@ -475,7 +474,7 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
 
 <!-- AUTH OVERLAY (se oculta al verificar sesión) -->
 <div id="auth-overlay" style="position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center">
-  <div style="width:14px;height:14px;border:2px solid rgba(74,140,245,0.3);border-top-color:var(--blue);border-radius:50%;animation:authSpin 0.7s linear infinite"></div>
+  <div style="width:14px;height:14px;border:2px solid rgba(245,158,60,0.3);border-top-color:var(--blue);border-radius:50%;animation:authSpin 0.7s linear infinite"></div>
 </div>
 <style>@keyframes authSpin{to{transform:rotate(360deg)}}</style>
 
@@ -534,7 +533,7 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
     <div id="cotiz-update-time" style="font-size:10px;color:var(--text3);font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-bottom:6px;min-height:14px"></div>
     <button id="fetch-dolar-btn" class="cotiz-btn" onclick="fetchDolar()" style="margin-bottom:6px">↻ Traer cotización</button>
     <button class="cotiz-btn" onclick="updateCotiz()" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text2)">Aplicar manual</button>
-    <button onclick="openResumenModal()" style="width:100%;font-size:11px;padding:8px 10px;margin-top:8px;border-radius:8px;border:1px solid rgba(74,140,245,0.3);background:rgba(74,140,245,0.08);color:var(--blue);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:600;transition:background 0.15s" onmouseover="this.style.background='rgba(74,140,245,0.16)'" onmouseout="this.style.background='rgba(74,140,245,0.08)'">↓ Descargar resumen PDF</button>
+    <button onclick="openResumenModal()" style="width:100%;font-size:11px;padding:8px 10px;margin-top:8px;border-radius:8px;border:1px solid rgba(245,158,60,0.3);background:rgba(245,158,60,0.08);color:var(--blue);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:600;transition:background 0.15s" onmouseover="this.style.background='rgba(245,158,60,0.16)'" onmouseout="this.style.background='rgba(245,158,60,0.08)'">↓ Descargar resumen PDF</button>
     <button onclick="openMFAModal()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">🔑 Gestionar 2FA</button>
     <button onclick="doLogout()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">→ Cerrar sesión</button>
   </div>
@@ -796,11 +795,11 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
           <div><label>Fecha límite</label><input type="date" id="meta-fecha"></div>
           <div><label>Color</label>
             <select id="meta-color">
-              <option value="#3483FA">Azul</option>
+              <option value="#F59E3C">Azul</option>
               <option value="#00A650">Verde</option>
               <option value="#F5A623">Naranja</option>
               <option value="#8B7CF6">Violeta</option>
-              <option value="#F23D4F">Rojo</option>
+              <option value="#F0573C">Rojo</option>
               <option value="#00D4A1">Turquesa</option>
             </select>
           </div>
@@ -927,7 +926,7 @@ Chart.defaults.font.size=12;
 let INSTRUMENTOS=[];
 let COLORS={};
 let ICONS={};
-const CAT_COLORS={'Alimentación':'#00D4A1','Entretenimiento':'#8B7CF6','Transporte':'#4A9EFF','Salud':'#FF6B47','Vivienda':'#F5A623','Servicios':'#38BDF8','Otros':'#8B93A8'};
+const CAT_COLORS={'Alimentación':'#E0A33D','Entretenimiento':'#C77DBB','Transporte':'#E2763C','Salud':'#F0573C','Vivienda':'#B5793E','Servicios':'#D9A441','Otros':'#A8907C'};
 const TC_COLORS={Visa:'#1A56DB',Mastercard:'#E25718',Amex:'#00A4A6'};
 let ARS_INSTR=new Set();
 
@@ -1357,7 +1356,7 @@ function renderResumen(){
   const total=entries.reduce((s,[,v])=>s+v.usd,0);
   document.getElementById('legend-patrim').innerHTML=entries.map(([k,v],i)=>`<span><b style="background:${colors[i]}"></b>${k} ${Math.round(v.usd/total*100)}%</span>`).join('');
   if(chartPatrim)chartPatrim.destroy();
-  chartPatrim=new Chart(document.getElementById('chartPatrim').getContext('2d'),{type:'doughnut',data:{labels:entries.map(([k])=>k),datasets:[{data:entries.map(([,v])=>v.usd),backgroundColor:colors,borderWidth:2,borderColor:'#151821',hoverOffset:8,hoverBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttUSD()},cutout:'62%'}});
+  chartPatrim=new Chart(document.getElementById('chartPatrim').getContext('2d'),{type:'doughnut',data:{labels:entries.map(([k])=>k),datasets:[{data:entries.map(([,v])=>v.usd),backgroundColor:colors,borderWidth:2,borderColor:'#251A13',hoverOffset:8,hoverBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttUSD()},cutout:'62%'}});
 
   // Category chart (egresos en efectivo + gastos TC categorizados)
   const catItems=[...data.egresos.filter(e=>inRango(e.fecha)),...data.movTC.filter(m=>m.tipo==='gasto'&&m.cat&&inRango(m.fecha))];
@@ -1367,7 +1366,7 @@ function renderResumen(){
   document.getElementById('legend-cat').innerHTML=catEntries.map(([k])=>`<span><b style="background:${CAT_COLORS[k]||'#888'}"></b>${k}</span>`).join('');
   if(chartCat)chartCat.destroy();
   if(catEntries.length){
-    chartCat=new Chart(document.getElementById('chartCat').getContext('2d'),{type:'bar',data:{labels:catEntries.map(([k])=>k),datasets:[{data:catEntries.map(([,v])=>v*USD_ARS),backgroundColor:catEntries.map(([k])=>CAT_COLORS[k]||'#888'),borderRadius:6,borderSkipped:false,borderWidth:0,hoverBackgroundColor:catEntries.map(([k])=>(CAT_COLORS[k]||'#888')+'cc')}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:{x:{ticks:{color:'#555F78',callback:v=>fmtARS(v),font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'},border:{display:false}},y:{ticks:{color:'#8B93A8',font:{size:11}},grid:{display:false},border:{display:false}}}}});
+    chartCat=new Chart(document.getElementById('chartCat').getContext('2d'),{type:'bar',data:{labels:catEntries.map(([k])=>k),datasets:[{data:catEntries.map(([,v])=>v*USD_ARS),backgroundColor:catEntries.map(([k])=>CAT_COLORS[k]||'#888'),borderRadius:6,borderSkipped:false,borderWidth:0,hoverBackgroundColor:catEntries.map(([k])=>(CAT_COLORS[k]||'#888')+'cc')}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:{x:{ticks:{color:'#8A715E',callback:v=>fmtARS(v),font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'},border:{display:false}},y:{ticks:{color:'#BBA28E',font:{size:11}},grid:{display:false},border:{display:false}}}}});
   } else { chartCat=null; }
 
   renderFlujoMensual();
@@ -1424,7 +1423,7 @@ function renderFlujoMensual(){
   const pos=neto>=0;
   const pill=(id,txt)=>{
     const a=flujoPeriodo===id;
-    return `<button onclick="flujoPeriodo='${id}';renderFlujoMensual()" style="font-size:11px;font-weight:${a?700:500};padding:5px 12px;border-radius:99px;border:1px solid ${a?'var(--green)':'var(--border)'};background:${a?'rgba(18,201,138,0.12)':'transparent'};color:${a?'var(--green)':'var(--text3)'};cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0">${txt}</button>`;
+    return `<button onclick="flujoPeriodo='${id}';renderFlujoMensual()" style="font-size:11px;font-weight:${a?700:500};padding:5px 12px;border-radius:99px;border:1px solid ${a?'var(--green)':'var(--border)'};background:${a?'rgba(111,184,92,0.12)':'transparent'};color:${a?'var(--green)':'var(--text3)'};cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0">${txt}</button>`;
   };
   const row=(label,usd,color)=>`
     <div class="fm-row">
@@ -1467,7 +1466,7 @@ function renderFlujoMensual(){
         </div>
       </div>
     </div>
-    <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:${pos?'rgba(18,201,138,0.05)':'rgba(239,72,88,0.05)'}">
+    <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:${pos?'rgba(111,184,92,0.05)':'rgba(240,87,60,0.05)'}">
       <span class="fm-result-label">Resultado del período</span>
       <div style="text-align:right">
         <div class="fm-result-val" style="color:${pos?'var(--green)':'var(--red)'}">${pos?'+':''}${fmtARS(neto*USD_ARS)}</div>
@@ -1504,7 +1503,7 @@ function renderPatrimonio(){
   if(chartPatEvo) chartPatEvo.destroy();
   const canvPE=document.getElementById('chartPatEvo');
   if(canvPE && snaps.length>1){
-    chartPatEvo=new Chart(canvPE.getContext('2d'),{type:'line',data:{labels:snaps.map(s=>s.label),datasets:[{data:snaps.map(s=>s.usd*USD_ARS),borderColor:'#3483FA',borderWidth:2,backgroundColor:'rgba(52,131,250,0.08)',fill:true,tension:0.4,pointBackgroundColor:'#3483FA',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:scalesARS()}});
+    chartPatEvo=new Chart(canvPE.getContext('2d'),{type:'line',data:{labels:snaps.map(s=>s.label),datasets:[{data:snaps.map(s=>s.usd*USD_ARS),borderColor:'#F59E3C',borderWidth:2,backgroundColor:'rgba(245,158,60,0.08)',fill:true,tension:0.4,pointBackgroundColor:'#F59E3C',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:scalesARS()}});
   }
 }
 
@@ -1764,10 +1763,10 @@ const doughnutCenterPlugin = {
     const cx = left + width/2, cy = top + height/2;
     ctx.save();
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#F0F2F8';
+    ctx.fillStyle = '#F7EDE2';
     ctx.font = "500 13px 'SF Mono', ui-monospace, Menlo, Consolas, monospace";
     ctx.fillText(fmtUSD(total), cx, cy - 10);
-    ctx.fillStyle = '#555F78';
+    ctx.fillStyle = '#8A715E';
     ctx.font = "400 11px 'SF Mono', ui-monospace, Menlo, Consolas, monospace";
     ctx.fillText(fmtARS(total * USD_ARS), cx, cy + 10);
     ctx.restore();
@@ -1777,15 +1776,15 @@ Chart.register(doughnutCenterPlugin);
 
 function ttARS() {
   return {
-    backgroundColor: 'rgba(13,15,20,0.97)',
+    backgroundColor: 'rgba(26,18,12,0.97)',
     borderColor: 'rgba(255,255,255,0.08)',
     borderWidth: 1,
     padding: { x: 14, y: 10 },
     cornerRadius: 8,
     titleFont: { family: '-apple-system', size: 12, weight: '600' },
     bodyFont: { family: 'SF Mono', size: 12 },
-    titleColor: '#F0F2F8',
-    bodyColor: '#8B93A8',
+    titleColor: '#F7EDE2',
+    bodyColor: '#BBA28E',
     callbacks: {
       label: ctx => [' ' + fmtARS(ctx.raw), ' ' + fmtUSD(ctx.raw / USD_ARS)]
     }
@@ -1793,15 +1792,15 @@ function ttARS() {
 }
 function ttUSD() {
   return {
-    backgroundColor: 'rgba(13,15,20,0.97)',
+    backgroundColor: 'rgba(26,18,12,0.97)',
     borderColor: 'rgba(255,255,255,0.08)',
     borderWidth: 1,
     padding: { x: 14, y: 10 },
     cornerRadius: 8,
     titleFont: { family: '-apple-system', size: 12, weight: '600' },
     bodyFont: { family: 'SF Mono', size: 12 },
-    titleColor: '#F0F2F8',
-    bodyColor: '#8B93A8',
+    titleColor: '#F7EDE2',
+    bodyColor: '#BBA28E',
     callbacks: {
       title: items => items[0].label,
       label: ctx => {
@@ -1813,8 +1812,8 @@ function ttUSD() {
 }
 function scalesARS() {
   return {
-    y: { ticks: { color:'#555F78', callback: v => fmtARS(v), font:{ size:11 } }, grid: { color:'rgba(255,255,255,0.04)' }, border:{ display:false } },
-    x: { ticks: { color:'#8B93A8', font:{ size:10 }, maxRotation:20 }, grid:{ display:false }, border:{ display:false } }
+    y: { ticks: { color:'#8A715E', callback: v => fmtARS(v), font:{ size:11 } }, grid: { color:'rgba(255,255,255,0.04)' }, border:{ display:false } },
+    x: { ticks: { color:'#BBA28E', font:{ size:10 }, maxRotation:20 }, grid:{ display:false }, border:{ display:false } }
   };
 }
 
@@ -1874,7 +1873,7 @@ function renderGastoDiario(){
     label:ctx=>[' '+fmtARS(ctx.raw),' '+fmtUSD(ctx.raw/USD_ARS)]
   }});
   if(chartGastoDia)chartGastoDia.destroy();
-  chartGastoDia=new Chart(canvas.getContext('2d'),{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:'#EF4858',borderRadius:5,borderSkipped:false,borderWidth:0,hoverBackgroundColor:'#EF4858cc'}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttip},scales:scalesARS()}});
+  chartGastoDia=new Chart(canvas.getContext('2d'),{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:'#F0573C',borderRadius:5,borderSkipped:false,borderWidth:0,hoverBackgroundColor:'#F0573Ccc'}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttip},scales:scalesARS()}});
 }
 
 /* ── METAS ── */
@@ -1961,7 +1960,7 @@ function setResumenPeriodo(tipo){
     if(!btn) return;
     const on=k===tipo;
     btn.style.border=on?'1px solid var(--blue)':'1px solid var(--border2)';
-    btn.style.background=on?'rgba(74,140,245,0.12)':'transparent';
+    btn.style.background=on?'rgba(245,158,60,0.12)':'transparent';
     btn.style.color=on?'var(--blue)':'var(--text2)';
   });
   const ci=document.getElementById('rp-custom-inputs');
@@ -2026,15 +2025,15 @@ function downloadResumenMes(desde, hasta, label){
 @font-face{font-family:'Inter';font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-700-normal.woff2') format('woff2')}
 @font-face{font-family:'Inter';font-weight:800;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-800-normal.woff2') format('woff2')}
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#06080F;--surf:#0C1220;--surf2:#101928;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.12);--tx:#ECF1FF;--tx2:#6A82A8;--tx3:#3C5070;--blue:#4A8CF5;--green:#12C98A;--red:#EF4858}
+:root{--bg:#120C08;--surf:#1C1410;--surf2:#251A13;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.12);--tx:#F7EDE2;--tx2:#BBA28E;--tx3:#8A715E;--blue:#F59E3C;--green:#6FB85C;--red:#F0573C}
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:13px;color:var(--tx);background:var(--bg);padding:36px 40px;max-width:860px;margin:0 auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 h1{font-size:22px;font-weight:800;color:var(--tx);letter-spacing:-0.03em;margin-bottom:3px}
 h2{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:var(--tx3);margin:26px 0 10px;display:flex;align-items:center;gap:8px}
 h2::before{content:'';width:3px;height:10px;background:var(--blue);border-radius:2px;opacity:.5;flex-shrink:0}
 h2::after{content:'';flex:1;height:1px;background:var(--bd)}
-.header{margin-bottom:26px;padding:20px 24px;background:linear-gradient(145deg,#101D35 0%,#0B1526 55%,#080E1C 100%);border:1px solid rgba(74,140,245,0.16);border-radius:12px;position:relative;overflow:hidden}
-.header::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;background:radial-gradient(ellipse,rgba(74,140,245,0.12) 0%,transparent 65%);pointer-events:none}
-.header-title{font-size:22px;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#7EC0FF 0%,var(--blue) 70%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+.header{margin-bottom:26px;padding:20px 24px;background:linear-gradient(145deg,#2A1B10 0%,#1E1209 55%,#140D07 100%);border:1px solid rgba(245,158,60,0.16);border-radius:12px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;background:radial-gradient(ellipse,rgba(245,158,60,0.12) 0%,transparent 65%);pointer-events:none}
+.header-title{font-size:22px;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#FFCB8C 0%,var(--blue) 70%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
 .header-sub{font-size:11px;color:var(--tx3);margin-top:5px;position:relative}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
 .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
@@ -2043,26 +2042,26 @@ h2::after{content:'';flex:1;height:1px;background:var(--bd)}
 .card-val{font-size:18px;font-weight:700;letter-spacing:-0.02em;color:var(--tx)}
 .card-sub{font-size:11px;color:var(--tx3);margin-top:3px}
 .green{color:var(--green)}.red{color:var(--red)}.blue{color:var(--blue)}
-.card.has-green{border-left:2px solid rgba(18,201,138,.35)}.card.has-red{border-left:2px solid rgba(239,72,88,.35)}
+.card.has-green{border-left:2px solid rgba(111,184,92,.35)}.card.has-red{border-left:2px solid rgba(240,87,60,.35)}
 table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:4px}
-thead th{background:rgba(16,25,40,.9);color:var(--tx3);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;padding:9px 14px;text-align:left;border-bottom:1px solid var(--bd)}
+thead th{background:rgba(37,26,19,.9);color:var(--tx3);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;padding:9px 14px;text-align:left;border-bottom:1px solid var(--bd)}
 tbody td{padding:10px 14px;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--tx)}
 tbody tr:last-child td{border-bottom:none}
-tbody tr:hover{background:rgba(74,140,245,.04)}
+tbody tr:hover{background:rgba(245,158,60,.04)}
 .ta-right{text-align:right}
 .tx3{color:var(--tx3);font-size:11px}
 .badge{display:inline-block;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:0.05em}
-.b-ing{background:rgba(18,201,138,.13);color:var(--green)}
-.b-eg{background:rgba(239,72,88,.13);color:var(--red)}
+.b-ing{background:rgba(111,184,92,.13);color:var(--green)}
+.b-eg{background:rgba(240,87,60,.13);color:var(--red)}
 .b-rep{background:rgba(139,124,246,.13);color:#9F8FFF}
-.b-pago{background:rgba(18,201,138,.13);color:var(--green)}
-.b-dep{background:rgba(74,140,245,.13);color:var(--blue)}
-.print-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:22px;padding:9px 20px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 10px rgba(74,140,245,.3)}
+.b-pago{background:rgba(111,184,92,.13);color:var(--green)}
+.b-dep{background:rgba(245,158,60,.13);color:var(--blue)}
+.print-btn{display:inline-flex;align-items:center;gap:6px;margin-bottom:22px;padding:9px 20px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 10px rgba(245,158,60,.3)}
 .empty-row td{color:var(--tx3);text-align:center;padding:16px;font-style:italic}
 @page{margin:14mm 16mm;size:A4 portrait}
 @media print{
   .print-btn{display:none !important}
-  html,body{background:#06080F !important;padding:0 !important;max-width:none !important;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color:#ECF1FF !important}
+  html,body{background:#120C08 !important;padding:0 !important;max-width:none !important;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color:#F7EDE2 !important}
   .header{page-break-inside:avoid;margin-bottom:16px}
   h2{margin-top:18px;page-break-after:avoid}
   h2+*{page-break-before:avoid}
@@ -2148,7 +2147,7 @@ async function guardarPDF(){
       margin:0,
       filename:'${pdfFilename}',
       image:{type:'jpeg',quality:0.98},
-      html2canvas:{scale:2,useCORS:true,backgroundColor:'#06080F',logging:false},
+      html2canvas:{scale:2,useCORS:true,backgroundColor:'#120C08',logging:false},
       jsPDF:{unit:'mm',format:[W*MM,H*MM],orientation:'portrait'}
     }).from(b).save();
   }catch(e){alert('No se pudo generar el PDF.');}
@@ -2189,7 +2188,7 @@ async function generateResumenPDFNative(d){
     if(d.isCurrentMonth) PH+=cardSecH;
     PH=Math.ceil(PH)+4;
     const doc=new jsPDF({unit:'pt',format:[PW,PH],orientation:'portrait',compress:true});
-    const C={bg:[6,8,15],surf:[16,25,40],bd:[40,52,74],tx:[236,241,255],tx3:[106,130,168],blue:[74,140,245],green:[18,201,138],red:[239,72,88],violet:[159,143,255]};
+    const C={bg:[18,12,8],surf:[37,26,19],bd:[60,48,38],tx:[247,237,226],tx3:[138,113,94],blue:[245,158,60],green:[111,184,92],red:[240,87,60],violet:[199,125,187]};
     // sanea caracteres fuera de Latin-1 (las fuentes estándar de jsPDF no los soportan)
     const S=t=>String(t==null?'':t).replace(/—/g,'-').replace(/[…]/g,'...').replace(/≈/g,'~').replace(/[“”]/g,'"').replace(/[’]/g,"'");
     const setTx=c=>doc.setTextColor(c[0],c[1],c[2]);
@@ -2210,7 +2209,7 @@ async function generateResumenPDFNative(d){
     };
     // ── header ──
     const hH=62;
-    setFill([13,22,40]); doc.roundedRect(M,y,CW,hH,8,8,'F');
+    setFill([42,27,16]); doc.roundedRect(M,y,CW,hH,8,8,'F');
     setTx(C.blue); doc.setFont(F,'bold'); doc.setFontSize(16);
     T(fit('Resumen financiero · '+(d.label.charAt(0).toUpperCase()+d.label.slice(1)),CW-32),M+16,y+27);
     setTx(C.tx3); doc.setFont(F,'normal'); doc.setFontSize(8.5);
@@ -2519,7 +2518,7 @@ async function openMFAModal(){
         <div style="font-size:14px;color:var(--green);font-weight:700;margin-bottom:4px">2FA activo</div>
         <div style="font-size:12px;color:var(--text3)">Tu cuenta está protegida con autenticación de dos factores.</div>
       </div>
-      <button onclick="unenrollMFA('${totp[0].id}')" style="width:100%;padding:11px;border-radius:10px;border:1px solid rgba(239,72,88,0.3);background:rgba(239,72,88,0.08);color:var(--red);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Desactivar 2FA</button>`;
+      <button onclick="unenrollMFA('${totp[0].id}')" style="width:100%;padding:11px;border-radius:10px;border:1px solid rgba(240,87,60,0.3);background:rgba(240,87,60,0.08);color:var(--red);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Desactivar 2FA</button>`;
   } else {
     const{data,error}=await sb.auth.mfa.enroll({factorType:'totp',friendlyName:'Finanzas'});
     if(error){ content.innerHTML=`<div style="color:var(--red);font-size:13px;text-align:center">${error.message}</div>`; return; }
@@ -2530,7 +2529,7 @@ async function openMFAModal(){
       <div style="font-size:9px;color:var(--text3);margin-bottom:14px;font-family:'SF Mono',ui-monospace,monospace;word-break:break-all;text-align:center;letter-spacing:0.04em">${data.totp.secret}</div>
       <input id="mfa-enroll-code" type="text" inputmode="numeric" maxlength="6" placeholder="Código de 6 dígitos" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:20px;padding:12px;font-family:'SF Mono',monospace;text-align:center;letter-spacing:0.18em;outline:none;margin-bottom:8px">
       <div id="mfa-enroll-err" style="font-size:12px;color:var(--red);min-height:14px;text-align:center;margin-bottom:10px"></div>
-      <button onclick="enrollMFA()" id="mfa-enroll-btn" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 12px rgba(74,140,245,0.35)">Activar 2FA</button>`;
+      <button onclick="enrollMFA()" id="mfa-enroll-btn" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 12px rgba(245,158,60,0.35)">Activar 2FA</button>`;
     const inp=document.getElementById('mfa-enroll-code');
     inp.addEventListener('input',function(){ this.value=this.value.replace(/\D/g,''); });
     setTimeout(()=>inp.focus(),100);
@@ -2694,19 +2693,19 @@ checkAuth();
 </script>
 
 <!-- IDLE WARNING -->
-<div id="idle-warn" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(6,9,17,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px">
+<div id="idle-warn" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(18,12,8,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:18px;padding:30px 28px;max-width:310px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.55)">
     <div style="font-size:32px;margin-bottom:12px">⏱</div>
     <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:5px">¿Seguís ahí?</div>
     <div style="font-size:12px;color:var(--text2);margin-bottom:4px">Tu sesión se cerrará en</div>
     <div id="idle-countdown" style="font-size:36px;font-weight:800;font-family:'SF Mono',ui-monospace,monospace;color:var(--blue);margin:14px 0;letter-spacing:-0.02em">2:00</div>
-    <button onclick="continueSession()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;box-shadow:0 2px 12px rgba(74,140,245,0.35)">Continuar sesión</button>
+    <button onclick="continueSession()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;box-shadow:0 2px 12px rgba(245,158,60,0.35)">Continuar sesión</button>
     <button onclick="doLogout()" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text3);font-size:13px;cursor:pointer;font-family:inherit">Cerrar sesión ahora</button>
   </div>
 </div>
 
 <!-- RESUMEN PDF MODAL -->
-<div id="resumen-modal" onclick="if(event.target===this)closeResumenModal()" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(6,9,17,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px">
+<div id="resumen-modal" onclick="if(event.target===this)closeResumenModal()" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(18,12,8,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:18px;padding:26px 28px 28px;max-width:360px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.55)">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
       <div style="font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.02em">Resumen PDF</div>
@@ -2714,7 +2713,7 @@ checkAuth();
     </div>
     <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--text3);margin-bottom:10px">Período</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px">
-      <button id="rpbtn-mes-actual" onclick="setResumenPeriodo('mes-actual')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--blue);background:rgba(74,140,245,0.12);color:var(--blue);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Mes actual</button>
+      <button id="rpbtn-mes-actual" onclick="setResumenPeriodo('mes-actual')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--blue);background:rgba(245,158,60,0.12);color:var(--blue);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Mes actual</button>
       <button id="rpbtn-mes-anterior" onclick="setResumenPeriodo('mes-anterior')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Mes anterior</button>
       <button id="rpbtn-30dias" onclick="setResumenPeriodo('30dias')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Últimos 30 días</button>
       <button id="rpbtn-custom" onclick="setResumenPeriodo('custom')" style="padding:9px 10px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s">Personalizado</button>
@@ -2723,12 +2722,12 @@ checkAuth();
       <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);display:block;margin-bottom:5px">Desde</label><input type="date" id="rp-desde" style="width:100%;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12px;font-family:inherit"></div>
       <div><label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);display:block;margin-bottom:5px">Hasta</label><input type="date" id="rp-hasta" style="width:100%;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;color:var(--text);padding:7px 10px;font-size:12px;font-family:inherit"></div>
     </div>
-    <button onclick="descargarResumenPDF()" style="width:100%;padding:11px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:-0.01em;box-shadow:0 2px 12px rgba(74,140,245,0.35)">↓ Descargar PDF</button>
+    <button onclick="descargarResumenPDF()" style="width:100%;padding:11px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:-0.01em;box-shadow:0 2px 12px rgba(245,158,60,0.35)">↓ Descargar PDF</button>
   </div>
 </div>
 
 <!-- MFA MODAL -->
-<div id="mfa-modal" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(6,9,17,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px">
+<div id="mfa-modal" style="display:none;position:fixed;inset:0;z-index:9997;background:rgba(18,12,8,0.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:18px;padding:28px;max-width:340px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.55)">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
       <div style="font-size:15px;font-weight:700;color:var(--text)">Verificación en dos pasos</div>
