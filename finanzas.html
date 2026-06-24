@@ -278,7 +278,8 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
 
 @media (max-width: 860px) {
   /* topbar */
-  .topbar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: calc(64px + env(safe-area-inset-top, 0px)); background: rgba(12,18,32,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 150; align-items: flex-end; padding: 0 20px 12px; gap: 16px; }
+  .topbar { display: flex; position: fixed; top: 0; left: 0; right: 0; height: calc(64px + env(safe-area-inset-top, 0px)); background: rgba(12,18,32,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); z-index: 150; align-items: flex-end; padding: 0 18px 12px; gap: 12px; }
+  .topbar-brand { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, #5C9FFF 0%, var(--blue) 100%); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; font-family: 'SF Mono', ui-monospace, monospace; letter-spacing: -0.04em; box-shadow: 0 3px 10px rgba(74,140,245,0.35); flex-shrink: 0; }
   .topbar-logo { font-size: 18px; font-weight: 700; color: var(--text); flex: 1; letter-spacing: -0.02em; }
   .hamburger { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; background: none; border: none; cursor: pointer; padding: 12px; color: var(--text2); border-radius: 10px; transition: background 0.15s; }
   .hamburger:hover { background: var(--surface2); }
@@ -293,13 +294,14 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
   .grid-3, .grid-form-3, .grid-form-4 { grid-template-columns: 1fr 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
   /* hero */
-  .header-hero { padding: 20px 20px 18px; }
+  .header-hero { padding: 22px 20px 20px; border-radius: 18px; }
   .hero-balance { font-size: 32px; }
   .hero-mqv-val { font-size: 20px; }
-  .hero-stat { padding-right: 20px; margin-right: 20px; }
+  .hero-stats { gap: 10px; }
+  .hero-stat, .hero-stat:last-child { flex: 1 1 0; background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.075) !important; border-radius: 13px; padding: 12px 13px !important; margin: 0 !important; }
   /* content */
   .content { padding: 18px 16px; }
-  .card { padding: 16px 14px; overflow-x: auto; }
+  .card { padding: 16px 15px; overflow-x: auto; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.035); }
   .pat-grid { grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); }
   table { width: max-content; min-width: 100%; }
   thead th { font-size: 10px; padding: 9px 10px; }
@@ -311,11 +313,9 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
 
 @media (max-width: 500px) {
   .grid-3, .grid-form-2, .grid-form-3, .grid-form-4, .grid-4 { grid-template-columns: 1fr; }
-  .hero-stats { flex-wrap: wrap; gap: 10px 0; }
-  .hero-stat { border-right: none !important; padding-right: 0; margin-right: 0; width: 50%; }
-  .hero-stat:nth-child(odd) { border-right: 1px solid var(--border) !important; padding-right: 12px; margin-right: 0; }
-  .content { padding: 12px 12px; }
-  .header-hero { padding: 18px 14px 16px; }
+  .hero-stats { gap: 8px; }
+  .content { padding: 13px 13px; }
+  .header-hero { padding: 20px 16px 18px; }
 
   /* Tipografía general */
   body { font-size: 15px; }
@@ -453,8 +453,11 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
   .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(12,18,32,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); }
   .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: none; border: none; color: var(--text3); cursor: pointer; font-size: 13px; padding: 10px 2px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 500; transition: color 0.14s; min-height: 66px; position: relative; }
   .bn-item.active { color: var(--blue); }
-  .bn-item.active::after { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 2px; background: var(--blue); border-radius: 0 0 3px 3px; }
-  .bn-item svg { flex-shrink: 0; }
+  .bn-item::before { content: ''; position: absolute; top: 7px; left: 50%; transform: translateX(-50%); width: 46px; height: 30px; border-radius: 11px; background: transparent; transition: background 0.18s, transform 0.18s; z-index: 0; }
+  .bn-item.active::before { background: var(--blue-bg); }
+  .bn-item svg, .bn-item span { position: relative; z-index: 1; }
+  .bn-item svg { flex-shrink: 0; transition: transform 0.18s; }
+  .bn-item.active svg { transform: translateY(-1px); }
   .content { padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
   input[type=text], input[type=number], input[type=date], input[type=email], input[type=password], select { font-size: 16px; }
   .action-btn { min-width: 40px; min-height: 40px; font-size: 16px; }
@@ -548,6 +551,7 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
     <button class="hamburger" onclick="toggleSidebar()" aria-label="Menú">
       <span></span><span></span><span></span>
     </button>
+    <span class="topbar-brand">$</span>
     <span class="topbar-logo" id="topbar-title">Resumen</span>
   </div>
 
