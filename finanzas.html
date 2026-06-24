@@ -34,14 +34,14 @@
 
 :root {
   --bg: #000000;
-  --surface: #141210;
-  --surface2: #1C1916;
-  --surface3: #26211C;
-  --border: rgba(255,238,224,0.07);
-  --border2: rgba(255,238,224,0.13);
-  --text: #F7EDE2;
-  --text2: #BBA28E;
-  --text3: #8A715E;
+  --surface: #15131B;
+  --surface2: #1D1A26;
+  --surface3: #282433;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #F2F1F7;
+  --text2: #A7A1BC;
+  --text3: #6E687E;
   --blue: #9D5CF5;
   --blue-hover: #8A45E8;
   --blue-bg: rgba(157,92,245,0.09);
@@ -99,7 +99,7 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .hero-mqv-val { font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.025em; line-height: 1; }
 .hero-mqv-sub { font-size: 11px; color: var(--text3); font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; margin-top: 4px; }
 .hero-stats { display: flex; gap: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); flex-wrap: wrap; }
-.hero-stat { flex: 1 1 auto; min-width: 150px; background: rgba(255,238,224,0.04); border: 1px solid var(--border2); border-radius: 13px; padding: 13px 16px; }
+.hero-stat { flex: 1 1 auto; min-width: 150px; background: rgba(255,255,255,0.04); border: 1px solid var(--border2); border-radius: 13px; padding: 13px 16px; }
 .hero-stat .hs-label { font-size: 9px; color: var(--text3); margin-bottom: 7px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
 .hero-stat .hs-val { font-size: 17px; font-weight: 600; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; line-height: 1.2; color: var(--text); }
 .hero-stat .hs-sub { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
@@ -121,7 +121,7 @@ body { font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue
 .grid-form-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
 
 /* ── CARDS ── */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,238,224,0.035); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.035); }
 .card-title { font-size: 9px; font-weight: 800; color: var(--text3); margin-bottom: 18px; text-transform: uppercase; letter-spacing: 0.12em; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
 
 /* ── METRIC CARDS ── */
@@ -1356,7 +1356,7 @@ function renderResumen(){
   const total=entries.reduce((s,[,v])=>s+v.usd,0);
   document.getElementById('legend-patrim').innerHTML=entries.map(([k,v],i)=>`<span><b style="background:${colors[i]}"></b>${k} ${Math.round(v.usd/total*100)}%</span>`).join('');
   if(chartPatrim)chartPatrim.destroy();
-  chartPatrim=new Chart(document.getElementById('chartPatrim').getContext('2d'),{type:'doughnut',data:{labels:entries.map(([k])=>k),datasets:[{data:entries.map(([,v])=>v.usd),backgroundColor:colors,borderWidth:2,borderColor:'#1C1916',hoverOffset:8,hoverBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttUSD()},cutout:'62%'}});
+  chartPatrim=new Chart(document.getElementById('chartPatrim').getContext('2d'),{type:'doughnut',data:{labels:entries.map(([k])=>k),datasets:[{data:entries.map(([,v])=>v.usd),backgroundColor:colors,borderWidth:2,borderColor:'#1D1A26',hoverOffset:8,hoverBorderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttUSD()},cutout:'62%'}});
 
   // Category chart (egresos en efectivo + gastos TC categorizados)
   const catItems=[...data.egresos.filter(e=>inRango(e.fecha)),...data.movTC.filter(m=>m.tipo==='gasto'&&m.cat&&inRango(m.fecha))];
@@ -1366,7 +1366,7 @@ function renderResumen(){
   document.getElementById('legend-cat').innerHTML=catEntries.map(([k])=>`<span><b style="background:${CAT_COLORS[k]||'#888'}"></b>${k}</span>`).join('');
   if(chartCat)chartCat.destroy();
   if(catEntries.length){
-    chartCat=new Chart(document.getElementById('chartCat').getContext('2d'),{type:'bar',data:{labels:catEntries.map(([k])=>k),datasets:[{data:catEntries.map(([,v])=>v*USD_ARS),backgroundColor:catEntries.map(([k])=>CAT_COLORS[k]||'#888'),borderRadius:6,borderSkipped:false,borderWidth:0,hoverBackgroundColor:catEntries.map(([k])=>(CAT_COLORS[k]||'#888')+'cc')}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:{x:{ticks:{color:'#8A715E',callback:v=>fmtARS(v),font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'},border:{display:false}},y:{ticks:{color:'#BBA28E',font:{size:11}},grid:{display:false},border:{display:false}}}}});
+    chartCat=new Chart(document.getElementById('chartCat').getContext('2d'),{type:'bar',data:{labels:catEntries.map(([k])=>k),datasets:[{data:catEntries.map(([,v])=>v*USD_ARS),backgroundColor:catEntries.map(([k])=>CAT_COLORS[k]||'#888'),borderRadius:6,borderSkipped:false,borderWidth:0,hoverBackgroundColor:catEntries.map(([k])=>(CAT_COLORS[k]||'#888')+'cc')}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttARS()},scales:{x:{ticks:{color:'#6E687E',callback:v=>fmtARS(v),font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'},border:{display:false}},y:{ticks:{color:'#A7A1BC',font:{size:11}},grid:{display:false},border:{display:false}}}}});
   } else { chartCat=null; }
 
   renderFlujoMensual();
@@ -1763,10 +1763,10 @@ const doughnutCenterPlugin = {
     const cx = left + width/2, cy = top + height/2;
     ctx.save();
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#F7EDE2';
+    ctx.fillStyle = '#F2F1F7';
     ctx.font = "500 13px 'SF Mono', ui-monospace, Menlo, Consolas, monospace";
     ctx.fillText(fmtUSD(total), cx, cy - 10);
-    ctx.fillStyle = '#8A715E';
+    ctx.fillStyle = '#6E687E';
     ctx.font = "400 11px 'SF Mono', ui-monospace, Menlo, Consolas, monospace";
     ctx.fillText(fmtARS(total * USD_ARS), cx, cy + 10);
     ctx.restore();
@@ -1783,8 +1783,8 @@ function ttARS() {
     cornerRadius: 8,
     titleFont: { family: '-apple-system', size: 12, weight: '600' },
     bodyFont: { family: 'SF Mono', size: 12 },
-    titleColor: '#F7EDE2',
-    bodyColor: '#BBA28E',
+    titleColor: '#F2F1F7',
+    bodyColor: '#A7A1BC',
     callbacks: {
       label: ctx => [' ' + fmtARS(ctx.raw), ' ' + fmtUSD(ctx.raw / USD_ARS)]
     }
@@ -1799,8 +1799,8 @@ function ttUSD() {
     cornerRadius: 8,
     titleFont: { family: '-apple-system', size: 12, weight: '600' },
     bodyFont: { family: 'SF Mono', size: 12 },
-    titleColor: '#F7EDE2',
-    bodyColor: '#BBA28E',
+    titleColor: '#F2F1F7',
+    bodyColor: '#A7A1BC',
     callbacks: {
       title: items => items[0].label,
       label: ctx => {
@@ -1812,8 +1812,8 @@ function ttUSD() {
 }
 function scalesARS() {
   return {
-    y: { ticks: { color:'#8A715E', callback: v => fmtARS(v), font:{ size:11 } }, grid: { color:'rgba(255,255,255,0.04)' }, border:{ display:false } },
-    x: { ticks: { color:'#BBA28E', font:{ size:10 }, maxRotation:20 }, grid:{ display:false }, border:{ display:false } }
+    y: { ticks: { color:'#6E687E', callback: v => fmtARS(v), font:{ size:11 } }, grid: { color:'rgba(255,255,255,0.04)' }, border:{ display:false } },
+    x: { ticks: { color:'#A7A1BC', font:{ size:10 }, maxRotation:20 }, grid:{ display:false }, border:{ display:false } }
   };
 }
 
@@ -2015,7 +2015,7 @@ function downloadResumenMes(desde, hasta, label){
 @font-face{font-family:'Inter';font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-700-normal.woff2') format('woff2')}
 @font-face{font-family:'Inter';font-weight:800;font-display:swap;src:url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-800-normal.woff2') format('woff2')}
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#000000;--surf:#141210;--surf2:#1C1916;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.12);--tx:#F7EDE2;--tx2:#BBA28E;--tx3:#8A715E;--blue:#9D5CF5;--green:#6FB85C;--red:#F0573C}
+:root{--bg:#000000;--surf:#15131B;--surf2:#1D1A26;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.12);--tx:#F2F1F7;--tx2:#A7A1BC;--tx3:#6E687E;--blue:#9D5CF5;--green:#6FB85C;--red:#F0573C}
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:13px;color:var(--tx);background:var(--bg);padding:36px 40px;max-width:860px;margin:0 auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 h1{font-size:22px;font-weight:800;color:var(--tx);letter-spacing:-0.03em;margin-bottom:3px}
 h2{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:var(--tx3);margin:26px 0 10px;display:flex;align-items:center;gap:8px}
@@ -2051,7 +2051,7 @@ tbody tr:hover{background:rgba(157,92,245,.04)}
 @page{margin:14mm 16mm;size:A4 portrait}
 @media print{
   .print-btn{display:none !important}
-  html,body{background:#000000 !important;padding:0 !important;max-width:none !important;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color:#F7EDE2 !important}
+  html,body{background:#000000 !important;padding:0 !important;max-width:none !important;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color:#F2F1F7 !important}
   .header{page-break-inside:avoid;margin-bottom:16px}
   h2{margin-top:18px;page-break-after:avoid}
   h2+*{page-break-before:avoid}
@@ -2178,7 +2178,7 @@ async function generateResumenPDFNative(d){
     if(d.isCurrentMonth) PH+=cardSecH;
     PH=Math.ceil(PH)+4;
     const doc=new jsPDF({unit:'pt',format:[PW,PH],orientation:'portrait',compress:true});
-    const C={bg:[0,0,0],surf:[20,18,24],bd:[52,46,64],tx:[247,237,226],tx3:[140,124,150],blue:[157,92,245],green:[111,184,92],red:[240,87,60],violet:[208,122,208]};
+    const C={bg:[0,0,0],surf:[20,18,24],bd:[52,46,64],tx:[242,241,247],tx3:[140,124,150],blue:[157,92,245],green:[111,184,92],red:[240,87,60],violet:[208,122,208]};
     // sanea caracteres fuera de Latin-1 (las fuentes estándar de jsPDF no los soportan)
     const S=t=>String(t==null?'':t).replace(/—/g,'-').replace(/[…]/g,'...').replace(/≈/g,'~').replace(/[“”]/g,'"').replace(/[’]/g,"'");
     const setTx=c=>doc.setTextColor(c[0],c[1],c[2]);
