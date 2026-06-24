@@ -555,7 +555,10 @@ tbody tr:hover { background: rgba(74,140,245,0.05); box-shadow: inset 3px 0 0 rg
 
       <div id="flujo-mensual-card" class="card" style="padding:0;overflow:hidden"></div>
 
-      <div id="presupuesto-block"></div>
+      <div class="card">
+        <div class="card-title"><span>Gasto por día</span><span id="gd-prom" style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0"></span></div>
+        <div class="chart-wrap" style="height:200px"><canvas id="chartGastoDia" role="img" aria-label="Gasto por día">Gasto por día.</canvas></div>
+      </div>
 
       <div class="grid-2">
         <div class="card">
@@ -927,7 +930,7 @@ let sortDir={ingresos:'desc',egresos:'desc',ahorros:'desc',transferencias:'desc'
 let rendPeriodo='mes-actual', rendCustom={desde:'',hasta:''};
 let curMode={in:'usd', eg:'usd', tc:'usd', tp:'usd', tr:'usd', sueldo:'usd'};
 let rangoResumen={desde:'',hasta:''}, mesFiltros={ingresos:'',egresos:'',ahorros:''};
-let chartFlujo=null, chartPatrim=null, chartEvo=null, chartCat=null, chartPatEvo=null, chartFlujoMes=null;
+let chartFlujo=null, chartPatrim=null, chartEvo=null, chartCat=null, chartPatEvo=null, chartFlujoMes=null, chartGastoDia=null;
 let flujoPeriodo='mes';
 
 /* ── PERSISTENCE ── */
@@ -1339,7 +1342,7 @@ function renderResumen(){
 
   renderFlujoMensual();
   renderUltimos();
-  renderPresupuestos();
+  renderGastoDiario();
 }
 
 function renderUltimos(){
@@ -1785,44 +1788,38 @@ function getPatrimonioMensual(){
 
 
 /* ── PRESUPUESTOS ── */
-function renderPresupuestos(){
-  const now=new Date();
-  const ts=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
-  const te=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-31`;
-  const gastado={};
-  data.egresos.filter(e=>e.fecha>=ts&&e.fecha<=te).forEach(e=>{ gastado[e.cat]=(gastado[e.cat]||0)+e.usd; });
-  data.movTC.filter(m=>m.tipo==='gasto'&&m.cat&&m.fecha>=ts&&m.fecha<=te).forEach(m=>{ gastado[m.cat]=(gastado[m.cat]||0)+m.usd; });
-  const cats=Object.keys(data.presupuestos);
-  const rows=cats.map(cat=>{
-    const bUSD=data.presupuestos[cat];
-    const gUSD=gastado[cat]||0;
-    const pct=bUSD>0?Math.min(Math.round(gUSD/bUSD*100),100):0;
-    const over=bUSD>0&&gUSD>bUSD;
-    const barColor=over?'var(--red)':'var(--blue)';
-    return`<div style="margin-bottom:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:12px;color:var(--text2)">${cat}</span>
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:11px;color:${over?'var(--red)':'var(--text3)'}">${fmtARS(gUSD*USD_ARS)} /</span>
-          <input type="number" value="${bUSD||''}" placeholder="∞" min="0" step="1"
-            onchange="updatePresupuesto('${cat}',this.value)"
-            style="width:72px;padding:3px 6px;font-size:11px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:inherit;outline:none;text-align:right">
-          <span style="font-size:10px;color:var(--text3)">U$D</span>
-        </div>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${barColor};transition:width 0.4s ease"></div></div>
-    </div>`;
-  }).join('');
-  const el=document.getElementById('presupuesto-block');
-  if(el) el.innerHTML=`<div class="card" style="padding:16px 20px;margin-bottom:18px">
-    <div class="card-title" style="margin-bottom:16px"><span>Presupuesto mensual</span><span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">Editá el límite en U$D</span></div>
-    ${rows}
-  </div>`;
-}
-
-function updatePresupuesto(cat,val){
-  data.presupuestos[cat]=parseFloat(val)||0;
-  saveData(); renderPresupuestos();
+function renderGastoDiario(){
+  const canvas=document.getElementById('chartGastoDia');
+  if(!canvas) return;
+  // Rango: el del resumen si está seteado; si no, el mes actual (día 1 → hoy)
+  let desde, hasta;
+  if(rangoResumen.desde && rangoResumen.hasta){ desde=rangoResumen.desde; hasta=rangoResumen.hasta; }
+  else {
+    const now=new Date();
+    desde=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+    hasta=today();
+  }
+  // Gasto por día = egresos en efectivo + gastos de tarjeta (en USD), luego a pesos
+  const porDia={};
+  data.egresos.filter(e=>e.fecha>=desde&&e.fecha<=hasta).forEach(e=>{ porDia[e.fecha]=(porDia[e.fecha]||0)+e.usd; });
+  data.movTC.filter(m=>m.tipo==='gasto'&&m.fecha>=desde&&m.fecha<=hasta).forEach(m=>{ porDia[m.fecha]=(porDia[m.fecha]||0)+m.usd; });
+  // Lista continua de días
+  const days=[]; const d=new Date(desde+'T12:00:00'), end=new Date(hasta+'T12:00:00');
+  let guard=0;
+  while(d<=end && guard++<400){ days.push(d.toISOString().split('T')[0]); d.setDate(d.getDate()+1); }
+  const multiMes=desde.slice(0,7)!==hasta.slice(0,7);
+  const labels=days.map(iso=>{ const[,mm,dd]=iso.split('-'); return multiMes?`${dd}/${mm}`:String(+dd); });
+  const vals=days.map(iso=>(porDia[iso]||0)*USD_ARS);
+  const total=vals.reduce((a,b)=>a+b,0);
+  const prom=days.length?total/days.length:0;
+  const promEl=document.getElementById('gd-prom');
+  if(promEl) promEl.textContent=days.length?`Prom. ${fmtARS(prom)}/día`:'';
+  const ttip=Object.assign(ttARS(),{callbacks:{
+    title:items=>fmtDate(days[items[0].dataIndex]),
+    label:ctx=>[' '+fmtARS(ctx.raw),' '+fmtUSD(ctx.raw/USD_ARS)]
+  }});
+  if(chartGastoDia)chartGastoDia.destroy();
+  chartGastoDia=new Chart(canvas.getContext('2d'),{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:'#EF4858',borderRadius:5,borderSkipped:false,borderWidth:0,hoverBackgroundColor:'#EF4858cc'}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:500,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:ttip},scales:scalesARS()}});
 }
 
 /* ── METAS ── */
