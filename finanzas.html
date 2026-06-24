@@ -2128,9 +2128,15 @@ async function generateResumenPDFNative(d){
   try{ await loadJsPDF(); }catch(e){ toast('No se pudo cargar el generador de PDF.','error'); return; }
   try{
     const { jsPDF }=window.jspdf;
-    const doc=new jsPDF({unit:'pt',format:'a4',orientation:'portrait',compress:true});
-    const PW=doc.internal.pageSize.getWidth(), PH=doc.internal.pageSize.getHeight();
-    const M=34, CW=PW-M*2, F='helvetica';
+    const PW=595.28, M=34, CW=PW-M*2, F='helvetica';
+    // Altura exacta del contenido → una sola página (sin página vacía ni tablas cortadas)
+    const cardSecH=94, tH=n=>20+18+(n?n*24:34)+14;
+    let PH=M + (62+18) + cardSecH /*ing vs eg*/ + cardSecH /*deuda*/
+          + tH(d.inMes.length) + tH(d.egMes.length)
+          + (d.tcMes.length?tH(d.tcMes.length):0) + (d.ahMes.length?tH(d.ahMes.length):0) + M;
+    if(d.isCurrentMonth) PH+=cardSecH;
+    PH=Math.ceil(PH)+4;
+    const doc=new jsPDF({unit:'pt',format:[PW,PH],orientation:'portrait',compress:true});
     const C={bg:[6,8,15],surf:[16,25,40],bd:[40,52,74],tx:[236,241,255],tx3:[106,130,168],blue:[74,140,245],green:[18,201,138],red:[239,72,88],violet:[159,143,255]};
     // sanea caracteres fuera de Latin-1 (las fuentes estándar de jsPDF no los soportan)
     const S=t=>String(t==null?'':t).replace(/—/g,'-').replace(/[…]/g,'...').replace(/≈/g,'~').replace(/[“”]/g,'"').replace(/[’]/g,"'");
