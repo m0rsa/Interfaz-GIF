@@ -2418,7 +2418,7 @@ async function fetchMercados(){
     setPriceCard('eth',d.ethereum?.usd,d.ethereum?.usd_24h_change);
   }catch(e){ setPriceCard('btc',null,null); setPriceCard('eth',null,null); }
   try{
-    const r=await fetch('https://axwxdiweiqxuqrbqmuwo.supabase.co/functions/v1/sp500-proxy');
+    const r=await fetch(SUPA_URL+'/functions/v1/sp500-proxy');
     const d=await r.json();
     if(d.error) throw new Error(d.error);
     setPriceCard('sp500',d.price,d.change);
