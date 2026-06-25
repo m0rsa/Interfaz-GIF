@@ -2467,9 +2467,6 @@ function calcInteres(){
 }
 
 /* ── AUTH ── */
-// Inyectado por GitHub Actions desde Secrets — no figura en el repo
-const GATE_HASH='__GATE_HASH__';
-
 function _hideOverlay(){
   const o=document.getElementById('auth-overlay');
   if(!o)return;
@@ -2479,8 +2476,8 @@ function _hideOverlay(){
 }
 
 async function checkAuth(){
-  // 1. Verificar gate token
-  if(sessionStorage.getItem('_gk')!==GATE_HASH){
+  // 1. Verificar que el gate fue pasado (validado server-side en login)
+  if(!sessionStorage.getItem('_gk')){
     window.location.replace('login.html'); return;
   }
   // 2. Verificar sesión Supabase

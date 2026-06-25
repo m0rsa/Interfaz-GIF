@@ -185,17 +185,7 @@ body{font-family:'SF Pro',-apple-system,BlinkMacSystemFont,sans-serif;color:var(
 const SUPA_URL='__SUPA_URL__';
 const SUPA_KEY='__SUPA_KEY__';
 
-// Inyectado por GitHub Actions desde Secrets — no figura en el repo
-const GATE_HASH='__GATE_HASH__';
-const GATE_SALT='_fin_v2';
-
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
-
-/* ── HASH ── */
-async function hashStr(s){
-  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
 
 /* ── TOGGLE EYE ── */
 const EYE_OPEN='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
@@ -317,9 +307,15 @@ async function checkGate(){
   const btn=document.getElementById('gate-btn');
   const errEl=document.getElementById('gate-error');
   btn.disabled=true; btn.innerHTML='<div class="spinner"></div>';
-  const inputHash=await hashStr(val+GATE_SALT);
+  // Validación del código en el servidor (Edge Function); el hash nunca está en el cliente
+  let ok=false, neterr=false;
+  try{
+    const r=await fetch(SUPA_URL+'/functions/v1/gate-verify',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY,'apikey':SUPA_KEY},body:JSON.stringify({code:val})});
+    ok=(await r.json()).ok===true;
+  }catch(e){ neterr=true; }
   btn.disabled=false; btn.innerHTML='Continuar';
-  if(inputHash!==GATE_HASH){
+  if(neterr){ errEl.textContent='Error de conexión. Probá de nuevo.'; errEl.className='ferr show'; return; }
+  if(!ok){
     gSetA(gAttempts+1);
     document.getElementById('gate-input').classList.add('err');
     if(gAttempts>=GATE_MAX){
@@ -333,7 +329,7 @@ async function checkGate(){
     return;
   }
   gSetA(0); gSetL(0);
-  sessionStorage.setItem('_gk',GATE_HASH);
+  sessionStorage.setItem('_gk','ok');
   document.getElementById('gate-input').classList.remove('err');
   showLogin();
 }
@@ -419,10 +415,10 @@ window.addEventListener('load',async()=>{
   // Si ya hay sesión activa + gate válida → redirigir directo
   const gk=sessionStorage.getItem('_gk');
   const{data:{session}}=await sb.auth.getSession();
-  if(session && gk===GATE_HASH){ window.location.replace('finanzas.html'); return; }
+  if(session && gk){ window.location.replace('finanzas.html'); return; }
 
   // Si el gate ya fue pasado → ir a paso 2
-  if(gk===GATE_HASH){ showLogin(); return; }
+  if(gk){ showLogin(); return; }
 
   // Caso base: empezar en paso 1
   setTimeout(()=>document.getElementById('gate-input').focus(),80);

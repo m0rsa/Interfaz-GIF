@@ -4,7 +4,7 @@ files = ['login.html', 'finanzas.html']
 subs = {
     '__SUPA_URL__':  os.environ['SUPA_URL'],
     '__SUPA_KEY__':  os.environ['SUPA_KEY'],
-    '__GATE_HASH__': os.environ['GATE_HASH'],
+    # GATE_HASH ya no se inyecta: la validación del gate es server-side (Edge Function gate-verify)
 }
 
 for fname in files:
