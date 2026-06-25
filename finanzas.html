@@ -1617,7 +1617,10 @@ function buildRows(items,tipo,cellsFn){
 function renderTCHistorial(el){
   if(!el)return;
   const _tcDir=sortDir.tc||'desc';
-  const movs=data.movTC.filter(m=>m.tipo!=='deuda_inicial').sort((a,b)=>_tcDir==='asc'?a.fecha.localeCompare(b.fecha):b.fecha.localeCompare(a.fecha));
+  const isMain=el.id!=='deudas-detalle';
+  let movs=data.movTC.filter(m=>m.tipo!=='deuda_inicial');
+  if(isMain) movs=movs.filter(m=>inHistR('tc',m.fecha));
+  movs=movs.sort((a,b)=>_tcDir==='asc'?a.fecha.localeCompare(b.fecha):b.fecha.localeCompare(a.fecha));
   // Desglose por tarjeta (en ARS usando raw amounts para evitar distorsión por TC viejo)
   const byCard={};
   data.movTC.filter(m=>m.tipo==='gasto').forEach(m=>{
@@ -1659,8 +1662,9 @@ function renderTCHistorial(el){
     `<div style="font-size:22px;font-weight:600;margin-bottom:4px">${_rparts.join('<span style="color:var(--text3);margin:0 6px">+</span>')||'Sin deuda'}</div>`+
     `<div style="font-size:13px;color:var(--text3);margin-bottom:16px">≈ ${fmtARS(_rars+_rusd*USD_ARS)} total en pesos al TC actual</div>`+
     cardBreakdown+
+    (isMain?histBar('tc'):'')+
     (movs.length? renderDayGroups(movs,'tc',tcRow,{idns:ns,totalFn:tcTotal,actFn:tcAct,extraFn:tcExtra})
-                : '<div class="empty">Sin movimientos de tarjeta.</div>');
+                : `<div class="empty">${isMain?'Sin movimientos en el rango.':'Sin movimientos de tarjeta.'}</div>`);
 }
 
 /* ── HISTORIAL AGRUPADO POR DÍA ── */
@@ -1675,6 +1679,32 @@ function toggleDay(id){
   const grp=body?body.closest('.day-group'):null;
   if(grp){ const ch=grp.querySelector('.day-chev'); if(ch)ch.textContent=open?'▾':'▸'; const h=grp.querySelector('.day-head'); if(h)h.setAttribute('aria-expanded',open); }
 }
+/* ── FILTRO POR RANGO DE FECHAS (historiales) ── */
+const histR={ingresos:{d:'',h:''},egresos:{d:'',h:''},tc:{d:'',h:''}};
+function histBar(id){
+  const r=histR[id]||{d:'',h:''};
+  const reset=(r.d||r.h)?`<button class="gd-reset" onclick="clearHistR('${id}')" title="Ver todo">↺ Todo</button>`:'';
+  return `<div class="gd-range">
+    <span class="gd-lbl">Desde</span>
+    <input type="date" id="hr-d-${id}" value="${r.d}" onchange="setHistR('${id}')">
+    <span class="gd-lbl">Hasta</span>
+    <input type="date" id="hr-h-${id}" value="${r.h}" onchange="setHistR('${id}')">
+    ${reset}
+  </div>`;
+}
+function setHistR(id){
+  const d=document.getElementById('hr-d-'+id), h=document.getElementById('hr-h-'+id);
+  histR[id]={d:d?d.value:'',h:h?h.value:''};
+  reRenderHist(id);
+}
+function clearHistR(id){ histR[id]={d:'',h:''}; reRenderHist(id); }
+function reRenderHist(id){
+  if(id==='ingresos') renderIngresos();
+  else if(id==='egresos') renderEgresos();
+  else if(id==='tc') renderTCHistorial(document.getElementById('tc-historial-egresos'));
+}
+function inHistR(id,fecha){ const r=histR[id]; if(!r) return true; if(r.d&&fecha<r.d) return false; if(r.h&&fecha>r.h) return false; return true; }
+
 function renderDayGroups(items,tipo,rowFn,o){
   o=o||{};
   const ns=o.idns||tipo, sign=o.sign||'', color=o.color||'var(--text)';
@@ -1708,14 +1738,12 @@ function renderDayGroups(items,tipo,rowFn,o){
 }
 
 function renderIngresos(){
-  const meses=getMesesDe(data.ingresos);
-  document.getElementById('filtro-bar-ingresos').innerHTML=buildFiltroSelect('ingresos',meses);
-  const mes=mesFiltros.ingresos;
+  document.getElementById('filtro-bar-ingresos').innerHTML=histBar('ingresos');
   const busq=(document.getElementById('search-ingresos')?.value||'').toLowerCase().trim();
-  let items=mes?data.ingresos.filter(i=>i.fecha.startsWith(mes)):data.ingresos;
+  let items=data.ingresos.filter(i=>inHistR('ingresos',i.fecha));
   if(busq)items=items.filter(i=>(i.concepto||'').toLowerCase().includes(busq));
   const el=document.getElementById('lista-ingresos');
-  if(!items.length){el.innerHTML='<div class="empty">Sin ingresos registrados.</div>';return;}
+  if(!items.length){el.innerHTML='<div class="empty">Sin ingresos en el rango.</div>';return;}
   el.innerHTML=renderDayGroups(items,'ingresos',
     i=>`<div class="day-row-main"><div class="td-main">${i.concepto||'—'}</div><div class="day-row-tags"><span class="badge ${i.cat==='Repago'?'repago':'ingreso'}">${i.cat}</span>${i.cuenta?`<span class="acct-pill" style="background:${COLORS[i.cuenta]||'#888'}22;color:${COLORS[i.cuenta]||'#888'}">${i.cuenta}</span>`:''}</div></div><div class="day-row-amt"><div class="td-main" style="color:var(--green)">${fmtARS(i.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(i.usd)}${i.rawCur==='ars'?' · en $':''}</div></div>`,
     {sign:'',color:'var(--green)'});
@@ -1723,14 +1751,12 @@ function renderIngresos(){
 
 function renderEgresos(){
   renderTCHistorial(document.getElementById('tc-historial-egresos'));
-  const meses=getMesesDe(data.egresos);
-  document.getElementById('filtro-bar-egresos').innerHTML=buildFiltroSelect('egresos',meses);
-  const mes=mesFiltros.egresos;
+  document.getElementById('filtro-bar-egresos').innerHTML=histBar('egresos');
   const busq=(document.getElementById('search-egresos')?.value||'').toLowerCase().trim();
-  let egFiltered=mes?data.egresos.filter(e=>e.fecha.startsWith(mes)):data.egresos;
+  let egFiltered=data.egresos.filter(e=>inHistR('egresos',e.fecha));
   if(busq)egFiltered=egFiltered.filter(e=>(e.concepto||'').toLowerCase().includes(busq));
   const el=document.getElementById('lista-egresos');
-  if(!egFiltered.length){el.innerHTML='<div class="empty">Sin egresos en efectivo.</div>';return;}
+  if(!egFiltered.length){el.innerHTML='<div class="empty">Sin egresos en el rango.</div>';return;}
   el.innerHTML=renderDayGroups(egFiltered,'egresos',
     e=>`<div class="day-row-main"><div class="td-main">${e.concepto||'—'}</div><div class="day-row-tags"><span class="badge egreso">${e.cat||'Otros'}</span>${e.cuenta?`<span class="acct-pill" style="background:${COLORS[e.cuenta]||'#888'}22;color:${COLORS[e.cuenta]||'#888'}">${e.cuenta}</span>`:''}</div></div><div class="day-row-amt"><div class="td-main" style="color:var(--red)">-${fmtARS(e.usd*USD_ARS)}</div><div class="td-sub">${fmtUSD(e.usd)}${e.rawCur==='ars'?' · en $':''}</div></div>`,
     {sign:'-',color:'var(--red)'});
