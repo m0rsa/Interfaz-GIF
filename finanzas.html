@@ -547,6 +547,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
     </div>
     <input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="importarDatos(this)">
     <button onclick="openRecurModal()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">🔁 Recurrentes</button>
+    <button onclick="openCatsModal()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">🏷 Categorías</button>
     <button onclick="openMFAModal()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">🔑 Gestionar 2FA</button>
     <button onclick="doLogout()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">→ Cerrar sesión</button>
   </div>
@@ -952,6 +953,19 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
     <p style="font-size:11px;color:var(--text3);margin:-4px 0 12px">Se generan solos cada mes al abrir la app, en el día que elijas.</p>
     <div id="recur-list" style="margin-bottom:14px"></div>
     <div style="border-top:1px solid var(--border);padding-top:14px"><div id="recur-form"></div></div>
+  </div>
+</div>
+
+<!-- CATEGORÍAS MODAL -->
+<div id="cats-modal" class="edit-modal-overlay" onclick="if(event.target===this)closeCatsModal()">
+  <div class="edit-modal-sheet">
+    <div class="em-handle"></div>
+    <div class="em-header">
+      <span>🏷 Categorías</span>
+      <button class="em-close" onclick="closeCatsModal()">✕</button>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin:-4px 0 12px">Renombrar migra los movimientos existentes. Al eliminar, pasan a "Otros".</p>
+    <div id="cats-list"></div>
   </div>
 </div>
 
@@ -1791,7 +1805,7 @@ function renderTCHistorial(el){
   const tcExtra=m=>{
     if(m.tipo!=='gasto') return '';
     const tarjOpts=['Visa','Mastercard','Amex'].map(t=>`<option value="${t}"${(m.tarjeta||'Visa')===t?' selected':''}>${t}</option>`).join('');
-    const tcCats=['Vivienda','Alimentación','Transporte','Salud','Entretenimiento','Servicios','Otros'];
+    const tcCats=CAT_EGRESOS.slice(); if(m.cat&&!tcCats.includes(m.cat)) tcCats.push(m.cat);
     const catOpts=tcCats.map(c=>`<option value="${c}"${(m.cat||'Otros')===c?' selected':''}>${c}</option>`).join('');
     const isAr=m.rawCur==='ars';
     const montoVal=isAr?(+m.rawMonto||0).toFixed(2):(+m.usd||0).toFixed(2);
@@ -2197,6 +2211,68 @@ function agregarRecurrente(){
 }
 function eliminarRecurrente(id){ data.recurrentes=(data.recurrentes||[]).filter(t=>t.id!==id); saveData(); renderRecurList(); }
 function toggleRecurrente(id){ const t=(data.recurrentes||[]).find(x=>x.id===id); if(t){ t.activo=(t.activo===false); saveData(); renderRecurList(); } }
+
+/* ── CATEGORÍAS EDITABLES ── */
+function poblarSelectsCategorias(){
+  const set=(id,arr)=>{ const el=document.getElementById(id); if(!el)return; const v=el.value; el.innerHTML=arr.map(c=>`<option>${c}</option>`).join(''); if(arr.includes(v))el.value=v; };
+  set('in-cat',CAT_INGRESOS); set('eg-cat',CAT_EGRESOS); set('tc-cat',CAT_EGRESOS);
+}
+function openCatsModal(){ closeSidebar(); renderCatsModal(); document.getElementById('cats-modal').classList.add('open'); }
+function closeCatsModal(){ document.getElementById('cats-modal').classList.remove('open'); }
+function renderCatsModal(){
+  const el=document.getElementById('cats-list'); if(!el) return;
+  const esc=s=>String(s).replace(/"/g,'&quot;');
+  const row=(grupo,c,i)=>`<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+    ${grupo==='eg'?`<input type="color" value="${CAT_COLORS[c]||'#9D5CF5'}" onchange="setCatColor(${i},this.value)" title="Color" style="width:30px;height:30px;padding:0;border:1px solid var(--border2);border-radius:6px;background:none;cursor:pointer;flex:0 0 auto">`:''}
+    <input type="text" value="${esc(c)}" onchange="renombrarCat('${grupo}',${i},this.value)" style="flex:1;min-width:0">
+    <button class="action-btn" title="Eliminar" onclick="eliminarCat('${grupo}',${i})">🗑</button>
+  </div>`;
+  el.innerHTML=`
+    <div style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin:4px 0 8px">Egresos y tarjeta</div>
+    ${CAT_EGRESOS.map((c,i)=>row('eg',c,i)).join('')}
+    <div style="display:flex;gap:6px;margin:6px 0 16px"><input type="text" id="cat-new-eg" placeholder="Nueva categoría de egreso" style="flex:1"><button class="btn sm primary" onclick="agregarCat('eg')">+ Agregar</button></div>
+    <div style="font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin:4px 0 8px">Ingresos</div>
+    ${CAT_INGRESOS.map((c,i)=>row('in',c,i)).join('')}
+    <div style="display:flex;gap:6px;margin-top:6px"><input type="text" id="cat-new-in" placeholder="Nueva categoría de ingreso" style="flex:1"><button class="btn sm primary" onclick="agregarCat('in')">+ Agregar</button></div>`;
+}
+function _catArr(grupo){ return grupo==='eg'?CAT_EGRESOS:CAT_INGRESOS; }
+function _migraCat(grupo,viejo,nuevo){
+  const tcIngreso=grupo==='in';
+  const migra=lst=>lst.forEach(m=>{ if(m.cat===viejo) m.cat=nuevo; });
+  if(grupo==='eg'){ migra(data.egresos); migra(data.movTC); }
+  else migra(data.ingresos);
+  (data.recurrentes||[]).forEach(t=>{ if((t.tipo==='ingreso')===tcIngreso && t.cat===viejo) t.cat=nuevo; });
+}
+function renombrarCat(grupo,idx,nuevo){
+  nuevo=(nuevo||'').trim(); const arr=_catArr(grupo); const viejo=arr[idx];
+  if(!nuevo){ renderCatsModal(); return; }
+  if(!viejo||viejo===nuevo){ return; }
+  if(arr.includes(nuevo)){ toast('Ya existe esa categoría.','error'); renderCatsModal(); return; }
+  arr[idx]=nuevo;
+  _migraCat(grupo,viejo,nuevo);
+  if(grupo==='eg'){ if(CAT_COLORS[viejo]!=null){ CAT_COLORS[nuevo]=CAT_COLORS[viejo]; delete CAT_COLORS[viejo]; } if(data.presupuestos&&data.presupuestos[viejo]!=null){ data.presupuestos[nuevo]=data.presupuestos[viejo]; delete data.presupuestos[viejo]; } }
+  saveData(); poblarSelectsCategorias(); renderCatsModal(); renderAll();
+}
+function eliminarCat(grupo,idx){
+  const arr=_catArr(grupo); const c=arr[idx]; if(!c) return;
+  if(arr.length<=1){ toast('Tiene que quedar al menos una categoría.','error'); return; }
+  if(!confirm(`Eliminar "${c}"? Los movimientos que la usen pasarán a "Otros".`)) return;
+  arr.splice(idx,1);
+  if(!arr.includes('Otros')) arr.push('Otros');
+  _migraCat(grupo,c,'Otros');
+  if(grupo==='eg'){ delete CAT_COLORS[c]; if(data.presupuestos) delete data.presupuestos[c]; }
+  saveData(); poblarSelectsCategorias(); renderCatsModal(); renderAll();
+}
+function setCatColor(idx,color){ const c=CAT_EGRESOS[idx]; if(c){ CAT_COLORS[c]=color; saveData(); renderAll(); } }
+function agregarCat(grupo){
+  const inp=document.getElementById(grupo==='eg'?'cat-new-eg':'cat-new-in');
+  const nuevo=(inp.value||'').trim(); if(!nuevo) return;
+  const arr=_catArr(grupo);
+  if(arr.includes(nuevo)){ toast('Ya existe esa categoría.','error'); return; }
+  arr.push(nuevo);
+  if(grupo==='eg' && !CAT_COLORS[nuevo]) CAT_COLORS[nuevo]='#9D5CF5';
+  inp.value=''; saveData(); poblarSelectsCategorias(); renderCatsModal(); renderAll();
+}
 
 /* ── GASTO POR DÍA ── */
 function defGastoDiaDesde(){ const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-01`; }
@@ -2919,6 +2995,7 @@ async function init(){
   const mesSel=document.getElementById('resumen-mes-sel'); if(mesSel) mesSel.value=nowM;
   await loadFromSupabase();
   updateCotizDisplay();
+  poblarSelectsCategorias();
   const nGen=generarRecurrentes();
   if(nGen) toast(nGen+(nGen>1?' movimientos recurrentes generados':' movimiento recurrente generado'),'success');
   updateDeudaChip(); renderResumen();
@@ -2941,9 +3018,8 @@ function openEditModal(tipo, id) {
   const isCurARS = editState.cur === 'ars';
   let fields = '';
   if (tipo === 'ingresos' || tipo === 'egresos') {
-    const cats = tipo === 'ingresos'
-      ? ['Sueldo','Freelance','Inversión','Repago','Otros']
-      : ['Vivienda','Alimentación','Transporte','Salud','Entretenimiento','Servicios','Otros'];
+    const cats = (tipo === 'ingresos' ? CAT_INGRESOS : CAT_EGRESOS).slice();
+    if(item.cat && !cats.includes(item.cat)) cats.push(item.cat);
     const displayMonto = isCurARS
       ? Math.round(item.rawCur === 'ars' ? item.rawMonto : item.usd * USD_ARS)
       : (item.rawCur === 'usd' ? item.rawMonto : item.usd);
