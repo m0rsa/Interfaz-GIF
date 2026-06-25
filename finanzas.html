@@ -546,6 +546,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
       <button onclick="document.getElementById('import-file').click()" title="Restaurar desde un archivo de backup" style="flex:1;font-size:11px;padding:7px 8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">⬆ Importar</button>
     </div>
     <input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="importarDatos(this)">
+    <button onclick="openRecurModal()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">🔁 Recurrentes</button>
     <button onclick="openMFAModal()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">🔑 Gestionar 2FA</button>
     <button onclick="doLogout()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">→ Cerrar sesión</button>
   </div>
@@ -940,6 +941,20 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
   </div>
 </div>
 
+<!-- RECURRENTES MODAL -->
+<div id="recur-modal" class="edit-modal-overlay" onclick="if(event.target===this)closeRecurModal()">
+  <div class="edit-modal-sheet">
+    <div class="em-handle"></div>
+    <div class="em-header">
+      <span>🔁 Movimientos recurrentes</span>
+      <button class="em-close" onclick="closeRecurModal()">✕</button>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin:-4px 0 12px">Se generan solos cada mes al abrir la app, en el día que elijas.</p>
+    <div id="recur-list" style="margin-bottom:14px"></div>
+    <div style="border-top:1px solid var(--border);padding-top:14px"><div id="recur-form"></div></div>
+  </div>
+</div>
+
 <script>
 /* ── CHART.JS GLOBAL FONT ── */
 Chart.defaults.font.family="'SF Pro',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif";
@@ -977,6 +992,7 @@ let data = {
   sueldo: 0,
   presupuestos: { Alimentación:0, Transporte:0, Salud:0, Entretenimiento:0, Servicios:0, Ahorros:0, Otros:0 },
   metas: [],
+  recurrentes: [],
 };
 
 /* ── UI STATE ── */
@@ -1005,7 +1021,7 @@ function loadData(){
 }
 async function syncSupabase(){
   try{
-    await sb.from('finanzas_config').upsert({id:1,cotiz_c:data.cotizC,cotiz_v:data.cotizV,deuda_tc:data.deudaTC,sueldo:data.sueldo,presupuestos_json:JSON.stringify(data.presupuestos),metas_json:JSON.stringify(data.metas),instrumentos_json:JSON.stringify({instrumentos:INSTRUMENTOS,colors:COLORS,icons:ICONS,ars_instr:[...ARS_INSTR],cat_eg:CAT_EGRESOS,cat_in:CAT_INGRESOS,cat_colors:CAT_COLORS}),updated_at:new Date().toISOString()});
+    await sb.from('finanzas_config').upsert({id:1,cotiz_c:data.cotizC,cotiz_v:data.cotizV,deuda_tc:data.deudaTC,sueldo:data.sueldo,presupuestos_json:JSON.stringify(data.presupuestos),metas_json:JSON.stringify(data.metas),recurrentes_json:JSON.stringify(data.recurrentes||[]),instrumentos_json:JSON.stringify({instrumentos:INSTRUMENTOS,colors:COLORS,icons:ICONS,ars_instr:[...ARS_INSTR],cat_eg:CAT_EGRESOS,cat_in:CAT_INGRESOS,cat_colors:CAT_COLORS}),updated_at:new Date().toISOString()});
     const tbls=[
       {n:'ingresos',       arr:data.ingresos,           m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,raw_rate:r.rawRate||null,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
       {n:'egresos',        arr:data.egresos,             m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,raw_rate:r.rawRate||null,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
@@ -1037,7 +1053,7 @@ async function loadFromSupabase(){
     const fd=r=>typeof r==='string'&&r.includes('T')?r.split('T')[0]:r;
     if(cfg.data){
       data.cotizC=+cfg.data.cotiz_c; data.cotizV=+cfg.data.cotiz_v; data.deudaTC=+cfg.data.deuda_tc; data.sueldo=+cfg.data.sueldo;
-      try{ if(cfg.data.presupuestos_json) data.presupuestos=JSON.parse(cfg.data.presupuestos_json); if(cfg.data.metas_json) data.metas=JSON.parse(cfg.data.metas_json); }catch(e){}
+      try{ if(cfg.data.presupuestos_json) data.presupuestos=JSON.parse(cfg.data.presupuestos_json); if(cfg.data.metas_json) data.metas=JSON.parse(cfg.data.metas_json); if(cfg.data.recurrentes_json) data.recurrentes=JSON.parse(cfg.data.recurrentes_json); }catch(e){}
       try{
         if(cfg.data.instrumentos_json){
           const ic=JSON.parse(cfg.data.instrumentos_json);
@@ -2079,6 +2095,109 @@ function renderPresupuestos(){
   el.innerHTML=`<div class="card"><div class="card-title">Presupuestos del mes</div>${rows}</div>`;
 }
 
+/* ── MOVIMIENTOS RECURRENTES ── */
+function _pad2(n){ return String(n).padStart(2,'0'); }
+function _rv(id){ const e=document.getElementById(id); return e?e.value:''; }
+function crearMovDeRecurrente(t,fecha){
+  const usd = t.rawCur==='ars' ? (t.rawMonto/USD_ARS) : t.rawMonto;
+  const id = Date.now()+Math.floor(Math.random()*1e6);
+  const base={ id, usd, rawMonto:t.rawMonto, rawCur:t.rawCur, rawRate:USD_ARS, fecha, nota:'(recurrente)' };
+  if(t.tipo==='ingreso') data.ingresos.push({...base, concepto:t.concepto, cat:t.cat||'Otros', cuenta:t.cuenta||INSTRUMENTOS[0]});
+  else if(t.tipo==='tc'){ data.deudaTC+=usd; data.movTC.push({...base, tipo:'gasto', concepto:t.concepto, cat:t.cat||'Otros', tarjeta:t.tarjeta||'Visa'}); }
+  else data.egresos.push({...base, concepto:t.concepto, cat:t.cat||'Otros', cuenta:t.cuenta||INSTRUMENTOS[0]});
+}
+// Genera los movimientos pendientes de cada plantilla (uno por mes vencido)
+function generarRecurrentes(){
+  if(!Array.isArray(data.recurrentes)||!data.recurrentes.length) return 0;
+  const now=new Date(), curY=now.getFullYear(), curM1=now.getMonth()+1, curDom=now.getDate();
+  const nextYM=(y,m)=>{ m++; if(m>12){m=1;y++;} return [y,m]; };
+  let gen=0;
+  data.recurrentes.forEach(t=>{
+    if(t.activo===false) return;
+    let y,m;
+    if(t.lastGen){ const a=String(t.lastGen).split('-').map(Number); [y,m]=nextYM(a[0],a[1]); }
+    else { y=curY; m=curM1; }   // primera vez: arranca este mes (sin backfill histórico)
+    let guard=0;
+    while((y<curY || (y===curY && m<=curM1)) && guard++<60){
+      const dim=new Date(y,m,0).getDate(), dia=Math.min(+t.dia||1,dim);
+      const esActual=(y===curY && m===curM1);
+      if(esActual && curDom<dia) break;   // el día de este mes todavía no llegó
+      crearMovDeRecurrente(t, `${y}-${_pad2(m)}-${_pad2(dia)}`);
+      t.lastGen=`${y}-${_pad2(m)}`;
+      gen++;
+      [y,m]=nextYM(y,m);
+    }
+  });
+  if(gen) saveData();
+  return gen;
+}
+let recurState={tipo:'egreso'};
+function openRecurModal(){ closeSidebar(); renderRecurForm(); renderRecurList(); document.getElementById('recur-modal').classList.add('open'); }
+function closeRecurModal(){ document.getElementById('recur-modal').classList.remove('open'); }
+function renderRecurForm(){
+  const f=document.getElementById('recur-form'); if(!f) return;
+  const prev={concepto:_rv('rc-concepto'),monto:_rv('rc-monto'),dia:_rv('rc-dia')||'1',cur:_rv('rc-cur')||'usd'};
+  const tipo=recurState.tipo;
+  const cats=(tipo==='ingreso'?CAT_INGRESOS:CAT_EGRESOS);
+  const tipoBtn=(v,lbl)=>`<button type="button" onclick="recurState.tipo='${v}';renderRecurForm()" style="flex:1;padding:7px;border-radius:7px;border:1px solid ${tipo===v?'var(--blue)':'var(--border2)'};background:${tipo===v?'var(--blue-bg)':'transparent'};color:${tipo===v?'var(--blue)':'var(--text3)'};font-weight:600;font-size:12px;cursor:pointer">${lbl}</button>`;
+  f.innerHTML=`
+    <div style="display:flex;gap:6px;margin-bottom:10px">${tipoBtn('ingreso','Ingreso')}${tipoBtn('egreso','Egreso')}${tipoBtn('tc','Tarjeta')}</div>
+    <div style="margin-bottom:10px"><label>Concepto</label><input type="text" id="rc-concepto" placeholder="Ej: Alquiler" value="${prev.concepto.replace(/"/g,'&quot;')}"></div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <div style="flex:2"><label>Monto</label><input type="number" id="rc-monto" placeholder="0" min="0" step="0.01" value="${prev.monto}"></div>
+      <div style="flex:1"><label>Moneda</label><select id="rc-cur"><option value="usd"${prev.cur==='usd'?' selected':''}>USD</option><option value="ars"${prev.cur==='ars'?' selected':''}>$</option></select></div>
+      <div style="flex:1"><label>Día</label><input type="number" id="rc-dia" min="1" max="31" value="${prev.dia}"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <div style="flex:1"><label>Categoría</label><select id="rc-cat">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div style="flex:1">${tipo==='tc'
+        ?`<label>Tarjeta</label><select id="rc-tarjeta">${['Visa','Mastercard','Amex'].map(t=>`<option>${t}</option>`).join('')}</select>`
+        :`<label>Cuenta</label><select id="rc-cuenta">${INSTRUMENTOS.map(i=>`<option>${i}</option>`).join('')}</select>`}</div>
+    </div>
+    <button class="btn primary" style="width:100%" onclick="agregarRecurrente()">+ Agregar recurrente</button>`;
+}
+function renderRecurList(){
+  const el=document.getElementById('recur-list'); if(!el) return;
+  const arr=data.recurrentes||[];
+  if(!arr.length){ el.innerHTML='<div class="empty" style="padding:14px">Sin recurrentes. Agregá uno abajo.</div>'; return; }
+  el.innerHTML=arr.map(t=>{
+    const off=t.activo===false;
+    const tipoLbl=t.tipo==='ingreso'?'Ingreso':t.tipo==='tc'?'Tarjeta':'Egreso';
+    const tipoColor=t.tipo==='ingreso'?'var(--green)':t.tipo==='tc'?'#F0573C':'var(--red)';
+    const monto=t.rawCur==='ars'?fmtARS(t.rawMonto):fmtUSD(t.rawMonto);
+    return `<div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--border);border-radius:9px;margin-bottom:6px;background:var(--surface2);opacity:${off?0.5:1}">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.concepto}</div>
+        <div style="font-size:11px;color:var(--text3)"><span style="color:${tipoColor};font-weight:700">${tipoLbl}</span> · ${monto} · día ${t.dia} · ${t.cat||'—'}</div>
+      </div>
+      <button class="action-btn" title="${off?'Activar':'Pausar'}" onclick="toggleRecurrente(${t.id})">${off?'▶':'⏸'}</button>
+      <button class="action-btn" title="Eliminar" onclick="eliminarRecurrente(${t.id})">🗑</button>
+    </div>`;
+  }).join('');
+}
+function agregarRecurrente(){
+  const tipo=recurState.tipo;
+  const concepto=_rv('rc-concepto').trim();
+  const monto=parseFloat(_rv('rc-monto'));
+  const dia=Math.min(31,Math.max(1,parseInt(_rv('rc-dia'))||1));
+  const cur=_rv('rc-cur')||'usd';
+  const cat=_rv('rc-cat');
+  if(!concepto||isNaN(monto)||monto<=0){ toast('Completá concepto y monto.','error'); return; }
+  const t={ id:Date.now(), tipo, concepto, rawMonto:monto, rawCur:cur, dia, cat, activo:true, lastGen:'' };
+  if(tipo==='tc') t.tarjeta=_rv('rc-tarjeta'); else t.cuenta=_rv('rc-cuenta');
+  if(!Array.isArray(data.recurrentes)) data.recurrentes=[];
+  data.recurrentes.push(t);
+  saveData();
+  const n=generarRecurrentes();           // si el día ya pasó, lo genera ya mismo
+  renderRecurForm(); renderRecurList();
+  const cc=document.getElementById('rc-concepto'); if(cc)cc.value='';
+  const mm=document.getElementById('rc-monto'); if(mm)mm.value='';
+  toast('Recurrente agregado'+(n?' · '+n+' generado este mes':''),'success');
+  updateDeudaChip(); renderAll();
+}
+function eliminarRecurrente(id){ data.recurrentes=(data.recurrentes||[]).filter(t=>t.id!==id); saveData(); renderRecurList(); }
+function toggleRecurrente(id){ const t=(data.recurrentes||[]).find(x=>x.id===id); if(t){ t.activo=(t.activo===false); saveData(); renderRecurList(); } }
+
 /* ── GASTO POR DÍA ── */
 function defGastoDiaDesde(){ const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-01`; }
 function resetGastoDia(){
@@ -2800,6 +2919,8 @@ async function init(){
   const mesSel=document.getElementById('resumen-mes-sel'); if(mesSel) mesSel.value=nowM;
   await loadFromSupabase();
   updateCotizDisplay();
+  const nGen=generarRecurrentes();
+  if(nGen) toast(nGen+(nGen>1?' movimientos recurrentes generados':' movimiento recurrente generado'),'success');
   updateDeudaChip(); renderResumen();
   renderAll();
   renderCuentas('in'); renderCuentas('eg'); renderCuentas('trde'); renderCuentas('trha'); updateDeudaChip();
