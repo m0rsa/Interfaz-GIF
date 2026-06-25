@@ -597,6 +597,8 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
 
       <div id="flujo-mensual-card" class="card" style="padding:0;overflow:hidden"></div>
 
+      <div id="insights-block"></div>
+
       <div class="card">
         <div class="card-title"><span>Gasto por día</span><span id="gd-prom" style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0"></span></div>
         <div class="gd-range">
@@ -627,6 +629,8 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
         <div class="chart-legend" id="legend-cat"></div>
         <div class="chart-wrap" style="height:180px"><canvas id="chartCat" role="img" aria-label="Egresos por categoría">Categorías.</canvas></div>
       </div>
+
+      <div id="presup-block"></div>
 
       <div id="mqv-block"></div>
 
@@ -945,8 +949,11 @@ Chart.defaults.font.size=12;
 let INSTRUMENTOS=[];
 let COLORS={};
 let ICONS={};
-const CAT_COLORS={'Alimentación':'#A06BFF','Entretenimiento':'#D07AD0','Transporte':'#7C6BFF','Salud':'#F0573C','Vivienda':'#6E4FC2','Servicios':'#C9A6FF','Otros':'#A8907C'};
+let CAT_COLORS={'Alimentación':'#A06BFF','Entretenimiento':'#D07AD0','Transporte':'#7C6BFF','Salud':'#F0573C','Vivienda':'#6E4FC2','Servicios':'#C9A6FF','Otros':'#A8907C'};
 const TC_COLORS={Visa:'#7C6BFF',Mastercard:'#C77DD6',Amex:'#9D5CF5'};
+// Categorías (editables; se persisten en finanzas_config.instrumentos_json)
+let CAT_EGRESOS=['Vivienda','Alimentación','Transporte','Salud','Entretenimiento','Servicios','Otros'];
+let CAT_INGRESOS=['Sueldo','Freelance','Inversión','Repago','Otros'];
 let ARS_INSTR=new Set();
 
 /* ── SUPABASE ── */
@@ -998,7 +1005,7 @@ function loadData(){
 }
 async function syncSupabase(){
   try{
-    await sb.from('finanzas_config').upsert({id:1,cotiz_c:data.cotizC,cotiz_v:data.cotizV,deuda_tc:data.deudaTC,sueldo:data.sueldo,presupuestos_json:JSON.stringify(data.presupuestos),metas_json:JSON.stringify(data.metas),instrumentos_json:JSON.stringify({instrumentos:INSTRUMENTOS,colors:COLORS,icons:ICONS,ars_instr:[...ARS_INSTR]}),updated_at:new Date().toISOString()});
+    await sb.from('finanzas_config').upsert({id:1,cotiz_c:data.cotizC,cotiz_v:data.cotizV,deuda_tc:data.deudaTC,sueldo:data.sueldo,presupuestos_json:JSON.stringify(data.presupuestos),metas_json:JSON.stringify(data.metas),instrumentos_json:JSON.stringify({instrumentos:INSTRUMENTOS,colors:COLORS,icons:ICONS,ars_instr:[...ARS_INSTR],cat_eg:CAT_EGRESOS,cat_in:CAT_INGRESOS,cat_colors:CAT_COLORS}),updated_at:new Date().toISOString()});
     const tbls=[
       {n:'ingresos',       arr:data.ingresos,           m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,raw_rate:r.rawRate||null,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
       {n:'egresos',        arr:data.egresos,             m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,raw_rate:r.rawRate||null,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
@@ -1035,6 +1042,9 @@ async function loadFromSupabase(){
         if(cfg.data.instrumentos_json){
           const ic=JSON.parse(cfg.data.instrumentos_json);
           INSTRUMENTOS=ic.instrumentos||[]; COLORS=ic.colors||{}; ICONS=ic.icons||{}; ARS_INSTR=new Set(ic.ars_instr||[]);
+          if(Array.isArray(ic.cat_eg)&&ic.cat_eg.length) CAT_EGRESOS=ic.cat_eg;
+          if(Array.isArray(ic.cat_in)&&ic.cat_in.length) CAT_INGRESOS=ic.cat_in;
+          if(ic.cat_colors&&Object.keys(ic.cat_colors).length) CAT_COLORS=ic.cat_colors;
           if(!selCuenta.in && INSTRUMENTOS[0]) selCuenta={in:INSTRUMENTOS[0],eg:INSTRUMENTOS[0],tp:INSTRUMENTOS[0],trde:INSTRUMENTOS[0],trha:INSTRUMENTOS[1]||INSTRUMENTOS[0]};
           const ahTipo=document.getElementById('ah-tipo');
           if(ahTipo) ahTipo.innerHTML=Object.keys(COLORS).map(i=>`<option>${i}</option>`).join('');
@@ -1452,6 +1462,8 @@ function renderResumen(){
   } else { chartCat=null; }
 
   renderFlujoMensual();
+  renderInsights();
+  renderPresupuestos();
   renderUltimos();
   renderGastoDiario();
 }
@@ -1991,6 +2003,80 @@ function getPatrimonioMensual(){
     else cur=`${y}-${String(mo+1).padStart(2,'0')}`;
   }
   return months;
+}
+
+/* ── INSIGHTS / ALERTAS ── */
+// Gasto = egresos netos de repagos + gastos de tarjeta, en pesos (misma def que el gráfico)
+function gastoEnRango(desde,hasta){
+  let t=0;
+  data.egresos.forEach(e=>{ if(e.fecha>=desde&&e.fecha<=hasta) t+=mARS(e); });
+  data.movTC.forEach(m=>{ if(m.tipo==='gasto'&&m.fecha>=desde&&m.fecha<=hasta) t+=mARS(m); });
+  data.ingresos.forEach(i=>{ if(i.cat==='Repago'&&i.fecha>=desde&&i.fecha<=hasta) t-=mARS(i); });
+  return t;
+}
+function gastoPorCatRango(desde,hasta){
+  const c={};
+  const add=(cat,v)=>{ const k=cat||'Otros'; c[k]=(c[k]||0)+v; };
+  data.egresos.forEach(e=>{ if(e.fecha>=desde&&e.fecha<=hasta) add(e.cat,mARS(e)); });
+  data.movTC.forEach(m=>{ if(m.tipo==='gasto'&&m.fecha>=desde&&m.fecha<=hasta) add(m.cat,mARS(m)); });
+  return c;
+}
+function renderInsights(){
+  const el=document.getElementById('insights-block'); if(!el) return;
+  const now=new Date(), y=now.getFullYear(), mo=now.getMonth(), dom=now.getDate();
+  const f2=n=>String(n).padStart(2,'0');
+  const thisStart=`${y}-${f2(mo+1)}-01`, hoy=`${y}-${f2(mo+1)}-${f2(dom)}`;
+  const prev=new Date(y,mo-1,1), py=prev.getFullYear(), pm=prev.getMonth();
+  const prevDays=new Date(py,pm+1,0).getDate(), prevEndDay=Math.min(dom,prevDays);
+  const prevStart=`${py}-${f2(pm+1)}-01`, prevEnd=`${py}-${f2(pm+1)}-${f2(prevEndDay)}`;
+  const gThis=gastoEnRango(thisStart,hoy), gPrev=gastoEnRango(prevStart,prevEnd);
+  const daysInMonth=new Date(y,mo+1,0).getDate();
+  const proj=dom>0?gThis/dom*daysInMonth:0;
+  const catThis=gastoPorCatRango(thisStart,hoy), catPrev=gastoPorCatRango(prevStart,prevEnd);
+  const topCat=Object.entries(catThis).sort((a,b)=>b[1]-a[1])[0];
+  let grew=null,grewDelta=0;
+  Object.keys(catThis).forEach(k=>{ const d=catThis[k]-(catPrev[k]||0); if(d>grewDelta){grewDelta=d;grew=k;} });
+  // comparativa %
+  let cmpTxt,cmpColor;
+  if(gPrev>0){ const pct=Math.round((gThis-gPrev)/gPrev*100); cmpTxt=(pct>=0?'+':'')+pct+'% vs mes pasado'; cmpColor=pct>0?'var(--red)':'var(--green)'; }
+  else { cmpTxt='Sin dato del mes pasado'; cmpColor='var(--text3)'; }
+  const card=(label,val,sub,subColor)=>`<div class="metric-card"><div class="mc-label">${label}</div><div class="mc-val" style="font-size:clamp(15px,2.6vw,20px)">${val}</div><div class="mc-sub" style="color:${subColor||'var(--text3)'}">${sub}</div></div>`;
+  el.innerHTML=`<div class="card" style="margin-bottom:0">
+    <div class="card-title">📊 Este mes (al ${dom}/${f2(mo+1)})</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
+      ${card('Gasto del mes',fmtARS(gThis),cmpTxt,cmpColor)}
+      ${card('Proyección fin de mes',fmtARS(proj),'a este ritmo')}
+      ${card('Categoría top',topCat?topCat[0]:'—',topCat?fmtARS(topCat[1]):'sin gastos')}
+      ${card('Más creció',grew||'—',grew?'+'+fmtARS(grewDelta)+' vs mes pasado':'sin aumentos')}
+    </div>
+  </div>`;
+}
+
+/* ── PRESUPUESTOS POR CATEGORÍA ── */
+function setPresupuesto(cat,val){ if(!data.presupuestos)data.presupuestos={}; data.presupuestos[cat]=Math.max(0,parseFloat(val)||0); saveData(); renderPresupuestos(); }
+function renderPresupuestos(){
+  const el=document.getElementById('presup-block'); if(!el) return;
+  const now=new Date(),y=now.getFullYear(),mo=now.getMonth(),f2=n=>String(n).padStart(2,'0');
+  const thisStart=`${y}-${f2(mo+1)}-01`, hoy=`${y}-${f2(mo+1)}-${f2(now.getDate())}`;
+  const gastoCat=gastoPorCatRango(thisStart,hoy);
+  const rows=CAT_EGRESOS.map(cat=>{
+    const pres=+((data.presupuestos||{})[cat])||0;
+    const gas=gastoCat[cat]||0;
+    const realPct=pres>0?Math.round(gas/pres*100):0;
+    const pct=Math.min(realPct,100), over=pres>0&&gas>pres;
+    const col=over?'var(--red)':(realPct>=80?'#E0A23C':'var(--green)');
+    const c=CAT_COLORS[cat]||'#888';
+    const sub=pres>0?(over?`<span style="color:var(--red)">Te pasaste ${fmtARS(gas-pres)} · ${realPct}%</span>`:`${realPct}% usado · queda ${fmtARS(pres-gas)}`):'Sin presupuesto';
+    return `<div style="margin-bottom:13px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px">
+        <span style="font-size:12px;font-weight:600;color:var(--text2)"><b style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${c};margin-right:6px"></b>${cat}</span>
+        <span style="font-size:11px;color:var(--text3);white-space:nowrap">${fmtARS(gas)} / <input type="number" value="${pres||''}" placeholder="0" min="0" onchange="setPresupuesto('${cat}',this.value)" style="width:84px;padding:3px 6px;font-size:11px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);text-align:right;font-family:'SF Mono',ui-monospace,monospace"></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${col}"></div></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px">${sub}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div class="card"><div class="card-title">Presupuestos del mes</div>${rows}</div>`;
 }
 
 /* ── GASTO POR DÍA ── */
