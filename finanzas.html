@@ -1913,10 +1913,11 @@ function renderGastoDiario(){
   if(!desde){ desde=defGastoDiaDesde(); if(dEl) dEl.value=desde; }
   if(!hasta){ hasta=today(); if(hEl) hEl.value=hasta; }
   if(desde>hasta){ const t=desde; desde=hasta; hasta=t; } // por las dudas
-  // Gasto por día = egresos en efectivo + gastos de tarjeta, en pesos (lo cargado en $ queda fijo)
+  // Gasto por día = egresos netos de repagos + gastos de tarjeta, en pesos (lo cargado en $ queda fijo)
   const porDia={};
   data.egresos.filter(e=>e.fecha>=desde&&e.fecha<=hasta).forEach(e=>{ porDia[e.fecha]=(porDia[e.fecha]||0)+mARS(e); });
   data.movTC.filter(m=>m.tipo==='gasto'&&m.fecha>=desde&&m.fecha<=hasta).forEach(m=>{ porDia[m.fecha]=(porDia[m.fecha]||0)+mARS(m); });
+  data.ingresos.filter(i=>i.cat==='Repago'&&i.fecha>=desde&&i.fecha<=hasta).forEach(i=>{ porDia[i.fecha]=(porDia[i.fecha]||0)-mARS(i); });
   // Lista continua de días
   const days=[]; const d=new Date(desde+'T12:00:00'), end=new Date(hasta+'T12:00:00');
   let guard=0;
