@@ -541,6 +541,11 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
     <button id="fetch-dolar-btn" class="cotiz-btn" onclick="fetchDolar()" style="margin-bottom:6px">↻ Traer cotización</button>
     <button class="cotiz-btn" onclick="updateCotiz()" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text2)">Aplicar manual</button>
     <button onclick="openResumenModal()" style="width:100%;font-size:11px;padding:8px 10px;margin-top:8px;border-radius:8px;border:1px solid rgba(157,92,245,0.3);background:rgba(157,92,245,0.08);color:var(--blue);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:600;transition:background 0.15s" onmouseover="this.style.background='rgba(157,92,245,0.16)'" onmouseout="this.style.background='rgba(157,92,245,0.08)'">↓ Descargar resumen PDF</button>
+    <div style="display:flex;gap:4px;margin-top:4px">
+      <button onclick="exportarDatos()" title="Descargar copia de seguridad (JSON)" style="flex:1;font-size:11px;padding:7px 8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">⬇ Exportar</button>
+      <button onclick="document.getElementById('import-file').click()" title="Restaurar desde un archivo de backup" style="flex:1;font-size:11px;padding:7px 8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">⬆ Importar</button>
+    </div>
+    <input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="importarDatos(this)">
     <button onclick="openMFAModal()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">🔑 Gestionar 2FA</button>
     <button onclick="doLogout()" style="width:100%;font-size:11px;padding:7px 10px;margin-top:4px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif;font-weight:500;transition:color 0.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">→ Cerrar sesión</button>
   </div>
@@ -995,11 +1000,11 @@ async function syncSupabase(){
   try{
     await sb.from('finanzas_config').upsert({id:1,cotiz_c:data.cotizC,cotiz_v:data.cotizV,deuda_tc:data.deudaTC,sueldo:data.sueldo,presupuestos_json:JSON.stringify(data.presupuestos),metas_json:JSON.stringify(data.metas),instrumentos_json:JSON.stringify({instrumentos:INSTRUMENTOS,colors:COLORS,icons:ICONS,ars_instr:[...ARS_INSTR]}),updated_at:new Date().toISOString()});
     const tbls=[
-      {n:'ingresos',       arr:data.ingresos,           m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
-      {n:'egresos',        arr:data.egresos,             m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
+      {n:'ingresos',       arr:data.ingresos,           m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,raw_rate:r.rawRate||null,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
+      {n:'egresos',        arr:data.egresos,             m:r=>({id:r.id,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,raw_rate:r.rawRate||null,cat:r.cat,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta})},
       {n:'ahorros',        arr:data.ahorros,             m:r=>({id:r.id,tipo:r.tipo,usd:r.usd,ars:r.ars||0,fecha:r.fecha,nota:r.nota||'',mov:r.mov})},
-      {n:'transferencias', arr:data.transferencias||[],  m:r=>({id:r.id,desde:r.desde,hacia:r.hacia,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,fecha:r.fecha,nota:r.nota||''})},
-      {n:'mov_tc',         arr:data.movTC,               m:r=>({id:r.id,tipo:r.tipo,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto||null,raw_cur:r.rawCur||null,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta||null,tarjeta:r.tarjeta||null,cat:r.cat||null})},
+      {n:'transferencias', arr:data.transferencias||[],  m:r=>({id:r.id,desde:r.desde,hacia:r.hacia,usd:r.usd,raw_monto:r.rawMonto,raw_cur:r.rawCur,raw_rate:r.rawRate||null,fecha:r.fecha,nota:r.nota||''})},
+      {n:'mov_tc',         arr:data.movTC,               m:r=>({id:r.id,tipo:r.tipo,concepto:r.concepto,usd:r.usd,raw_monto:r.rawMonto||null,raw_cur:r.rawCur||null,raw_rate:r.rawRate||null,fecha:r.fecha,nota:r.nota||'',cuenta:r.cuenta||null,tarjeta:r.tarjeta||null,cat:r.cat||null})},
     ];
     for(const t of tbls){
       if(t.arr.length){
@@ -1036,11 +1041,11 @@ async function loadFromSupabase(){
         }
       }catch(e){}
     }
-    data.ingresos=(ing.data||[]).map(r=>({id:r.id,concepto:r.concepto,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,cat:r.cat,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta}));
-    data.egresos=(eg.data||[]).map(r=>({id:r.id,concepto:r.concepto,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,cat:r.cat,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta}));
+    data.ingresos=(ing.data||[]).map(r=>({id:r.id,concepto:r.concepto,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,rawRate:r.raw_rate!=null?+r.raw_rate:undefined,cat:r.cat,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta}));
+    data.egresos=(eg.data||[]).map(r=>({id:r.id,concepto:r.concepto,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,rawRate:r.raw_rate!=null?+r.raw_rate:undefined,cat:r.cat,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta}));
     data.ahorros=(ah.data||[]).map(r=>({id:r.id,tipo:r.tipo,usd:+r.usd,ars:+r.ars,fecha:fd(r.fecha),nota:r.nota||'',mov:r.mov}));
-    data.transferencias=(tr.data||[]).map(r=>({id:r.id,desde:r.desde,hacia:r.hacia,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,fecha:fd(r.fecha),nota:r.nota||''}));
-    data.movTC=(tc.data||[]).map(r=>({id:r.id,tipo:r.tipo,concepto:r.concepto,usd:+r.usd,rawMonto:r.raw_monto!=null?+r.raw_monto:undefined,rawCur:r.raw_cur||undefined,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta||undefined,tarjeta:r.tarjeta||undefined,cat:r.cat||undefined}));
+    data.transferencias=(tr.data||[]).map(r=>({id:r.id,desde:r.desde,hacia:r.hacia,usd:+r.usd,rawMonto:+r.raw_monto,rawCur:r.raw_cur,rawRate:r.raw_rate!=null?+r.raw_rate:undefined,fecha:fd(r.fecha),nota:r.nota||''}));
+    data.movTC=(tc.data||[]).map(r=>({id:r.id,tipo:r.tipo,concepto:r.concepto,usd:+r.usd,rawMonto:r.raw_monto!=null?+r.raw_monto:undefined,rawCur:r.raw_cur||undefined,rawRate:r.raw_rate!=null?+r.raw_rate:undefined,fecha:fd(r.fecha),nota:r.nota||'',cuenta:r.cuenta||undefined,tarjeta:r.tarjeta||undefined,cat:r.cat||undefined}));
     try{ localStorage.setItem('finanzas_v1',JSON.stringify(data)); }catch(e){}
   }catch(e){ console.error('Error cargando Supabase:',e); }
 }
@@ -1068,21 +1073,29 @@ async function fetchDolar(){
   const btn=document.getElementById('fetch-dolar-btn');
   const timeEl=document.getElementById('cotiz-update-time');
   if(btn){ btn.textContent='↻ Cargando…'; btn.disabled=true; }
-  try{
-    const r=await fetch('https://dolarapi.com/v1/dolares/blue');
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const d=await r.json();
-    if(d.compra && d.venta){
-      document.getElementById('cotiz-c').value=d.compra;
-      document.getElementById('cotiz-v').value=d.venta;
-      updateCotiz();
-      if(timeEl) timeEl.textContent='Actualizado '+hhmm();
-    }
-  }catch(e){
-    if(timeEl) timeEl.textContent='Sin conexión';
-  }finally{
-    if(btn){ btn.textContent='↻ Traer cotización'; btn.disabled=false; }
+  // Intenta dolarapi y, si falla, bluelytics como respaldo
+  const fuentes=[
+    {url:'https://dolarapi.com/v1/dolares/blue', pick:d=>({c:d.compra,v:d.venta})},
+    {url:'https://api.bluelytics.com.ar/v2/latest', pick:d=>({c:d.blue&&d.blue.value_buy,v:d.blue&&d.blue.value_sell})},
+  ];
+  let ok=false;
+  for(const f of fuentes){
+    try{
+      const r=await fetch(f.url);
+      if(!r.ok) continue;
+      const {c,v}=f.pick(await r.json());
+      if(c&&v){
+        document.getElementById('cotiz-c').value=c;
+        document.getElementById('cotiz-v').value=v;
+        updateCotiz();
+        const n=new Date();
+        if(timeEl) timeEl.textContent='Actualizado '+n.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})+' '+hhmm();
+        ok=true; break;
+      }
+    }catch(e){ /* probar siguiente fuente */ }
   }
+  if(!ok && timeEl) timeEl.textContent='Sin conexión';
+  if(btn){ btn.textContent='↻ Traer cotización'; btn.disabled=false; }
 }
 
 /* ── TOAST ── */
@@ -1092,6 +1105,65 @@ function toast(msg,type='info'){
   t.textContent=msg;
   document.body.appendChild(t);
   setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(8px)'; setTimeout(()=>t.remove(),300); },2500);
+}
+// Toast con acción "Deshacer" (para borrados) — 6s de gracia
+let _undoTimer=null;
+function toastUndo(msg, restoreFn){
+  if(_undoTimer){ clearTimeout(_undoTimer); _undoTimer=null; }
+  const t=document.createElement('div');
+  t.className='toast info';
+  const span=document.createElement('span'); span.textContent=msg;
+  const btn=document.createElement('button');
+  btn.textContent='Deshacer';
+  btn.style.cssText='margin-left:14px;background:none;border:none;color:var(--blue);font-weight:700;cursor:pointer;font-family:inherit;font-size:inherit';
+  btn.onclick=()=>{ try{restoreFn();}catch(e){console.error(e);} t.remove(); if(_undoTimer){clearTimeout(_undoTimer);_undoTimer=null;} toast('Restaurado','success'); };
+  t.appendChild(span); t.appendChild(btn);
+  document.body.appendChild(t);
+  _undoTimer=setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(8px)'; setTimeout(()=>t.remove(),300); _undoTimer=null; },6000);
+}
+
+/* ── BACKUP: EXPORT / IMPORT ── */
+function exportarDatos(){
+  try{
+    const payload={
+      _app:'finanzas', _v:1, _exported:new Date().toISOString(),
+      data, instrumentos:INSTRUMENTOS, colors:COLORS, icons:ICONS, ars_instr:[...ARS_INSTR]
+    };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='finanzas-backup-'+today()+'.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    toast('Backup descargado','success');
+  }catch(e){ console.error('export:',e); toast('No se pudo exportar.','error'); }
+}
+function importarDatos(input){
+  const file=input&&input.files&&input.files[0]; if(!file){ return; }
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const p=JSON.parse(ev.target.result);
+      if(!p||!p.data||typeof p.data!=='object') throw new Error('formato');
+      const n=(p.data.ingresos||[]).length+(p.data.egresos||[]).length+(p.data.movTC||[]).length;
+      if(!confirm(`Esto va a REEMPLAZAR todos tus datos actuales por los del backup (${n} movimientos). ¿Continuar?`)){ input.value=''; return; }
+      // Reemplazo en sitio para conservar referencias del objeto data
+      Object.keys(data).forEach(k=>{ delete data[k]; });
+      Object.assign(data, p.data);
+      if(Array.isArray(p.instrumentos)) INSTRUMENTOS=p.instrumentos;
+      if(p.colors) COLORS=p.colors;
+      if(p.icons) ICONS=p.icons;
+      if(Array.isArray(p.ars_instr)) ARS_INSTR=new Set(p.ars_instr);
+      USD_C=+data.cotizC||USD_C; USD_V=+data.cotizV||USD_V; USD_ARS=(USD_C+USD_V)/2;
+      const ahTipo=document.getElementById('ah-tipo');
+      if(ahTipo&&Object.keys(COLORS).length) ahTipo.innerHTML=Object.keys(COLORS).map(i=>`<option>${i}</option>`).join('');
+      saveData(); updateCotizDisplay(); updateDeudaChip(); renderAll();
+      toast('Datos importados correctamente','success');
+    }catch(err){ console.error('import:',err); toast('Archivo de backup inválido.','error'); }
+    input.value='';
+  };
+  reader.onerror=()=>{ toast('No se pudo leer el archivo.','error'); input.value=''; };
+  reader.readAsText(file);
 }
 
 /* ── FORMATTERS ── */
@@ -1106,11 +1178,14 @@ function fmtUSD(n){ return'U$D '+Number(n).toLocaleString('es-AR',{minimumFracti
    Lo cargado en pesos queda FIJO en pesos (rawMonto); lo cargado en USD queda fijo en USD.
    El equivalente en la otra moneda flota con la cotización actual. Aplica a ingresos,
    egresos, transferencias y movTC (todos tienen rawMonto/rawCur). */
-function mARS(it){ return it.rawCur==='ars' ? (+it.rawMonto||0) : (+it.usd||+it.rawMonto||0)*USD_ARS; }
-function mUSD(it){ return it.rawCur==='ars' ? (+it.rawMonto||0)/USD_ARS : (+it.usd||+it.rawMonto||0); }
-/* Para ahorros (modelo distinto: guardan ars y usd; para instrumentos en pesos el ars es el fijo) */
-function ahARS(a){ return ARS_INSTR.has(a.tipo) ? (+a.ars||0) : (+a.usd||0)*USD_ARS; }
-function ahUSD(a){ return ARS_INSTR.has(a.tipo) ? (+a.ars||0)/USD_ARS : (+a.usd||0); }
+/* rawRate = cotización guardada al cargar el movimiento → histórico USD/ARS real, no flota.
+   Si falta (registros viejos), se recupera de raw_monto/usd para ítems en pesos; si no, usa la actual. */
+function _txRate(it){ if(+it.rawRate>0) return +it.rawRate; if(it.rawCur==='ars'&&+it.usd>0&&+it.rawMonto>0) return it.rawMonto/it.usd; return USD_ARS; }
+function mARS(it){ return it.rawCur==='ars' ? (+it.rawMonto||0) : (+it.usd||+it.rawMonto||0)*_txRate(it); }
+function mUSD(it){ return it.rawCur==='ars' ? (+it.rawMonto||0)/_txRate(it) : (+it.usd||+it.rawMonto||0); }
+/* Ahorros guardan AMBOS montos (ars y usd) al cargar → ya son históricos, sin reconversión */
+function ahARS(a){ return +a.ars||0; }
+function ahUSD(a){ return +a.usd||0; }
 
 /* ── BALANCES ── */
 function getSaldos(){
@@ -1227,7 +1302,7 @@ function agregarGastoTC(){
     const fechaCuota=d.toISOString().split('T')[0];
     const label=cuotas>1?`${concepto} (${i+1}/${cuotas})`:concepto;
     data.deudaTC+=usdCuota;
-    data.movTC.push({id:Date.now()+i,tipo:'gasto',concepto:label,usd:usdCuota,rawMonto:rawCuota,rawCur:curMode.tc,fecha:fechaCuota,nota,tarjeta,cat});
+    data.movTC.push({id:Date.now()+i,tipo:'gasto',concepto:label,usd:usdCuota,rawMonto:rawCuota,rawCur:curMode.tc,rawRate:USD_ARS,fecha:fechaCuota,nota,tarjeta,cat});
   }
   document.getElementById('tc-concepto').value='';
   document.getElementById('tc-monto').value='';
@@ -1235,7 +1310,7 @@ function agregarGastoTC(){
   document.getElementById('tc-hint').textContent='';
   toast('Gasto sumado a la deuda','success'); saveData(); updateDeudaChip(); renderAll();
 }
-function pagarTC(){ const raw=parseFloat(document.getElementById('tp-monto').value); const fecha=document.getElementById('tp-fecha').value||today(); const nota=document.getElementById('tp-nota').value||'Pago tarjeta'; const cuenta=selCuenta.tp; if(isNaN(raw)||raw<=0){toast('Ingresá un monto válido.','error');return;} const usd=curMode.tp==='ars'?raw/USD_ARS:raw; if(usd>data.deudaTC+0.001){toast('El monto supera la deuda actual.','error');return;} data.deudaTC=Math.max(0,data.deudaTC-usd); data.movTC.push({id:Date.now(),tipo:'pago',concepto:'Pago tarjeta',usd,rawMonto:raw,rawCur:curMode.tp,fecha,nota,cuenta}); document.getElementById('tp-monto').value=''; document.getElementById('tp-hint').textContent=''; toast('Pago registrado','success'); saveData(); updateDeudaChip(); renderAll(); renderCuentas('tp'); }
+function pagarTC(){ const raw=parseFloat(document.getElementById('tp-monto').value); const fecha=document.getElementById('tp-fecha').value||today(); const nota=document.getElementById('tp-nota').value||'Pago tarjeta'; const cuenta=selCuenta.tp; if(isNaN(raw)||raw<=0){toast('Ingresá un monto válido.','error');return;} const usd=curMode.tp==='ars'?raw/USD_ARS:raw; if(usd>data.deudaTC+0.001){toast('El monto supera la deuda actual.','error');return;} data.deudaTC=Math.max(0,data.deudaTC-usd); data.movTC.push({id:Date.now(),tipo:'pago',concepto:'Pago tarjeta',usd,rawMonto:raw,rawCur:curMode.tp,rawRate:USD_ARS,fecha,nota,cuenta}); document.getElementById('tp-monto').value=''; document.getElementById('tp-hint').textContent=''; toast('Pago registrado','success'); saveData(); updateDeudaChip(); renderAll(); renderCuentas('tp'); }
 
 /* ── SIDEBAR TOGGLE ── */
 function toggleSidebar(){ document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.sidebar-overlay').classList.toggle('open'); }
@@ -1528,7 +1603,7 @@ function agregarMovimiento(form){
   const cuenta=selCuenta[form];
   if(!concepto||isNaN(raw)||raw<=0){toast('Completá concepto y monto.','error');return;}
   const usd=curMode[form]==='ars'?raw/USD_ARS:raw;
-  const rec={id:Date.now(),concepto,usd,rawMonto:raw,rawCur:curMode[form],cat,fecha,nota,cuenta};
+  const rec={id:Date.now(),concepto,usd,rawMonto:raw,rawCur:curMode[form],rawRate:USD_ARS,cat,fecha,nota,cuenta};
   if(form==='in')data.ingresos.push(rec); else data.egresos.push(rec);
   document.getElementById(form+'-concepto').value='';
   document.getElementById(form+'-monto').value='';
@@ -1555,14 +1630,28 @@ function agregarTransferencia(){
   if(isNaN(raw)||raw<=0){toast('Ingresá un monto válido.','error');return;}
   if(desde===hacia){toast('Las cuentas deben ser distintas.','error');return;}
   const usd=curMode.tr==='ars'?raw/USD_ARS:raw;
-  data.transferencias.push({id:Date.now(),desde,hacia,usd,rawMonto:raw,rawCur:curMode.tr,fecha,nota});
+  data.transferencias.push({id:Date.now(),desde,hacia,usd,rawMonto:raw,rawCur:curMode.tr,rawRate:USD_ARS,fecha,nota});
   document.getElementById('tr-monto').value=''; document.getElementById('tr-hint').textContent='';
   toast('Transferencia registrada','success'); saveData(); renderAll(); renderCuentas('trde'); renderCuentas('trha');
 }
 
 /* ── ELIMINAR ── */
-function eliminar(tipo,id){ data[tipo]=data[tipo].filter(x=>x.id!==id); saveData(); renderAll(); if(tipo==='ingresos')renderCuentas('in'); else if(tipo==='egresos')renderCuentas('eg'); }
-function eliminarTC(id){ const m=data.movTC.find(x=>x.id===id); if(!m)return; if(m.tipo==='gasto')data.deudaTC=Math.max(0,data.deudaTC-m.usd); else if(m.tipo==='pago')data.deudaTC+=m.usd; data.movTC=data.movTC.filter(x=>x.id!==id); saveData(); updateDeudaChip(); renderAll(); const sp=document.getElementById('sec-patrimonio'); if(sp&&sp.classList.contains('active'))renderPatrimonio(); }
+function eliminar(tipo,id){
+  const arr=data[tipo]; const idx=arr.findIndex(x=>x.id===id); if(idx<0) return;
+  const item=arr[idx]; arr.splice(idx,1);
+  const refresh=()=>{ saveData(); renderAll(); if(tipo==='ingresos')renderCuentas('in'); else if(tipo==='egresos')renderCuentas('eg'); };
+  refresh();
+  toastUndo('Movimiento eliminado',()=>{ data[tipo].splice(Math.min(idx,data[tipo].length),0,item); refresh(); });
+}
+function eliminarTC(id){
+  const idx=data.movTC.findIndex(x=>x.id===id); if(idx<0)return;
+  const m=data.movTC[idx];
+  const delDeuda=mm=>{ if(mm.tipo==='gasto')data.deudaTC=Math.max(0,data.deudaTC-mm.usd); else if(mm.tipo==='pago')data.deudaTC+=mm.usd; };
+  const undoDeuda=mm=>{ if(mm.tipo==='gasto')data.deudaTC+=mm.usd; else if(mm.tipo==='pago')data.deudaTC=Math.max(0,data.deudaTC-mm.usd); };
+  const refresh=()=>{ saveData(); updateDeudaChip(); renderAll(); const sp=document.getElementById('sec-patrimonio'); if(sp&&sp.classList.contains('active'))renderPatrimonio(); };
+  delDeuda(m); data.movTC.splice(idx,1); refresh();
+  toastUndo('Movimiento de tarjeta eliminado',()=>{ data.movTC.splice(Math.min(idx,data.movTC.length),0,m); undoDeuda(m); refresh(); });
+}
 function toggleEditTC(id){ const r=document.getElementById('edr-tc-'+id); if(!r)return; const o=r.classList.contains('open'); document.querySelectorAll('.edit-date-row.open').forEach(x=>x.classList.remove('open')); if(!o)r.classList.add('open'); }
 // Convierte el monto del editor inline de TC al cambiar la moneda elegida
 function convTCcur(id){
@@ -1588,11 +1677,19 @@ function saveEditTC(id){
   const curSel=document.getElementById('edr-tc-cur-'+id);
   const isAr=curSel?curSel.value==='ars':m.rawCur==='ars';   // moneda elegida en el editor
   const nuevoUSD=isAr?raw/USD_ARS:raw;
+  const _ch=(+raw!==+m.rawMonto)||((isAr?'ars':'usd')!==m.rawCur);
   data.deudaTC=Math.max(0,data.deudaTC-m.usd+nuevoUSD);
   m.concepto=concepto; m.usd=nuevoUSD; m.rawMonto=raw; m.rawCur=isAr?'ars':'usd'; m.fecha=fecha; m.tarjeta=tarjeta; m.cat=cat;
+  if(_ch) m.rawRate=USD_ARS;   // valor re-estimado a la cotización actual; si no cambió, se preserva
   saveData(); toast('Cambios guardados','success'); updateDeudaChip(); renderAll();
 }
-function eliminarTransferencia(id){ data.transferencias=data.transferencias.filter(t=>t.id!==id); saveData(); renderAll(); renderCuentas('trde'); renderCuentas('trha'); }
+function eliminarTransferencia(id){
+  const arr=data.transferencias||[]; const idx=arr.findIndex(t=>t.id===id); if(idx<0)return;
+  const item=arr[idx]; arr.splice(idx,1);
+  const refresh=()=>{ saveData(); renderAll(); renderCuentas('trde'); renderCuentas('trha'); };
+  refresh();
+  toastUndo('Transferencia eliminada',()=>{ data.transferencias.splice(Math.min(idx,data.transferencias.length),0,item); refresh(); });
+}
 
 /* ── EDIT DATE ── */
 function toggleEditDate(tipo,id){ const r=document.getElementById('edr-'+tipo+'-'+id); if(!r)return; const o=r.classList.contains('open'); document.querySelectorAll('.edit-date-row.open').forEach(x=>x.classList.remove('open')); if(!o)r.classList.add('open'); }
@@ -2709,9 +2806,11 @@ function saveEditModal() {
     const fecha = document.getElementById('em-fecha').value;
     const nota = document.getElementById('em-nota').value;
     if (!concepto || isNaN(raw) || raw <= 0) { toast('Completá concepto y monto.','error'); return; }
+    const _ch = (+raw !== +item.rawMonto) || (cur !== item.rawCur);   // monto/moneda cambió
     item.concepto = concepto; item.usd = cur === 'ars' ? raw / USD_ARS : raw;
     item.rawMonto = raw; item.rawCur = cur; item.cat = cat; item.cuenta = cuenta;
     item.fecha = fecha; item.nota = nota;
+    if (_ch) item.rawRate = USD_ARS;   // re-estimado a la cotización actual; si no cambió, se preserva
   } else if (tipo === 'ahorros') {
     const item = data.ahorros.find(x => x.id === id);
     if (!item) return;
