@@ -706,7 +706,8 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
           <div id="panel-pagar" style="display:none">
             <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Registrá un pago. Descuenta de la cuenta elegida y reduce la deuda.</div>
             <div class="cur-toggle"><button class="active" id="tp-cur-usd" onclick="setCurTP('usd')">U$D</button><button id="tp-cur-ars" onclick="setCurTP('ars')">$ Pesos</button></div>
-            <div class="grid-form-3">
+            <div class="grid-form-4">
+              <div><label>Tarjeta a pagar</label><select id="tp-tarjeta" onchange="onTPtarjeta()"></select><div class="hint" id="tp-card-hint"></div></div>
               <div><label id="tp-monto-lbl">Monto a pagar (USD)</label><input type="number" inputmode="decimal" id="tp-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tp')"><div class="hint" id="tp-hint"></div></div>
               <div><label>Fecha</label><input type="date" id="tp-fecha"></div>
               <div><label>Nota</label><input type="text" id="tp-nota" placeholder="Pago mínimo, total..."></div>
@@ -1275,6 +1276,20 @@ function getTCRawTotales(){
   });
   return{usd:Math.max(0,usd),ars:Math.max(0,ars)};
 }
+// Deuda neta por tarjeta (gastos − pagos), separada en usd/ars. NO clampea a 0 para detectar sobrepagos.
+function getDeudaPorTarjeta(){
+  const cards={};
+  data.movTC.forEach(m=>{
+    const sign=m.tipo==='gasto'?1:m.tipo==='pago'?-1:0;
+    if(!sign)return;
+    const k=m.tarjeta||'Sin tarjeta';
+    if(!cards[k])cards[k]={usd:0,ars:0};
+    if(m.rawCur==='ars') cards[k].ars+=(m.rawMonto||0)*sign;
+    else cards[k].usd+=(m.rawMonto||m.usd||0)*sign;
+  });
+  return cards;
+}
+function deudaCardARS(card){ const v=getDeudaPorTarjeta()[card]||{usd:0,ars:0}; return v.ars+v.usd*USD_ARS; }
 function fmtTCDeuda(){
   const{usd,ars}=getTCRawTotales();
   const parts=[];
@@ -1323,7 +1338,32 @@ function selectCuenta(form,inst){ selCuenta[form]=inst; renderCuentas(form); }
 
 /* ── TARJETA ── */
 function openTarjeta(tab){ document.getElementById('tarjeta-body').classList.add('open'); switchTab(tab); }
-function switchTab(tab){ document.getElementById('tab-sumar').classList.toggle('active',tab==='sumar'); document.getElementById('tab-pagar').classList.toggle('active',tab==='pagar'); document.getElementById('panel-sumar').style.display=tab==='sumar'?'block':'none'; document.getElementById('panel-pagar').style.display=tab==='pagar'?'block':'none'; if(tab==='pagar')renderCuentas('tp'); }
+function switchTab(tab){ document.getElementById('tab-sumar').classList.toggle('active',tab==='sumar'); document.getElementById('tab-pagar').classList.toggle('active',tab==='pagar'); document.getElementById('panel-sumar').style.display=tab==='sumar'?'block':'none'; document.getElementById('panel-pagar').style.display=tab==='pagar'?'block':'none'; if(tab==='pagar'){renderCuentas('tp'); renderTPtarjetas();} }
+// Selector de tarjeta a pagar: muestra la deuda de cada tarjeta
+function renderTPtarjetas(){
+  const sel=document.getElementById('tp-tarjeta'); if(!sel)return;
+  const prev=sel.value||'Visa';
+  const dx=getDeudaPorTarjeta();
+  sel.innerHTML=['Visa','Mastercard','Amex'].map(t=>{
+    const ars=deudaCardARS(t);
+    return `<option value="${t}"${prev===t?' selected':''}>${t} — ${ars>0.5?fmtARS(ars):'sin deuda'}</option>`;
+  }).join('');
+  onTPtarjeta();
+}
+function onTPtarjeta(){
+  const sel=document.getElementById('tp-tarjeta'), h=document.getElementById('tp-card-hint'); if(!sel||!h)return;
+  const ars=deudaCardARS(sel.value);
+  h.innerHTML= ars>0.5
+    ? `Deuda: ${fmtARS(ars)} · <a href="#" onclick="pagarTotalTarjeta();return false" style="color:var(--accent);font-weight:600">Pagar total</a>`
+    : 'Sin deuda en esta tarjeta';
+}
+function pagarTotalTarjeta(){
+  const sel=document.getElementById('tp-tarjeta'); if(!sel)return;
+  const v=getDeudaPorTarjeta()[sel.value]||{usd:0,ars:0};
+  const inp=document.getElementById('tp-monto');
+  inp.value=(curMode.tp==='ars'?(v.ars+v.usd*USD_ARS):(v.usd+v.ars/USD_ARS)).toFixed(2);
+  updateHint('tp');
+}
 function updateDeudaChip(){ const c=document.getElementById('deuda-chip-header'); if(c)c.textContent='Deuda: '+fmtTCDeuda(); }
 
 function agregarGastoTC(){
@@ -1350,7 +1390,7 @@ function agregarGastoTC(){
   document.getElementById('tc-hint').textContent='';
   toast('Gasto sumado a la deuda','success'); saveData(); updateDeudaChip(); renderAll();
 }
-function pagarTC(){ const raw=parseFloat(document.getElementById('tp-monto').value); const fecha=document.getElementById('tp-fecha').value||today(); const nota=document.getElementById('tp-nota').value||'Pago tarjeta'; const cuenta=selCuenta.tp; if(isNaN(raw)||raw<=0){toast('Ingresá un monto válido.','error');return;} const usd=curMode.tp==='ars'?raw/USD_ARS:raw; if(usd>data.deudaTC+0.001){toast('El monto supera la deuda actual.','error');return;} data.deudaTC=Math.max(0,data.deudaTC-usd); data.movTC.push({id:Date.now(),tipo:'pago',concepto:'Pago tarjeta',usd,rawMonto:raw,rawCur:curMode.tp,rawRate:USD_ARS,fecha,nota,cuenta}); document.getElementById('tp-monto').value=''; document.getElementById('tp-hint').textContent=''; toast('Pago registrado','success'); saveData(); updateDeudaChip(); renderAll(); renderCuentas('tp'); }
+function pagarTC(){ const raw=parseFloat(document.getElementById('tp-monto').value); const fecha=document.getElementById('tp-fecha').value||today(); const nota=document.getElementById('tp-nota').value||'Pago tarjeta'; const cuenta=selCuenta.tp; const tarjeta=document.getElementById('tp-tarjeta')?.value||'Visa'; if(isNaN(raw)||raw<=0){toast('Ingresá un monto válido.','error');return;} const usd=curMode.tp==='ars'?raw/USD_ARS:raw; const cardUSD=deudaCardARS(tarjeta)/USD_ARS; if(usd>cardUSD+0.01){toast('El monto supera la deuda de '+tarjeta+'.','error');return;} data.deudaTC=Math.max(0,data.deudaTC-usd); data.movTC.push({id:Date.now(),tipo:'pago',concepto:'Pago '+tarjeta,usd,rawMonto:raw,rawCur:curMode.tp,rawRate:USD_ARS,fecha,nota,cuenta,tarjeta}); document.getElementById('tp-monto').value=''; document.getElementById('tp-hint').textContent=''; toast('Pago de '+tarjeta+' registrado','success'); saveData(); updateDeudaChip(); renderAll(); renderCuentas('tp'); renderTPtarjetas(); }
 
 /* ── SIDEBAR TOGGLE ── */
 function toggleSidebar(){ document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.sidebar-overlay').classList.toggle('open'); }
@@ -1715,13 +1755,17 @@ function saveEditTC(id){
   const fecha=document.getElementById('edr-tc-fecha-'+id).value||m.fecha;
   const tarjeta=document.getElementById('edr-tc-tarjeta-'+id)?.value||m.tarjeta;
   const cat=document.getElementById('edr-tc-cat-'+id)?.value||m.cat;
+  const cuenta=document.getElementById('edr-tc-cuenta-'+id)?.value||m.cuenta;
   if(isNaN(raw)||raw<=0){toast('Monto inválido.','error');return;}
   const curSel=document.getElementById('edr-tc-cur-'+id);
   const isAr=curSel?curSel.value==='ars':m.rawCur==='ars';   // moneda elegida en el editor
   const nuevoUSD=isAr?raw/USD_ARS:raw;
   const _ch=(+raw!==+m.rawMonto)||((isAr?'ars':'usd')!==m.rawCur);
-  data.deudaTC=Math.max(0,data.deudaTC-m.usd+nuevoUSD);
-  m.concepto=concepto; m.usd=nuevoUSD; m.rawMonto=raw; m.rawCur=isAr?'ars':'usd'; m.fecha=fecha; m.tarjeta=tarjeta; m.cat=cat;
+  // un gasto suma a la deuda; un pago la resta → el ajuste por edición es de signo contrario para pagos
+  if(m.tipo==='pago') data.deudaTC=Math.max(0,data.deudaTC+m.usd-nuevoUSD);
+  else data.deudaTC=Math.max(0,data.deudaTC-m.usd+nuevoUSD);
+  m.concepto=concepto; m.usd=nuevoUSD; m.rawMonto=raw; m.rawCur=isAr?'ars':'usd'; m.fecha=fecha; m.tarjeta=tarjeta;
+  if(m.tipo==='pago') m.cuenta=cuenta; else m.cat=cat;
   if(_ch) m.rawRate=USD_ARS;   // valor re-estimado a la cotización actual; si no cambió, se preserva
   saveData(); toast('Cambios guardados','success'); updateDeudaChip(); renderAll();
 }
@@ -1773,17 +1817,12 @@ function renderTCHistorial(el){
   let movs=data.movTC.filter(m=>m.tipo!=='deuda_inicial');
   if(isMain) movs=movs.filter(m=>inHistR('tc',m.fecha));
   movs=movs.sort((a,b)=>_tcDir==='asc'?a.fecha.localeCompare(b.fecha):b.fecha.localeCompare(a.fecha));
-  // Desglose por tarjeta (en ARS usando raw amounts para evitar distorsión por TC viejo)
-  const byCard={};
-  data.movTC.filter(m=>m.tipo==='gasto').forEach(m=>{
-    const k=m.tarjeta||'Sin tarjeta';
-    const cur=m.rawCur||'usd', monto=m.rawMonto??m.usd;
-    const ars=cur==='ars'?monto:monto*USD_ARS;
-    byCard[k]=(byCard[k]||0)+ars;
-  });
-  const cardBreakdown=Object.keys(byCard).length
+  // Desglose por tarjeta: deuda NETA (gastos − pagos) en ARS usando raw amounts para evitar distorsión por TC viejo
+  const _dxc=getDeudaPorTarjeta();
+  const byCard=Object.entries(_dxc).map(([k,v])=>[k,v.ars+v.usd*USD_ARS]).filter(([k,v])=>v>0.5);
+  const cardBreakdown=byCard.length
     ? '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">'+
-      Object.entries(byCard).map(([k,v])=>`<div style="background:var(--surface2);border:1px solid ${TC_COLORS[k]||'var(--border)'};border-radius:10px;padding:10px 14px;min-width:120px"><div style="font-size:11px;font-weight:700;color:${TC_COLORS[k]||'var(--text3)'};margin-bottom:4px">${k}</div><div style="font-size:17px;font-weight:600;color:var(--red)">${fmtARS(v)}</div></div>`).join('')+
+      byCard.map(([k,v])=>`<div style="background:var(--surface2);border:1px solid ${TC_COLORS[k]||'var(--border)'};border-radius:10px;padding:10px 14px;min-width:120px"><div style="font-size:11px;font-weight:700;color:${TC_COLORS[k]||'var(--text3)'};margin-bottom:4px">${k}</div><div style="font-size:17px;font-weight:600;color:var(--red)">${fmtARS(v)}</div></div>`).join('')+
       '</div>'
     : '';
   const{usd:_rusd,ars:_rars}=getTCRawTotales();
@@ -1799,18 +1838,21 @@ function renderTCHistorial(el){
       ?`<span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;background:${(CAT_COLORS[m.cat]||'#888')}22;color:${CAT_COLORS[m.cat]||'#888'};letter-spacing:0.04em;text-transform:uppercase">${m.cat}</span>`:'';
     return `<div class="day-row-main"><div class="td-main">${m.concepto||'—'}</div><div class="day-row-tags"><span class="badge ${m.tipo==='pago'?'pago':'tarjeta'}">${m.tipo==='pago'?'Pago':'Gasto'}</span>${catTag}${acct}</div></div><div class="day-row-amt"><div class="td-main" style="color:${m.tipo==='pago'?'var(--green)':'var(--red)'}">${m.tipo==='pago'?'-':'+'}${fmtARS(mARS(m))}</div><div class="td-sub">${fmtUSD(mUSD(m))}</div></div>`;
   };
-  const tcAct=m=>m.tipo==='gasto'
-    ? `<button class="action-btn" onclick="toggleEditTC(${m.id})" title="Editar">✏️</button><button class="action-btn" onclick="eliminarTC(${m.id})" title="Eliminar">🗑</button>`
-    : `<button class="action-btn" onclick="eliminarTC(${m.id})" title="Eliminar">🗑</button>`;
+  const tcAct=m=>`<button class="action-btn" onclick="toggleEditTC(${m.id})" title="Editar">✏️</button><button class="action-btn" onclick="eliminarTC(${m.id})" title="Eliminar">🗑</button>`;
   const tcExtra=m=>{
-    if(m.tipo!=='gasto') return '';
-    const tarjOpts=['Visa','Mastercard','Amex'].map(t=>`<option value="${t}"${(m.tarjeta||'Visa')===t?' selected':''}>${t}</option>`).join('');
-    const tcCats=CAT_EGRESOS.slice(); if(m.cat&&!tcCats.includes(m.cat)) tcCats.push(m.cat);
-    const catOpts=tcCats.map(c=>`<option value="${c}"${(m.cat||'Otros')===c?' selected':''}>${c}</option>`).join('');
+    if(m.tipo!=='gasto'&&m.tipo!=='pago') return '';
     const isAr=m.rawCur==='ars';
     const montoVal=isAr?(+m.rawMonto||0).toFixed(2):(+m.usd||0).toFixed(2);
     const curOpts=`<option value="usd"${!isAr?' selected':''}>USD</option><option value="ars"${isAr?' selected':''}>$</option>`;
-    return `<div class="edit-date-row" id="edr-tc-${m.id}"><input type="text" id="edr-tc-concepto-${m.id}" value="${(m.concepto||'').replace(/"/g,'&quot;')}" placeholder="Concepto" style="flex:2;min-width:120px"><input type="number" id="edr-tc-monto-${m.id}" value="${montoVal}" step="0.01" placeholder="Monto" style="flex:1;min-width:70px"><select id="edr-tc-cur-${m.id}" data-prev="${isAr?'ars':'usd'}" onchange="convTCcur(${m.id})" title="Moneda" style="flex:0 0 auto;min-width:62px">${curOpts}</select><input type="date" id="edr-tc-fecha-${m.id}" value="${m.fecha}" style="flex:1;min-width:120px"><select id="edr-tc-tarjeta-${m.id}" style="flex:1;min-width:100px">${tarjOpts}</select><select id="edr-tc-cat-${m.id}" style="flex:1;min-width:110px">${catOpts}</select><button class="btn sm primary" onclick="saveEditTC(${m.id})">✓</button></div>`;
+    const tarjOpts=['Visa','Mastercard','Amex'].map(t=>`<option value="${t}"${(m.tarjeta||'Visa')===t?' selected':''}>${t}</option>`).join('');
+    const base=`<input type="text" id="edr-tc-concepto-${m.id}" value="${(m.concepto||'').replace(/"/g,'&quot;')}" placeholder="Concepto" style="flex:2;min-width:120px"><input type="number" id="edr-tc-monto-${m.id}" value="${montoVal}" step="0.01" placeholder="Monto" style="flex:1;min-width:70px"><select id="edr-tc-cur-${m.id}" data-prev="${isAr?'ars':'usd'}" onchange="convTCcur(${m.id})" title="Moneda" style="flex:0 0 auto;min-width:62px">${curOpts}</select><input type="date" id="edr-tc-fecha-${m.id}" value="${m.fecha}" style="flex:1;min-width:120px"><select id="edr-tc-tarjeta-${m.id}" style="flex:1;min-width:100px">${tarjOpts}</select>`;
+    if(m.tipo==='pago'){
+      const ctaOpts=INSTRUMENTOS.map(c=>`<option value="${c}"${(m.cuenta||'')===c?' selected':''}>${c}</option>`).join('');
+      return `<div class="edit-date-row" id="edr-tc-${m.id}">${base}<select id="edr-tc-cuenta-${m.id}" title="Cuenta" style="flex:1;min-width:110px">${ctaOpts}</select><button class="btn sm primary" onclick="saveEditTC(${m.id})">✓</button></div>`;
+    }
+    const tcCats=CAT_EGRESOS.slice(); if(m.cat&&!tcCats.includes(m.cat)) tcCats.push(m.cat);
+    const catOpts=tcCats.map(c=>`<option value="${c}"${(m.cat||'Otros')===c?' selected':''}>${c}</option>`).join('');
+    return `<div class="edit-date-row" id="edr-tc-${m.id}">${base}<select id="edr-tc-cat-${m.id}" style="flex:1;min-width:110px">${catOpts}</select><button class="btn sm primary" onclick="saveEditTC(${m.id})">✓</button></div>`;
   };
   const tcTotal=ms=>{ const netA=ms.reduce((s,m)=>s+(m.tipo==='pago'?-mARS(m):mARS(m)),0); const netU=ms.reduce((s,m)=>s+(m.tipo==='pago'?-mUSD(m):mUSD(m)),0); const pos=netA>=0; return `<span class="day-tot-ars" style="color:${pos?'var(--red)':'var(--green)'}">${pos?'+':'-'}${fmtARS(Math.abs(netA))}</span><span class="day-tot-usd">${fmtUSD(Math.abs(netU))}</span>`; };
   el.innerHTML=
