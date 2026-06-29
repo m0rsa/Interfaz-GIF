@@ -1649,7 +1649,7 @@ function renderPatrimonio(){
   const saldos=getSaldos(), aUSD=getTotActivosUSD(), bUSD=getBalanceUSD();
   document.getElementById('metrics-patrim').innerHTML=`
     <div class="metric-card"><div class="mc-label">Activos totales</div><div class="mc-val green">${fmtARS(aUSD*USD_ARS)}</div><div class="mc-sub">${fmtUSD(aUSD)}</div></div>
-    <div class="metric-card"><div class="mc-label">Deuda tarjeta</div><div class="mc-val red" style="font-size:clamp(16px,3vw,22px)">${(()=>{const t=getTCRawTotales();const p=[];if(t.usd>0.005)p.push(fmtUSD(t.usd));if(t.ars>0.5)p.push(fmtARS(t.ars));return p.join(' + ')||'$0';})()}</div><div class="mc-sub">${fmtUSD(data.deudaTC)} equiv.</div></div>
+    <div class="metric-card"><div class="mc-label">Deuda tarjeta</div><div class="mc-val red" style="font-size:clamp(16px,3vw,22px)">${(()=>{const t=getTCRawTotales();const p=[];if(t.usd>0.005)p.push(fmtUSD(t.usd));if(t.ars>0.5)p.push(fmtARS(t.ars));return p.join(' + ')||'$0';})()}</div><div class="mc-sub">${(()=>{const t=getTCRawTotales();const u=t.usd+t.ars/USD_ARS;return u>0.005?fmtUSD(u)+' equiv.':'';})()}</div></div>
     <div class="metric-card"><div class="mc-label">Balance neto</div><div class="mc-val ${bUSD>=0?'green':'red'}">${fmtARS(bUSD*USD_ARS)}</div><div class="mc-sub">${fmtUSD(bUSD)}</div></div>
     <div class="metric-card"><div class="mc-label">MQV proyectado</div><div class="mc-val purple">${fmtARS((bUSD+data.sueldo)*USD_ARS)}</div><div class="mc-sub">${fmtUSD(bUSD+data.sueldo)}</div></div>`;
   const entries=Object.entries(saldos).filter(([,v])=>v.usd>0).sort((a,b)=>b[1].usd-a[1].usd);
