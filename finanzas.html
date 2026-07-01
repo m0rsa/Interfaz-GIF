@@ -555,9 +555,9 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
     <div class="cotiz-label">Dólar libre</div>
     <div class="cotiz-row">
       <span>C</span>
-      <input class="cotiz-input" type="number" id="cotiz-c" placeholder="1455">
+      <input class="cotiz-input" type="text" inputmode="decimal" id="cotiz-c" placeholder="1455">
       <span>V</span>
-      <input class="cotiz-input" type="number" id="cotiz-v" placeholder="1475">
+      <input class="cotiz-input" type="text" inputmode="decimal" id="cotiz-v" placeholder="1475">
     </div>
     <div class="cotiz-prom" id="cotiz-prom"></div>
     <div id="cotiz-update-time" style="font-size:10px;color:var(--text3);font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-bottom:6px;min-height:14px"></div>
@@ -675,7 +675,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
         </div>
         <div class="grid-form-4">
           <div><label>Concepto</label><input type="text" id="in-concepto" placeholder="Sueldo, freelance..."></div>
-          <div><label id="in-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="in-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('in')"><div class="hint" id="in-hint"></div></div>
+          <div><label id="in-monto-lbl">Monto (USD)</label><input type="text" inputmode="decimal" id="in-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('in')"><div class="hint" id="in-hint"></div></div>
           <div><label>Categoría</label><select id="in-cat"><option>Sueldo</option><option>Freelance</option><option>Inversión</option><option>Repago</option><option>Otros</option></select></div>
           <div><label>Fecha</label><input type="date" id="in-fecha"></div>
         </div>
@@ -715,7 +715,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
             <div class="cur-toggle"><button class="active" id="tc-cur-usd" onclick="setCurTC('usd')">U$D</button><button id="tc-cur-ars" onclick="setCurTC('ars')">$ Pesos</button></div>
             <div class="grid-form-4">
               <div><label>Concepto</label><input type="text" id="tc-concepto" placeholder="Supermercado, Netflix..."></div>
-              <div><label id="tc-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="tc-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tc')"><div class="hint" id="tc-hint"></div></div>
+              <div><label id="tc-monto-lbl">Monto (USD)</label><input type="text" inputmode="decimal" id="tc-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tc')"><div class="hint" id="tc-hint"></div></div>
               <div><label>Cuotas</label><input type="number" inputmode="numeric" id="tc-cuotas" value="1" min="1" max="48" step="1"></div>
               <div><label>Fecha</label><input type="date" id="tc-fecha"></div>
             </div>
@@ -731,7 +731,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
             <div class="cur-toggle"><button class="active" id="tp-cur-usd" onclick="setCurTP('usd')">U$D</button><button id="tp-cur-ars" onclick="setCurTP('ars')">$ Pesos</button></div>
             <div class="grid-form-4">
               <div><label>Tarjeta a pagar</label><select id="tp-tarjeta" onchange="onTPtarjeta()"></select><div class="hint" id="tp-card-hint"></div></div>
-              <div><label id="tp-monto-lbl">Monto a pagar (USD)</label><input type="number" inputmode="decimal" id="tp-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tp')"><div class="hint" id="tp-hint"></div></div>
+              <div><label id="tp-monto-lbl">Monto a pagar (USD)</label><input type="text" inputmode="decimal" id="tp-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('tp')"><div class="hint" id="tp-hint"></div></div>
               <div><label>Fecha</label><input type="date" id="tp-fecha"></div>
               <div><label>Nota</label><input type="text" id="tp-nota" placeholder="Pago mínimo, total..."></div>
             </div>
@@ -752,7 +752,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
         </div>
         <div class="grid-form-4">
           <div><label>Concepto</label><input type="text" id="eg-concepto" placeholder="Alquiler, supermercado..."></div>
-          <div><label id="eg-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="eg-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('eg')"><div class="hint" id="eg-hint"></div></div>
+          <div><label id="eg-monto-lbl">Monto (USD)</label><input type="text" inputmode="decimal" id="eg-monto" placeholder="0" min="0" step="0.01" oninput="updateHint('eg')"><div class="hint" id="eg-hint"></div></div>
           <div><label>Categoría</label><select id="eg-cat"><option>Vivienda</option><option>Alimentación</option><option>Transporte</option><option>Salud</option><option>Entretenimiento</option><option>Servicios</option><option>Otros</option></select></div>
           <div><label>Fecha</label><input type="date" id="eg-fecha"></div>
         </div>
@@ -774,7 +774,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
       <div class="card">
         <div class="grid-form-3">
           <div><label>Instrumento</label><select id="ah-tipo" onchange="updateAhTipo()"></select></div>
-          <div><label id="ah-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="ah-monto" placeholder="0" step="0.01"></div>
+          <div><label id="ah-monto-lbl">Monto (USD)</label><input type="text" inputmode="decimal" id="ah-monto" placeholder="0" step="0.01"></div>
           <div><label>Tipo</label><select id="ah-mov"><option value="deposito">Depósito</option><option value="retiro">Retiro</option></select></div>
         </div>
         <div class="grid-form-2">
@@ -798,7 +798,7 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
           <button id="tr-cur-ars" onclick="setCurTR('ars')">$ Pesos</button>
         </div>
         <div class="grid-form-3">
-          <div><label id="tr-monto-lbl">Monto (USD)</label><input type="number" inputmode="decimal" id="tr-monto" placeholder="0" step="0.01" oninput="updateHint('tr')"><div class="hint" id="tr-hint"></div></div>
+          <div><label id="tr-monto-lbl">Monto (USD)</label><input type="text" inputmode="decimal" id="tr-monto" placeholder="0" step="0.01" oninput="updateHint('tr')"><div class="hint" id="tr-hint"></div></div>
           <div><label>Fecha</label><input type="date" id="tr-fecha"></div>
           <div><label>Nota (opcional)</label><input type="text" id="tr-nota" placeholder="Cambio de dólares..."></div>
         </div>
@@ -908,8 +908,8 @@ tbody tr:hover { background: rgba(157,92,245,0.05); box-shadow: inset 3px 0 0 rg
       <div class="section-title">Calculadora de interés compuesto</div>
       <div class="card">
         <div class="grid-form-4">
-          <div><label>Capital inicial (U$D)</label><input type="number" id="calc-capital" placeholder="1000" min="0" step="0.01" oninput="calcInteres()"></div>
-          <div><label>Tasa anual (%)</label><input type="number" id="calc-tasa" placeholder="12.00" min="0" step="0.1" oninput="calcInteres()"></div>
+          <div><label>Capital inicial (U$D)</label><input type="text" inputmode="decimal" id="calc-capital" placeholder="1000" oninput="calcInteres()"></div>
+          <div><label>Tasa anual (%)</label><input type="text" inputmode="decimal" id="calc-tasa" placeholder="12.00" oninput="calcInteres()"></div>
           <div><label>Período (meses)</label><input type="number" id="calc-periodo" placeholder="12" min="1" step="1" oninput="calcInteres()"></div>
           <div><label>Capitalización</label>
             <select id="calc-freq" onchange="calcInteres()">
@@ -1481,7 +1481,7 @@ function renderMQV(){
           <button onclick="setCurSueldo('usd')" style="font-size:11px;padding:3px 8px;border-radius:14px;border:1px solid var(--border2);background:${!isSueldoARS?'var(--text)':'transparent'};color:${!isSueldoARS?'var(--bg)':'var(--text2)'};cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif">U$D</button>
           <button onclick="setCurSueldo('ars')" style="font-size:11px;padding:3px 8px;border-radius:14px;border:1px solid var(--border2);background:${isSueldoARS?'var(--text)':'transparent'};color:${isSueldoARS?'var(--bg)':'var(--text2)'};cursor:pointer;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,Arial,sans-serif">$</button>
         </div>
-        <input type="number" value="${sueldoDisplay}" step="${isSueldoARS?'100':'0.01'}" style="width:110px;font-size:13px" oninput="updateSueldo(this.value)">
+        <input type="text" inputmode="decimal" value="${sueldoDisplay}" style="width:110px;font-size:13px" oninput="updateSueldo(this.value)">
       </div>
     </div>
   </div>`;
@@ -1868,7 +1868,7 @@ function renderTCHistorial(el){
     const montoVal=isAr?(+m.rawMonto||0).toFixed(2):(+m.usd||0).toFixed(2);
     const curOpts=`<option value="usd"${!isAr?' selected':''}>USD</option><option value="ars"${isAr?' selected':''}>$</option>`;
     const tarjOpts=['Visa','Mastercard','Amex'].map(t=>`<option value="${t}"${(m.tarjeta||'Visa')===t?' selected':''}>${t}</option>`).join('');
-    const base=`<input type="text" id="edr-tc-concepto-${m.id}" value="${(m.concepto||'').replace(/"/g,'&quot;')}" placeholder="Concepto" style="flex:2;min-width:120px"><input type="number" id="edr-tc-monto-${m.id}" value="${montoVal}" step="0.01" placeholder="Monto" style="flex:1;min-width:70px"><select id="edr-tc-cur-${m.id}" data-prev="${isAr?'ars':'usd'}" onchange="convTCcur(${m.id})" title="Moneda" style="flex:0 0 auto;min-width:62px">${curOpts}</select><input type="date" id="edr-tc-fecha-${m.id}" value="${m.fecha}" style="flex:1;min-width:120px"><select id="edr-tc-tarjeta-${m.id}" style="flex:1;min-width:100px">${tarjOpts}</select>`;
+    const base=`<input type="text" id="edr-tc-concepto-${m.id}" value="${(m.concepto||'').replace(/"/g,'&quot;')}" placeholder="Concepto" style="flex:2;min-width:120px"><input type="text" inputmode="decimal" id="edr-tc-monto-${m.id}" value="${montoVal}" placeholder="Monto" style="flex:1;min-width:70px"><select id="edr-tc-cur-${m.id}" data-prev="${isAr?'ars':'usd'}" onchange="convTCcur(${m.id})" title="Moneda" style="flex:0 0 auto;min-width:62px">${curOpts}</select><input type="date" id="edr-tc-fecha-${m.id}" value="${m.fecha}" style="flex:1;min-width:120px"><select id="edr-tc-tarjeta-${m.id}" style="flex:1;min-width:100px">${tarjOpts}</select>`;
     if(m.tipo==='pago'){
       const ctaOpts=INSTRUMENTOS.map(c=>`<option value="${c}"${(m.cuenta||'')===c?' selected':''}>${c}</option>`).join('');
       return `<div class="edit-date-row" id="edr-tc-${m.id}">${base}<select id="edr-tc-cuenta-${m.id}" title="Cuenta" style="flex:1;min-width:110px">${ctaOpts}</select><button class="btn sm primary" onclick="saveEditTC(${m.id})">✓</button></div>`;
@@ -2165,7 +2165,7 @@ function renderPresupuestos(){
     return `<div style="margin-bottom:13px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px">
         <span style="font-size:12px;font-weight:600;color:var(--text2)"><b style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${c};margin-right:6px"></b>${cat}</span>
-        <span style="font-size:11px;color:var(--text3);white-space:nowrap">${fmtARS(gas)} / <input type="number" value="${pres||''}" placeholder="0" min="0" onchange="setPresupuesto('${cat}',this.value)" style="width:84px;padding:3px 6px;font-size:11px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);text-align:right;font-family:'SF Mono',ui-monospace,monospace"></span>
+        <span style="font-size:11px;color:var(--text3);white-space:nowrap">${fmtARS(gas)} / <input type="text" inputmode="decimal" value="${pres||''}" placeholder="0" onchange="setPresupuesto('${cat}',this.value)" style="width:84px;padding:3px 6px;font-size:11px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);text-align:right;font-family:'SF Mono',ui-monospace,monospace"></span>
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${col}"></div></div>
       <div style="font-size:10px;color:var(--text3);margin-top:3px">${sub}</div>
@@ -2223,7 +2223,7 @@ function renderRecurForm(){
     <div style="display:flex;gap:6px;margin-bottom:10px">${tipoBtn('ingreso','Ingreso')}${tipoBtn('egreso','Egreso')}${tipoBtn('tc','Tarjeta')}</div>
     <div style="margin-bottom:10px"><label>Concepto</label><input type="text" id="rc-concepto" placeholder="Ej: Alquiler" value="${prev.concepto.replace(/"/g,'&quot;')}"></div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
-      <div style="flex:2"><label>Monto</label><input type="number" id="rc-monto" placeholder="0" min="0" step="0.01" value="${prev.monto}"></div>
+      <div style="flex:2"><label>Monto</label><input type="text" inputmode="decimal" id="rc-monto" placeholder="0" value="${prev.monto}"></div>
       <div style="flex:1"><label>Moneda</label><select id="rc-cur"><option value="usd"${prev.cur==='usd'?' selected':''}>USD</option><option value="ars"${prev.cur==='ars'?' selected':''}>$</option></select></div>
       <div style="flex:1"><label>Día</label><input type="number" id="rc-dia" min="1" max="31" value="${prev.dia}"></div>
     </div>
@@ -3089,7 +3089,7 @@ function openEditModal(tipo, id) {
       ? Math.round(item.rawCur === 'ars' ? item.rawMonto : item.usd * USD_ARS)
       : (item.rawCur === 'usd' ? item.rawMonto : item.usd);
     fields = `<div style="margin-bottom:14px"><label>Concepto</label><input type="text" id="em-concepto" value="${(item.concepto||'').replace(/"/g,'&quot;')}"></div>
-      <div style="margin-bottom:14px"><div class="cur-toggle" style="margin-bottom:8px"><button class="${!isCurARS?'active':''}" id="em-cur-usd" onclick="setCurEdit('usd')">U$D</button><button class="${isCurARS?'active':''}" id="em-cur-ars" onclick="setCurEdit('ars')">$ Pesos</button></div><label id="em-monto-lbl">Monto (${isCurARS?'$':'USD'})</label><input type="number" inputmode="decimal" id="em-monto" value="${displayMonto}" step="${isCurARS?'1':'0.01'}"></div>
+      <div style="margin-bottom:14px"><div class="cur-toggle" style="margin-bottom:8px"><button class="${!isCurARS?'active':''}" id="em-cur-usd" onclick="setCurEdit('usd')">U$D</button><button class="${isCurARS?'active':''}" id="em-cur-ars" onclick="setCurEdit('ars')">$ Pesos</button></div><label id="em-monto-lbl">Monto (${isCurARS?'$':'USD'})</label><input type="text" inputmode="decimal" id="em-monto" value="${displayMonto}" step="${isCurARS?'1':'0.01'}"></div>
       <div style="margin-bottom:14px"><label>Categoría</label><select id="em-cat">${cats.map(c=>`<option${c===item.cat?' selected':''}>${c}</option>`).join('')}</select></div>
       <div style="margin-bottom:14px"><label>Cuenta</label><select id="em-cuenta">${INSTRUMENTOS.map(inst=>`<option value="${inst}"${inst===item.cuenta?' selected':''}>${inst}</option>`).join('')}</select></div>
       <div style="margin-bottom:14px"><label>Fecha</label><input type="date" id="em-fecha" value="${item.fecha}"></div>
@@ -3098,7 +3098,7 @@ function openEditModal(tipo, id) {
     const isARS = ARS_INSTR.has(item.tipo);
     const displayMonto = isARS ? Math.round(item.ars || 0) : item.usd;
     fields = `<div style="margin-bottom:14px"><label>Instrumento</label><select id="em-ah-tipo" onchange="updateEditAhTipo()">${INSTRUMENTOS.map(i=>`<option value="${i}"${i===item.tipo?' selected':''}>${i}</option>`).join('')}</select></div>
-      <div style="margin-bottom:14px"><label id="em-ah-monto-lbl">Monto (${isARS?'$':'USD'})</label><input type="number" inputmode="decimal" id="em-ah-monto" value="${displayMonto}" step="${isARS?'1':'0.01'}"></div>
+      <div style="margin-bottom:14px"><label id="em-ah-monto-lbl">Monto (${isARS?'$':'USD'})</label><input type="text" inputmode="decimal" id="em-ah-monto" value="${displayMonto}" step="${isARS?'1':'0.01'}"></div>
       <div style="margin-bottom:14px"><label>Tipo</label><select id="em-ah-mov"><option value="deposito"${item.mov==='deposito'?' selected':''}>Depósito</option><option value="retiro"${item.mov==='retiro'?' selected':''}>Retiro</option></select></div>
       <div style="margin-bottom:14px"><label>Fecha</label><input type="date" id="em-ah-fecha" value="${item.fecha}"></div>
       <div style="margin-bottom:14px"><label>Nota (opcional)</label><input type="text" id="em-ah-nota" value="${(item.nota||'').replace(/"/g,'&quot;')}"></div>`;
@@ -3176,6 +3176,21 @@ function saveEditModal() {
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEditModal(); });
+
+/* ── NORMALIZAR DECIMALES (celular: acepta coma o punto) ──
+   Los inputs de monto son type=text inputmode=decimal para que la coma
+   llegue al JS (type=number la descarta en locales con coma). Este handler
+   convierte ',' → '.' y limpia caracteres inválidos mientras se escribe,
+   así todos los parseFloat existentes siguen funcionando sin cambios. */
+document.addEventListener('input', e=>{
+  const t=e.target;
+  if(!t||t.tagName!=='INPUT'||t.getAttribute('inputmode')!=='decimal') return;
+  const v=t.value;
+  let nv=v.replace(/,/g,'.').replace(/[^0-9.]/g,'');
+  const i=nv.indexOf('.');
+  if(i>=0) nv=nv.slice(0,i+1)+nv.slice(i+1).replace(/\./g,''); // un solo punto
+  if(nv!==v){ const p=t.selectionStart; t.value=nv; try{ t.setSelectionRange(p,p); }catch(_){} }
+}, true); // captura: corre antes de updateHint()
 
 /* ── CUSTOM DATE PICKER (reemplaza el calendario nativo, mismo tema) ── */
 const _dp = { input: null, view: null, el: null };
