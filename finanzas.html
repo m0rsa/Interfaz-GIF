@@ -151,6 +151,29 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgb
 select option { background: var(--surface2); }
 .hint { font-size: 11px; color: var(--text3); margin-top: 4px; min-height: 16px; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
 
+/* ── DATE INPUT + CUSTOM PICKER ── */
+input[type=date] { padding-right: 38px; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%239D5CF5'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Crect%20x='3'%20y='4'%20width='18'%20height='18'%20rx='2'/%3E%3Cline%20x1='16'%20y1='2'%20x2='16'%20y2='6'/%3E%3Cline%20x1='8'%20y1='2'%20x2='8'%20y2='6'/%3E%3Cline%20x1='3'%20y1='10'%20x2='21'%20y2='10'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; }
+input[type=date]::-webkit-calendar-picker-indicator { opacity: 0; display: none; -webkit-appearance: none; }
+input[type=date]::-webkit-inner-spin-button, input[type=date]::-webkit-clear-button { display: none; }
+.dp-pop { position: fixed; z-index: 100000; width: 268px; background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; padding: 14px; box-shadow: 0 16px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04); font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; display: none; }
+.dp-pop.open { display: block; animation: dpIn 0.13s ease; }
+@keyframes dpIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.dp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.dp-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; text-transform: capitalize; }
+.dp-nav { width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--border2); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: all 0.14s; font-family: inherit; }
+.dp-nav:hover { background: var(--blue); color: #fff; border-color: transparent; transform: translateY(-1px); }
+.dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.dp-dow { font-size: 9.5px; font-weight: 800; color: var(--text3); text-align: center; padding: 3px 0 6px; text-transform: uppercase; letter-spacing: 0.03em; }
+.dp-day { aspect-ratio: 1; border: none; background: transparent; color: var(--text); font-size: 12.5px; border-radius: 9px; cursor: pointer; transition: background 0.12s, color 0.12s; font-family: inherit; padding: 0; }
+.dp-day:hover { background: var(--surface3); }
+.dp-day.other { color: var(--text3); opacity: 0.45; }
+.dp-day.today { box-shadow: inset 0 0 0 1.5px var(--blue-border); color: var(--blue); font-weight: 700; }
+.dp-day.sel { background: var(--blue); color: #fff; font-weight: 700; box-shadow: 0 2px 10px rgba(157,92,245,0.4); }
+.dp-day.sel:hover { background: var(--blue-hover); }
+.dp-foot { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.dp-foot button { flex: 1; font-size: 11.5px; padding: 8px; border-radius: 9px; border: 1px solid var(--border2); background: var(--surface2); color: var(--text2); cursor: pointer; font-family: inherit; font-weight: 600; transition: all 0.14s; }
+.dp-foot button:hover { background: var(--surface3); color: var(--text); }
+
 /* ── BUTTONS ── */
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border2); background: var(--surface2); color: var(--text); transition: all 0.16s; font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.01em; }
 .btn:hover { background: var(--surface3); transform: translateY(-1px); }
@@ -3153,6 +3176,71 @@ function saveEditModal() {
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEditModal(); });
+
+/* ── CUSTOM DATE PICKER (reemplaza el calendario nativo, mismo tema) ── */
+const _dp = { input: null, view: null, el: null };
+function _dpParse(s){ if(!s||!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null; const [y,m,d]=s.split('-').map(Number); const dt=new Date(y,m-1,d); return isNaN(dt)?null:dt; }
+function _dpFmt(dt){ return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`; }
+function _dpBuild(){
+  if(_dp.el) return _dp.el;
+  const el=document.createElement('div'); el.className='dp-pop';
+  el.addEventListener('mousedown', e=>e.preventDefault()); // no robar/perder foco al clickear
+  el.addEventListener('click', e=>{
+    const nav=e.target.closest('[data-nav]');
+    if(nav){ _dp.view.setMonth(_dp.view.getMonth()+ +nav.dataset.nav); _dpRender(); _dpPos(); return; }
+    const act=e.target.closest('[data-act]');
+    if(act){ _dpSet(act.dataset.act==='today'?_dpFmt(new Date()):''); return; }
+    const day=e.target.closest('.dp-day');
+    if(day) _dpSet(day.dataset.d);
+  });
+  document.body.appendChild(el); _dp.el=el; return el;
+}
+function _dpSet(val){
+  const inp=_dp.input; if(!inp) return;
+  inp.value=val;
+  inp.dispatchEvent(new Event('input',{bubbles:true}));
+  inp.dispatchEvent(new Event('change',{bubbles:true}));
+  closeDatePicker();
+}
+function _dpRender(){
+  const el=_dpBuild(), v=_dp.view, y=v.getFullYear(), mo=v.getMonth();
+  const sel=_dpParse(_dp.input.value), today=new Date();
+  const same=(a,b)=>a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+  const monthName=v.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+  let start=(new Date(y,mo,1).getDay()+6)%7; // lunes primero
+  const dim=new Date(y,mo+1,0).getDate(), prevDim=new Date(y,mo,0).getDate();
+  const dows=['lun','mar','mié','jue','vie','sáb','dom'];
+  let cells='';
+  for(let i=0;i<start;i++){ const d=prevDim-start+1+i; cells+=`<button class="dp-day other" data-d="${_dpFmt(new Date(y,mo-1,d))}">${d}</button>`; }
+  for(let d=1;d<=dim;d++){ const dt=new Date(y,mo,d); const c=['dp-day']; if(same(dt,today))c.push('today'); if(same(dt,sel))c.push('sel'); cells+=`<button class="${c.join(' ')}" data-d="${_dpFmt(dt)}">${d}</button>`; }
+  const trail=(7-(start+dim)%7)%7;
+  for(let i=1;i<=trail;i++){ cells+=`<button class="dp-day other" data-d="${_dpFmt(new Date(y,mo+1,i))}">${i}</button>`; }
+  el.innerHTML=`<div class="dp-head"><button class="dp-nav" data-nav="-1">‹</button><div class="dp-title">${monthName}</div><button class="dp-nav" data-nav="1">›</button></div>`+
+    `<div class="dp-grid">${dows.map(d=>`<div class="dp-dow">${d}</div>`).join('')}${cells}</div>`+
+    `<div class="dp-foot"><button data-act="today">Hoy</button><button data-act="clear">Limpiar</button></div>`;
+}
+function _dpPos(){
+  const el=_dp.el, r=_dp.input.getBoundingClientRect();
+  el.style.visibility='hidden'; el.classList.add('open');
+  const w=el.offsetWidth, h=el.offsetHeight;
+  let left=r.left, top=r.bottom+6;
+  if(left+w>window.innerWidth-8) left=window.innerWidth-8-w;
+  if(left<8) left=8;
+  if(top+h>window.innerHeight-8 && r.top-6-h>8) top=r.top-6-h;
+  el.style.left=left+'px'; el.style.top=top+'px'; el.style.visibility='';
+}
+function openDatePicker(input){
+  _dp.input=input;
+  const cur=_dpParse(input.value)||new Date();
+  _dp.view=new Date(cur.getFullYear(),cur.getMonth(),1);
+  _dpRender(); _dpPos(); _dp.el.classList.add('open');
+}
+function closeDatePicker(){ if(_dp.el) _dp.el.classList.remove('open'); _dp.input=null; }
+document.addEventListener('focusin', e=>{ const t=e.target; if(t&&t.matches&&t.matches('input[type=date]')) openDatePicker(t); });
+document.addEventListener('mousedown', e=>{ if(_dp.el&&_dp.el.classList.contains('open')&&!_dp.el.contains(e.target)&&e.target!==_dp.input) closeDatePicker(); }, true);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDatePicker(); });
+window.addEventListener('scroll', ()=>closeDatePicker(), true);
+window.addEventListener('resize', ()=>closeDatePicker());
 
 checkAuth();
 </script>
